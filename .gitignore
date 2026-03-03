@@ -90,3 +90,5 @@ Xyce
 
 # Other
 uv.lock
+
+tests/simulation
