@@ -1,7 +1,7 @@
 site_name: OpenS Suite Documentation
 
 theme:
-  name: material
+  logo: launcher.png
 
 plugins:
   - search
