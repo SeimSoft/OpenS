@@ -52,13 +52,17 @@ jobs:
           # Safely extract coverage percentage
           COV_RAW=$(uv run coverage report | grep '^TOTAL' | awk '{print $4}' | tr -d '%' || true)
           if [[ "$COV_RAW" =~ ^[0-9]+$ ]]; then COV="$COV_RAW"; else COV="0"; fi
-          uv run anybadge -l coverage -v $COV -s "%" -m 50=red:60=orange:80=yellow:100=green -f docs/badges/coverage.svg -o
+          if [ "$COV" -ge 80 ]; then COLOR="brightgreen"; elif [ "$COV" -ge 60 ]; then COLOR="yellow"; elif [ "$COV" -ge 50 ]; then COLOR="orange"; else COLOR="red"; fi
+          curl -s "https://img.shields.io/badge/coverage-${COV}%25-${COLOR}" -o docs/badges/coverage.svg
 
           # Safely extract Pylint score
           uv run pylint src/opens_suite | tee pylint.txt || true
           SCORE_RAW=$(grep -Eo 'Your code has been rated at [-0-9.]+/10' pylint.txt | grep -Eo '[-0-9.]+' | head -1 || true)
           if [[ "$SCORE_RAW" =~ ^[-0-9.]+$ ]]; then SCORE="$SCORE_RAW"; else SCORE="0"; fi
-          uv run anybadge -l pylint -v $SCORE -s "/10" -m 5=red:7=orange:9=yellow:10=green -f docs/badges/pylint.svg -o
+          SCORE_INT=${SCORE%.*}
+          if [[ ! "$SCORE_INT" =~ ^[-0-9]+$ ]]; then SCORE_INT="0"; fi
+          if [ "$SCORE_INT" -ge 9 ]; then COLOR="brightgreen"; elif [ "$SCORE_INT" -ge 7 ]; then COLOR="yellow"; elif [ "$SCORE_INT" -ge 5 ]; then COLOR="orange"; else COLOR="red"; fi
+          curl -s "https://img.shields.io/badge/pylint-${SCORE}/10-${COLOR}" -o docs/badges/pylint.svg
 
       - name: Build MkDocs Site
         run: uv run zensical build

@@ -27,7 +27,6 @@ packages = ["src/opens_suite"]
 
 [dependency-groups]
 dev = [
-    "anybadge>=1.16.0",
     "mkdocstrings[python]>=0.26.1",
     "pylint>=3.2.7",
     "pytest>=8.3.5",
