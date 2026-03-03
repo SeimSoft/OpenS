@@ -36,11 +36,28 @@ jobs:
       - name: Setup Python
         run: uv python install 3.11
 
+      - name: Install System Dependencies for PyQt
+        run: sudo apt-get update && sudo apt-get install -y xvfb libegl1 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xfixes0 libxcb-xinerama0
+
       - name: Install Dependencies
         run: uv sync
 
+      - name: Generate Badges
+        run: |
+          mkdir -p docs/badges
+          xvfb-run -a uv run pytest --cov=src/opens_suite --cov-report=xml tests/ || true
+          COV=$(uv run coverage report | grep TOTAL | awk '{print $4}' | sed 's/%//') || echo "0"
+          if [ -z "$COV" ]; then COV="0"; fi
+          uv run anybadge -l coverage -v $COV -s "%" -m 50=red:60=orange:80=yellow:100=green -f docs/badges/coverage.svg -o
+
+          uv run pylint src/opens_suite | tee pylint.txt || true
+          SCORE=$(grep -Eo 'Your code has been rated at [-0-9.]+/10' pylint.txt | grep -o '[-0-9.]*' | head -1) || echo "0"
+          if [ -z "$SCORE" ]; then SCORE="0"; fi
+          uv run anybadge -l pylint -v $SCORE -s "/10" -m 5=red:7=orange:9=yellow:10=green -f docs/badges/pylint.svg -o
+
       - name: Build MkDocs Site
         run: uv run mkdocs build
+
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
