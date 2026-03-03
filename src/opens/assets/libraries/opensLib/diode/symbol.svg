@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="40" viewBox="0 0 60 40">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="MODEL" value="D" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="SUPPORTS_CURRENT" value="True" />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="D" bindkey="d" category="Passives" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="D{name} {pin_anode} {pin_cathode} {MODEL}" />
+  </defs>
+  <!-- Diode symbol (triangle pointing right, bar at cathode) -->
+  <!-- Lead from left pin to triangle -->
+  <path class="symbol" d="M 0 20 L 12 20" />
+  <!-- Triangle (anode) -->
+  <path class="symbol" d="M 12 8 L 42 20 L 12 32 Z" />
+  <!-- Cathode bar and lead to right pin -->
+  <path class="symbol" d="M 42 10 L 42 30" />
+  <path class="symbol" d="M 42 20 L 60 20" />
+
+  <!-- Pins (placed on 10-px grid, center at y=20) -->
+  <circle class="pin" id="pin_anode" cx="0" cy="20" r="2" />
+  <circle class="pin" id="pin_cathode" cx="60" cy="20" r="2" />
+
+  <!-- Text Placeholders -->
+  <text x="0" y="6" class="label">{name}</text>
+  <text x="0" y="36" class="value">{MODEL}</text>
+  <text x="30" y="6" class="value" style="fill: green;">{D{name}:i}</text>
+</svg>

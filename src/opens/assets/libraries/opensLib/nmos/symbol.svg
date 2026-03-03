@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 100 100">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="MODEL" value="MN" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="L" value="1u" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="W" value="10u" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="M" value="1" />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="M" bindkey="n" category="Transistors" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="M{name} {pin_d} {pin_g} {pin_s} {pin_b} {MODEL} L={L} W={W} m={M}" />
+  </defs>
+  <!-- NMOS: gate (left vertical), channel (two vertical lines), drain/source vertical extensions, bulk arrow -->
+  <!-- Using 0..100 coordinate space to match a typical nice-looking transistor drawing -->
+  <!-- Left gate connection -->
+  <line class="symbol" x1="10" y1="50" x2="35" y2="50" />
+  <!-- Gate vertical thin line -->
+  <line class="symbol" x1="35" y1="30" x2="35" y2="70" stroke-width="1" />
+  <!-- Channel (two vertical lines) -->
+  <line class="symbol" x1="42" y1="30" x2="42" y2="70" />
+
+  <!-- Drain path up/right and source path down/right -->
+  <polyline class="symbol" points="42,35 60,35 60,10" fill="none" />
+  <polyline class="symbol" points="42,65 60,65 60,90" fill="none" />
+
+  <!-- Bulk arrow (triangle) to indicate body connection near source side -->
+  <polygon fill="black"  points="52,60 52,70 60,65" />
+
+  <polygon fill="black"  points="50,63 50,57 43,60" />
+  <!-- Bulk connection-->
+  <line class="symbol" x1="43" y1="60" x2="70" y2="60" />
+
+  <!-- Pins (grid-aligned to 10px grid in 0..100 space) -->
+  <circle class="pin" id="pin_g" cx="10" cy="50" r="2" />
+  <circle class="pin" id="pin_d" cx="60" cy="10" r="2" />
+  <circle class="pin" id="pin_s" cx="60" cy="90" r="2" />
+  <!-- Bulk pin at triangle center area -->
+  <circle class="pin" id="pin_b" cx="70" cy="60" r="2" />
+
+  <text x="75" y="10" class="label">{name}</text>
+  <text x="75" y="30" class="value">{MODEL}</text>
+</svg>

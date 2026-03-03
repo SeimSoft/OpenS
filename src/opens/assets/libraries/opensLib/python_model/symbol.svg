@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80" viewBox="0 0 120 80">
+  <defs>
+    <style>
+      .symbol { fill: #eef; stroke: blue; stroke-width: 1; }
+      .label { font-family: Arial; font-size: 9px; fill: blue; font-weight: bold; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="MODEL_NAME" value="py_res" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="MODULE" value="test_module" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="CLASS" value="attiny13_model" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="PYTHONPATH" value="." />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix=".model" bindkey="" category="Python" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template=".model {MODEL_NAME} npy MODULE={MODULE} CLASS={CLASS} PYTHONPATH={PYTHONPATH}" />
+  </defs>
+  
+  <rect class="symbol" x="5" y="5" width="110" height="70" rx="4" ry="4" />
+  <text x="10" y="20" class="label">Python Model: {MODEL_NAME}</text>
+  <text x="10" y="35" class="value">Module: {MODULE}</text>
+  <text x="10" y="50" class="value">Class: {CLASS}</text>
+  <text x="10" y="65" class="value">Path: {PYTHONPATH}</text>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="40" viewBox="-10 -20 100 40">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: red; stroke: red; stroke-width: 1; }
+    </style>
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="PIN" category="IO" bindkey="o" />
+    <opens:pin xmlns:opens="http://opens-schematic.org" id="pin_1" net="{name}" />
+  </defs>
+  <!-- Output Pin Symbol: Connection at 0,0. Pointer points away from wire to the right. -->
+  <polygon class="symbol" points="0,-5 8,-5 20,0 8,5 0,5" />
+  <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
+  
+  <!-- Label: Anchor at 25, left-aligned. Baseline centered. -->
+  <text x="25" y="4" font-size="12px" fill="red" text-anchor="start">{name}</text>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="60" viewBox="0 0 40 60">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="V1" value="0" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="V2" value="5" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="TD" value="0" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="TR" value="1n" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="TF" value="1n" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="PW" value="1u" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="PER" value="2u" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="SUPPORTS_CURRENT" value="True" />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="V" bindkey="p" category="Sources" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="V{name} {pin_plus} {pin_minus} PULSE({V1} {V2} {TD} {TR} {TF} {PW} {PER})" />
+  </defs>
+  <!-- Pulse Source -->
+  <circle class="symbol" cx="20" cy="30" r="15" />
+  <path class="symbol" d="M 20 0 L 20 15" stroke-linecap="round"/>
+  <path class="symbol" d="M 20 45 L 20 60" stroke-linecap="round"/>
+
+  <!-- Square wave glyph inside the circle -->
+  <path class="symbol" d="M 10 35 L 15 35 L 15 25 L 25 25 L 25 35 L 30 35" stroke-linejoin="miter"/>
+
+  <!-- Pins (top and bottom) -->
+  <circle class="pin" id="pin_plus" cx="20" cy="0" r="2" />
+  <circle class="pin" id="pin_minus" cx="20" cy="60" r="2" />
+
+  <!-- Text Placeholders -->
+  <text x="35" y="25" class="label">{name}</text>
+  <text x="35" y="45" class="value">PULSE</text>
+  <text x="35" y="60" class="value" style="fill: green;">{V{name}:i}</text>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="40" viewBox="0 0 60 40">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; fill: none; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="L" value="1m" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="RSER" value="0.1" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="SUPPORTS_CURRENT" value="True" />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="L" bindkey="l" category="Passives" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="L{name} {pin_1} int_{name} {L}&#10;R{name}_ser int_{name} {pin_2} {RSER}" />
+  </defs>
+  <!-- Inductor Coils (3 Semicircles) -->
+  <path class="symbol" d="M 0 20 L 10 20" />
+  <path class="symbol" d="M 10 20 A 6.5 6.5 0 0 1 23 20" />
+  <path class="symbol" d="M 23 20 A 6.5 6.5 0 0 1 36 20" />
+  <path class="symbol" d="M 36 20 A 6.5 6.5 0 0 1 49 20" />
+  <path class="symbol" d="M 49 20 L 60 20" />
+  
+  <!-- Pins -->
+  <circle class="pin" id="pin_1" cx="0" cy="20" r="2" />
+  <circle class="pin" id="pin_2" cx="60" cy="20" r="2" />
+
+  <!-- Text Placeholders -->
+  <text x="0" y="0" class="label">{name}</text>
+  <text x="0" y="38" class="value">L={L}</text>
+  <text x="30" y="38" class="value">Rs={RSER}</text>
+  <text x="35" y="0" class="value" style="fill: green;">{L{name}:i}</text>
+</svg>

@@ -1,0 +1,16 @@
+<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg" xmlns:opens="http://opens-schematic.org">
+  <!-- A simple rectangle with some text for the script symbol -->
+  <!-- No pins -->
+  <rect x="0" y="0" width="60" height="60" fill="none" stroke="black" stroke-width="2"/>
+  <rect x="10" y="10" width="40" height="40" fill="#f0f0f0" stroke="black" stroke-width="1"/>
+  <text x="30" y="30" font-family="Arial" font-size="12" text-anchor="middle" dominant-baseline="middle">Jupyter</text>
+  <text x="30" y="45" font-family="Arial" font-size="10" text-anchor="middle" dominant-baseline="middle">{SCRIPT}</text>
+
+  <!-- Run Button -->
+  <rect class="script-run-button" id="run-btn" x="42" y="3" width="15" height="15" fill="#4caf50" stroke="black" stroke-width="1" rx="2" ry="2" opens:action="run"/>
+  <path d="M46,6 L53,10.5 L46,15 Z" fill="white" pointer-events="none"/>
+
+  <!-- Parameters -->
+  <opens:param name="SCRIPT" value="design_script.ipynb"/>
+  <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="SCRIPT" category="Python" />
+</svg>

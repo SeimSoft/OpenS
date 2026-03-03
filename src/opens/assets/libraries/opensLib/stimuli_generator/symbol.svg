@@ -1,0 +1,19 @@
+<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg" xmlns:opens="http://opens-schematic.org">
+  <!-- Stimuli Generator Symbol -->
+  <rect x="0" y="0" width="60" height="60" fill="none" stroke="black" stroke-width="2"/>
+  <rect x="10" y="10" width="40" height="40" fill="#e3f2fd" stroke="#1976d2" stroke-width="1"/>
+  
+  <!-- Waveform Icon -->
+  <path d="M15,35 L20,35 L25,20 L30,40 L35,25 L40,35 L45,35" fill="none" stroke="#1976d2" stroke-width="2"/>
+  
+  <text x="30" y="24" font-family="Arial" font-size="8" text-anchor="middle" dominant-baseline="middle" fill="#1976d2">Stimuli</text>
+  <text x="30" y="48" font-family="Arial" font-size="7" text-anchor="middle" dominant-baseline="middle" fill="#333">{SCRIPT}</text>
+
+  <!-- Run Button (Play Icon) -->
+  <rect class="script-run-button" id="run-btn" x="42" y="3" width="15" height="15" fill="#4caf50" stroke="black" stroke-width="1" rx="2" ry="2" opens:action="run"/>
+  <path d="M46,6 L53,10.5 L46,15 Z" fill="white" pointer-events="none"/>
+
+  <!-- Parameters -->
+  <opens:param name="SCRIPT" value="stimuli.ipynb"/>
+  <opens:symbol prefix="STIM" category="Stimuli"/>
+</svg>

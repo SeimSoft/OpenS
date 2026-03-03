@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .core { fill: none; stroke: black; stroke-width: 1; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="LP" value="1m" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="LS" value="1m" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="K" value="0.99" />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="TX" bindkey="t" category="Passives" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="LP{name} {pin_p1} {pin_p2} {LP}&#10;LS{name} {pin_s1} {pin_s2} {LS}&#10;K{name} LP{name} LS{name} {K}" />
+  </defs>
+
+  <!-- Primary Winding (Vertical Coils) -->
+  <path class="symbol" d="M 0 20 L 20 20" />
+  <path class="symbol" d="M 20 20 A 5 5 0 0 1 20 30" />
+  <path class="symbol" d="M 20 30 A 5 5 0 0 1 20 40" />
+  <path class="symbol" d="M 20 40 A 5 5 0 0 1 20 50" />
+  <path class="symbol" d="M 20 50 A 5 5 0 0 1 20 60" />
+  <path class="symbol" d="M 20 60 L 0 60" />
+
+  <!-- Core lines -->
+  <line class="core" x1="37" y1="20" x2="37" y2="60" />
+  <line class="core" x1="43" y1="20" x2="43" y2="60" />
+
+  <!-- Secondary Winding (Vertical Coils) -->
+  <path class="symbol" d="M 80 20 L 60 20" />
+  <path class="symbol" d="M 60 20 A 5 5 0 0 0 60 30" />
+  <path class="symbol" d="M 60 30 A 5 5 0 0 0 60 40" />
+  <path class="symbol" d="M 60 40 A 5 5 0 0 0 60 50" />
+  <path class="symbol" d="M 60 50 A 5 5 0 0 0 60 60" />
+  <path class="symbol" d="M 60 60 L 80 60" />
+
+  <!-- Pins -->
+  <circle class="pin" id="pin_p1" cx="0" cy="20" r="2" />
+  <circle class="pin" id="pin_p2" cx="0" cy="60" r="2" />
+  <circle class="pin" id="pin_s1" cx="80" cy="20" r="2" />
+  <circle class="pin" id="pin_s2" cx="80" cy="60" r="2" />
+
+  <!-- Text Placeholders -->
+  <text x="5" y="10" class="label">{name}</text>
+  <text x="5" y="75" class="value">K={K}</text>
+  <text x="30" y="10" class="value">P:{LP}</text>
+  <text x="30" y="75" class="value">S:{LS}</text>
+</svg>

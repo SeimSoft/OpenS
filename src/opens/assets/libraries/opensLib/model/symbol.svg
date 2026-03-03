@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="60" viewBox="0 0 100 60">
+  <defs>
+    <style>
+      .symbol { fill: none; stroke: black; stroke-width: 1; }
+      .label { font-family: Arial; font-size: 9px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="MODELNAME" value="MYMOD" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="TYPE" value="D" />
+    <!-- ARGS contains parameters; Types: D (Diode), NPN/PNP (BJT), NMOS/PMOS (MOSFET) -->
+    <opens:param xmlns:opens="http://opens-schematic.org" name="ARGS" value="(IS=1e-14 N=1 RS=0)" />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix=".model" bindkey="" category="Misc" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template=".model {MODELNAME} {TYPE} {ARGS}" />
+  </defs>
+  <!-- Simple box representing model entry -->
+  <rect class="symbol" x="5" y="5" width="90" height="50" rx="4" ry="4" />
+  <text x="10" y="20" class="label">Model: {MODELNAME}</text>
+  <text x="10" y="34" class="value">Type: {TYPE}</text>
+  <text x="10" y="46" class="value">Args: {ARGS}</text>
+</svg>

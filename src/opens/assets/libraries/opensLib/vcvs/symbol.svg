@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="80" viewBox="0 0 100 80">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .plus { stroke: black; stroke-width: 1; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="GAIN" value="1" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="V_MIN" value="-15" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="V_MAX" value="15" />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="B" category="Sources" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="B{name} {pin_plus} {pin_minus} V={{LIMIT(V({pin_ctrl_plus},{pin_ctrl_minus})*{GAIN}, {V_MIN}, {V_MAX})}}" />
+  </defs>
+  
+  <!-- VCVS Output Diamond -->
+  <polygon class="symbol" points="60,20 80,40 60,60 40,40" />
+  <path class="symbol" d="M 60 0 L 60 20" stroke-linecap="round"/>
+  <path class="symbol" d="M 60 60 L 60 80" stroke-linecap="round"/>
+  
+  <!-- Diamond + and - -->
+  <text x="56" y="32" class="value" style="font-size:10px">+</text>
+  <text x="56" y="55" class="value" style="font-size:10px">-</text>
+
+  <!-- VCVS Input Ports -->
+  <path class="symbol" d="M 0 20 L 20 20" stroke-linecap="round"/>
+  <circle class="symbol" cx="22" cy="20" r="2" />
+  <text x="25" y="24" class="value" style="font-size:10px">+</text>
+
+  <path class="symbol" d="M 0 60 L 20 60" stroke-linecap="round"/>
+  <circle class="symbol" cx="22" cy="60" r="2" />
+  <text x="26" y="63" class="value" style="font-size:10px">-</text>
+
+  <!-- Pins -->
+  <!-- Output -->
+  <circle class="pin" id="pin_plus" cx="60" cy="0" r="2" />
+  <circle class="pin" id="pin_minus" cx="60" cy="80" r="2" />
+  <!-- Input -->
+  <circle class="pin" id="pin_ctrl_plus" cx="0" cy="20" r="2" />
+  <circle class="pin" id="pin_ctrl_minus" cx="0" cy="60" r="2" />
+
+  <!-- Text Placeholders -->
+  <text x="80" y="25" class="label">{name}</text>
+  <text x="80" y="40" class="value">G={GAIN}</text>
+  <text x="80" y="50" class="value">min={V_MIN}</text>
+  <text x="80" y="60" class="value">max={V_MAX}</text>
+</svg>

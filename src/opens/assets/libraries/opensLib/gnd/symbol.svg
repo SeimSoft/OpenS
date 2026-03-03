@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+    </style>
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="GND" bindkey="g" category="Misc" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="" />
+    <opens:pin xmlns:opens="http://opens-schematic.org" id="pin_1" net="0" />
+  </defs>
+  
+  <!-- Ground Symbol (Triangle) -->
+  <path class="symbol" d="M 20 0 L 20 10" />
+  <path class="symbol" d="M 5 10 L 35 10 L 20 25 Z" />
+  
+  <!-- Pin (Top) -->
+  <circle class="pin" id="pin_1" cx="20" cy="0" r="2" />
+
+  <!-- Text Placeholders 
+  <text x="25" y="15" class="label">{name}</text>-->
+</svg>

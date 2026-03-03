@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="40" viewBox="0 0 60 40">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="C" value="1u" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="SUPPORTS_CURRENT" value="True" />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="C" bindkey="c" category="Passives" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="C{name} {pin_1} {pin_2} {C}" />
+  </defs>
+  <!-- Capacitor Plates -->
+  <path class="symbol" d="M 0 20 L 26 20 M 34 20 L 60 20" />
+  <path class="symbol" d="M 26 10 V 30 M 34 10 V 30" />
+  
+  <!-- Pins -->
+  <circle class="pin" id="pin_1" cx="0" cy="20" r="2" />
+  <circle class="pin" id="pin_2" cx="60" cy="20" r="2" />
+
+  <!-- Text Placeholders -->
+  <text x="0" y="0" class="label">{name}</text>
+  <text x="0" y="38" class="value">{C}</text>
+</svg>

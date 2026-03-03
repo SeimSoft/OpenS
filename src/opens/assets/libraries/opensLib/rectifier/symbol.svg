@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="MODEL" value="D" />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="BR" bindkey="b" category="Misc" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="D{name}1 {pin_ac1} {pin_plus} {MODEL}&#10;
+D{name}2 {pin_ac2} {pin_plus} {MODEL}&#10;
+D{name}3 {pin_minus} {pin_ac1} {MODEL}&#10;
+D{name}4 {pin_minus} {pin_ac2} {MODEL}" />
+  </defs>
+  <!-- Diamond boundary -->
+  <path class="symbol" d="M 50 10 L 90 50 L 50 90 L 10 50 Z" stroke-dasharray="4,4" stroke-opacity="0.3" />
+
+  <!-- Diode 1 (AC1 to PLUS) -->
+  <g transform="translate(30, 30) rotate(-45)">
+    <path class="symbol" d="M -10 0 L 10 0" />
+    <path class="symbol" d="M -5 -8 L 5 0 L -5 8 Z" />
+    <path class="symbol" d="M 5 -8 L 5 8" />
+  </g>
+  <path class="symbol" d="M 10 50 L 22.9 37.1" />
+  <path class="symbol" d="M 37.1 22.9 L 50 10" />
+
+  <!-- Diode 2 (AC2 to PLUS) -->
+   <g transform="translate(70, 30) rotate(-135)">
+    <path class="symbol" d="M -10 0 L 10 0" />
+    <path class="symbol" d="M -5 -8 L 5 0 L -5 8 Z" />
+    <path class="symbol" d="M 5 -8 L 5 8" />
+  </g>
+  <path class="symbol" d="M 90 50 L 77.1 37.1" />
+  <path class="symbol" d="M 62.9 22.9 L 50 10" />
+
+  <!-- Diode 3 (MINUS to AC1) -->
+  <g transform="translate(30, 70) rotate(45)">
+    <path class="symbol" d="M -10 0 L 10 0" />
+    <path class="symbol" d="M -5 -8 L 5 0 L -5 8 Z" />
+    <path class="symbol" d="M 5 -8 L 5 8" />
+  </g>
+  <path class="symbol" d="M 50 90 L 37.1 77.1" />
+  <path class="symbol" d="M 22.9 62.9 L 10 50" />
+
+  <!-- Diode 4 (MINUS to AC2) -->
+  <g transform="translate(70, 70) rotate(135)">
+    <path class="symbol" d="M -10 0 L 10 0" />
+    <path class="symbol" d="M -5 -8 L 5 0 L -5 8 Z" />
+    <path class="symbol" d="M 5 -8 L 5 8" />
+  </g>
+  <path class="symbol" d="M 50 90 L 62.9 77.1" />
+  <path class="symbol" d="M 77.1 62.9 L 90 50" />
+
+  <!-- Pins -->
+  <circle class="pin" id="pin_plus" cx="50" cy="10" r="2" />
+  <circle class="pin" id="pin_minus" cx="50" cy="90" r="2" />
+  <circle class="pin" id="pin_ac1" cx="10" cy="50" r="2" />
+  <circle class="pin" id="pin_ac2" cx="90" cy="50" r="2" />
+
+  <!-- Text Placeholders -->
+  <text x="60" y="20" class="label">{name}</text>
+  <text x="60" y="85" class="value">{MODEL}</text>
+  
+  <!-- Polarity markers -->
+  <text x="47" y="22" class="value" style="font-size: 10px;">+</text>
+  <text x="48" y="87" class="value" style="font-size: 10px;">-</text>
+  <text x="18" y="53" class="value" style="font-size: 8px;">~</text>
+  <text x="75" y="53" class="value" style="font-size: 8px;">~</text>
+</svg>

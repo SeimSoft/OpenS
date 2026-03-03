@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="40" viewBox="0 0 60 40">
+  <defs>
+    <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+    <opens:param xmlns:opens="http://opens-schematic.org" name="R" value="10k" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="SUPPORTS_CURRENT" value="True" />
+    <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="R" bindkey="r" category="Passives" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="R{name} {pin_1} {pin_2} {R}" />
+  </defs>
+  <!-- Resistor Rectangle (European Standard) -->
+  <path class="symbol" d="M 0 20 L 10 20 M 10 13 H 50 V 27 H 10 Z M 50 20 L 60 20" stroke-linecap="round"/>
+  
+  <!-- Current Direction Arrow 
+  <path d="M 29 17 L 32 20 L 29 23" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  -->
+
+  <!-- Pins -->
+  <circle class="pin" id="pin_1" cx="0" cy="20" r="2" />
+  <circle class="pin" id="pin_2" cx="60" cy="20" r="2" />
+
+  <!-- Text Placeholders -->
+  <text x="0" y="0" class="label">{name}</text>
+  <text x="0" y="38" class="value">{R}</text>
+  <text x="35" y="40" class="value" style="fill: green;">{R{name}:i}</text>
+</svg>
