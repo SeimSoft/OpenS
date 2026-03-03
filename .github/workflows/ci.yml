@@ -35,5 +35,5 @@ jobs:
         continue-on-error: true
 
       - name: Build MkDocs Documentation
-        run: uv run mkdocs build
+        run: uv run zensical build
 

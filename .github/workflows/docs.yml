@@ -61,7 +61,7 @@ jobs:
           uv run anybadge -l pylint -v $SCORE -s "/10" -m 5=red:7=orange:9=yellow:10=green -f docs/badges/pylint.svg -o
 
       - name: Build MkDocs Site
-        run: uv run mkdocs build
+        run: uv run zensical build
 
 
       - name: Upload artifact
