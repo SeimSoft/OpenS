@@ -81,17 +81,6 @@ class SchematicView(
         self.setScene(SchematicScene(self))
 
         # Performance Optimizations
-        import platform
-
-        if platform.system() != "Darwin":
-            try:
-                from PyQt6.QtOpenGLWidgets import QOpenGLWidget
-
-                self.setViewport(QOpenGLWidget())
-            except ImportError:
-                print(
-                    "Note: PyQt6.QtOpenGLWidgets not found. Hardware acceleration disabled."
-                )
         self.setRenderHints(
             QPainter.RenderHint.Antialiasing
             | QPainter.RenderHint.TextAntialiasing
