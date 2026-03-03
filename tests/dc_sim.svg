@@ -1,20 +1,20 @@
 <?xml version='1.0' encoding='utf-8'?>
 <svg xmlns:opens="http://opens-schematic.org" width="1008.71875" height="582.0" viewBox="-281.0 -271.0 1008.71875 582.0" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(-20.0,-50.0) rotate(0.0)" symbol_name="symbol" name="M1" save_v="True" save_i="False" param_MODEL="NMOS_MODEL" param_L="1u" param_W="10u" param_M="1" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens/assets/libraries/opensLib/nmos/symbol.svg">
+  <g transform="translate(-20.0,-50.0) rotate(0.0)" symbol_name="symbol" name="M1" save_v="True" save_i="False" param_MODEL="NMOS_MODEL" param_L="1u" param_W="10u" param_M="1" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens_suite/assets/libraries/opensLib/nmos/symbol.svg">
     <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
     <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">M1</text>
   </g>
-  <g transform="translate(-150.0,50.0) rotate(0.0)" symbol_name="symbol" name="V1" save_v="True" save_i="False" param_V="1" param_VAC="1" param_SUPPORTS_CURRENT="True" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens/assets/libraries/opensLib/vdc/symbol.svg">
+  <g transform="translate(-150.0,50.0) rotate(0.0)" symbol_name="symbol" name="V1" save_v="True" save_i="False" param_V="1" param_VAC="1" param_SUPPORTS_CURRENT="True" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens_suite/assets/libraries/opensLib/vdc/symbol.svg">
     <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
     <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">V1</text>
   </g>
   <line x1="-10.0" y1="0.0" x2="-130.0" y2="0.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="-130.0" y1="0.0" x2="-130.0" y2="50.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(-150.0,160.0) rotate(0.0)" symbol_name="symbol" name="GND1" save_v="True" save_i="False" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens/assets/libraries/opensLib/gnd/symbol.svg">
+  <g transform="translate(-150.0,160.0) rotate(0.0)" symbol_name="symbol" name="GND1" save_v="True" save_i="False" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens_suite/assets/libraries/opensLib/gnd/symbol.svg">
     <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
     <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">GND1</text>
   </g>
-  <g transform="translate(20.0,160.0) rotate(0.0)" symbol_name="symbol" name="GND2" save_v="True" save_i="False" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens/assets/libraries/opensLib/gnd/symbol.svg">
+  <g transform="translate(20.0,160.0) rotate(0.0)" symbol_name="symbol" name="GND2" save_v="True" save_i="False" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens_suite/assets/libraries/opensLib/gnd/symbol.svg">
     <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
     <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">GND2</text>
   </g>
@@ -23,22 +23,22 @@
   <line x1="50.0" y1="10.0" x2="90.0" y2="10.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="90.0" y1="10.0" x2="90.0" y2="70.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="90.0" y1="70.0" x2="40.0" y2="70.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(160.0,160.0) rotate(0.0)" symbol_name="symbol" name="GND3" save_v="True" save_i="False" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens/assets/libraries/opensLib/gnd/symbol.svg">
+  <g transform="translate(160.0,160.0) rotate(0.0)" symbol_name="symbol" name="GND3" save_v="True" save_i="False" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens_suite/assets/libraries/opensLib/gnd/symbol.svg">
     <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
     <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">GND3</text>
   </g>
   <line x1="180.0" y1="160.0" x2="180.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(160.0,40.0) rotate(0.0)" symbol_name="symbol" name="V2" save_v="True" save_i="False" param_V="0.2" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens/assets/libraries/opensLib/vdc/symbol.svg">
+  <g transform="translate(160.0,40.0) rotate(0.0)" symbol_name="symbol" name="V2" save_v="True" save_i="False" param_V="0.2" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens_suite/assets/libraries/opensLib/vdc/symbol.svg">
     <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
     <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">V2</text>
   </g>
   <line x1="180.0" y1="40.0" x2="180.0" y2="-120.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="180.0" y1="-120.0" x2="40.0" y2="-120.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="40.0" y1="-120.0" x2="40.0" y2="-40.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(310.0,-130.0) rotate(0.0)" symbol_name="symbol" name=".model1" save_v="True" save_i="False" param_MODELNAME="NMOS_MODEL" param_TYPE="NMOS" param_ARGS="(LEVEL=1 VTO=2.5 KP=0.5 LAMBDA=0.02 CGSO=100p CGDO=10p CBD=50p)" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens/assets/libraries/opensLib/model/symbol.svg">
+  <g transform="translate(310.0,-130.0) rotate(0.0)" symbol_name="symbol" name=".model1" save_v="True" save_i="False" param_MODELNAME="NMOS_MODEL" param_TYPE="NMOS" param_ARGS="(LEVEL=1 VTO=2.5 KP=0.5 LAMBDA=0.02 CGSO=100p CGDO=10p CBD=50p)" library_path="/Users/rennekef/Documents/SchematicEntry/backup/src/opens_suite/assets/libraries/opensLib/model/symbol.svg">
     <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
     <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">.model1</text>
   </g>
   <circle cx="40.0" cy="70.0" r="3" fill="black" />
-  <opens:analysis source="V1" start="0" step="0.1" stop="5" type="DC" enabled="True" />
+  <opens:analysis enabled="True" source="V1" start="0" step="0.1" stop="5" type="DC" />
 </svg>

@@ -1,9 +1,0 @@
-* OpenS Generated Netlist
-.preprocess addresistors nodcpath 1G
-.model NMOS_MODEL NMOS (LEVEL=1 VTO=2.5 KP=0.5 LAMBDA=0.02 CGSO=100p CGDO=10p CBD=50p)
-MM1 N_1 N_2 0 0 NMOS_MODEL L=1u W=10u m=1
-VV1 N_2 0 dc 1 ac 1
-VV2 N_1 0 dc 0.2 ac 0
-.dc V1 0 5 0.1
-.print dc v(*) 
-.end

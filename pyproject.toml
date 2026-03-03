@@ -20,7 +20,16 @@ dependencies = [
 ]
 
 [project.scripts]
-opens = "opens.__main__:main"
+opens = "opens_suite.__main__:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/opens"]
+packages = ["src/opens_suite"]
+
+[dependency-groups]
+dev = [
+    "mkdocs-material>=9.7.3",
+    "mkdocstrings[python]>=0.26.1",
+    "pylint>=3.2.7",
+    "pytest>=8.3.5",
+    "pytest-cov>=5.0.0",
+]
