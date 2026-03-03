@@ -49,6 +49,47 @@ from opens_suite.spice_parser import SpiceRawParser
 
 
 class IOMixin:
+    def _get_relative_lib_path(self, abs_path):
+        if not abs_path:
+            return ""
+
+        from PyQt6.QtCore import QSettings
+
+        settings = QSettings("OpenS", "OpenS")
+        paths_str = settings.value("library_search_paths", "")
+        search_paths = []
+        default_lib = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "assets",
+            "libraries",
+        )
+        if os.path.exists(default_lib):
+            search_paths.append(default_lib)
+
+        for p in paths_str.split(","):
+            p = p.strip()
+            if p and os.path.exists(p) and p not in search_paths:
+                search_paths.append(p)
+
+        # Also include project dir if it exists
+        if hasattr(self, "filename") and self.filename:
+            search_paths.append(os.path.dirname(os.path.abspath(self.filename)))
+
+        for sp in search_paths:
+            try:
+                rel = os.path.relpath(abs_path, sp)
+                if not rel.startswith("..") and not os.path.isabs(rel):
+                    # For windows compat, replace backslashes
+                    return rel.replace("\\", "/")
+            except ValueError:
+                pass
+
+        # Fallback: just return the last 3 parts (lib/cell/view)
+        parts = abs_path.replace("\\", "/").split("/")
+        if len(parts) >= 3:
+            return "/".join(parts[-3:])
+        return abs_path
+
     def save_schematic(self, filename, analyses=None, outputs=None, variables=None):
         # Register namespace for extra data
         ET.register_namespace("opens", "http://opens-schematic.org")
@@ -182,7 +223,9 @@ class IOMixin:
                 for k, v in item.parameters.items():
                     attribs[f"param_{k}"] = str(v)
 
-                attribs["library_path"] = item.svg_path
+                attribs["library_path"] = (
+                    self._get_relative_lib_path(item.svg_path) if item.svg_path else ""
+                )
 
                 g = ET.SubElement(root, "g", attribs)
                 # Fallback visuals for external viewers
@@ -344,33 +387,44 @@ class IOMixin:
                 if elem.tag.endswith("g"):
                     # Item
                     path = elem.get("library_path")
-                    # Fallback if path not found?
+
+                    from PyQt6.QtCore import QSettings
+
+                    settings = QSettings("OpenS", "OpenS")
+                    paths_str = settings.value("library_search_paths", "")
+                    search_paths = []
+                    # Note: io.py is in src/opens_suite/view, so go up one level
+                    default_lib = os.path.join(
+                        os.path.dirname(os.path.dirname(__file__)),
+                        "assets",
+                        "libraries",
+                    )
+                    if os.path.exists(default_lib):
+                        search_paths.append(default_lib)
+
+                    for p in paths_str.split(","):
+                        p = p.strip()
+                        if p and os.path.exists(p) and p not in search_paths:
+                            search_paths.append(p)
+
+                    search_paths.append(os.getcwd())  # For local backward compatibility
+                    if getattr(self, "filename", None):
+                        search_paths.append(
+                            os.path.dirname(os.path.abspath(self.filename))
+                        )
+
+                    # If path is relative, attempt to resolve through search paths
+                    if path and not os.path.isabs(path):
+                        for sp in search_paths:
+                            candidate = os.path.join(sp, path)
+                            if os.path.exists(candidate):
+                                path = candidate
+                                break
+
+                    # Fallback if path not found
                     if not path or not os.path.exists(path):
                         sym_name = elem.get("symbol_name")
                         if sym_name:
-                            from PyQt6.QtCore import QSettings
-
-                            settings = QSettings("OpenS", "OpenS")
-                            paths_str = settings.value("library_search_paths", "")
-                            search_paths = []
-                            # Note: io.py is in src/opens/view, so go up one level to src/opens
-                            default_lib = os.path.join(
-                                os.path.dirname(os.path.dirname(__file__)),
-                                "assets",
-                                "libraries",
-                            )
-                            if os.path.exists(default_lib):
-                                search_paths.append(default_lib)
-
-                            for p in paths_str.split(","):
-                                p = p.strip()
-                                if p and os.path.exists(p) and p not in search_paths:
-                                    search_paths.append(p)
-
-                            search_paths.append(
-                                os.getcwd()
-                            )  # For local backward compatibility
-
                             for sp in search_paths:
                                 # Try the new standard opensLib location first
                                 check = os.path.join(
