@@ -8,7 +8,7 @@ import numpy as np
 
 
 def _spectre_escape_node(name: str) -> str:
-    """Escape a node name for Spectre.
+    r"""Escape a node name for Spectre.
 
 
 
@@ -17,6 +17,10 @@ def _spectre_escape_node(name: str) -> str:
 
 
         net<0> -> net\<0\>
+
+
+
+    It also handles multiple index instances (e.g. net<0><1>)
 
     """
 
