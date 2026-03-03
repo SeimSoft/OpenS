@@ -76,6 +76,18 @@ class MainWindow(QMainWindow):
         self.probe_icon = QIcon(
             os.path.join(os.path.dirname(__file__), "assets", "icons", "probe.svg")
         )
+        self.undo_icon = QIcon(
+            os.path.join(os.path.dirname(__file__), "assets", "icons", "undo.svg")
+        )
+        self.redo_icon = QIcon(
+            os.path.join(os.path.dirname(__file__), "assets", "icons", "redo.svg")
+        )
+        self.symbol_icon = QIcon(
+            os.path.join(os.path.dirname(__file__), "assets", "icons", "symbol.svg")
+        )
+        self.labels_icon = QIcon(
+            os.path.join(os.path.dirname(__file__), "assets", "icons", "labels.svg")
+        )
         self.active_calculators = []
         self._probi_calc = None  # Track which calculator is probing
 
@@ -188,7 +200,7 @@ class MainWindow(QMainWindow):
 
         # Create Symbol Action
         self.create_symbol_action = QAction(
-            self.style().standardIcon(QStyle.StandardPixmap.SP_FileIcon),
+            self.symbol_icon,
             "Create/Update Symbol",
             self,
         )
@@ -208,19 +220,13 @@ class MainWindow(QMainWindow):
         self.exit_action.triggered.connect(self.close)
 
         # Undo Action
-        self.undo_action = QAction(
-            self.style().standardIcon(QStyle.StandardPixmap.SP_ArrowBack), "&Undo", self
-        )
+        self.undo_action = QAction(self.undo_icon, "&Undo", self)
         self.undo_action.setShortcut("Ctrl+Z")
         self.undo_action.setStatusTip("Undo last action")
         self.undo_action.triggered.connect(self.undo)
 
         # Redo Action
-        self.redo_action = QAction(
-            self.style().standardIcon(QStyle.StandardPixmap.SP_ArrowForward),
-            "&Redo",
-            self,
-        )
+        self.redo_action = QAction(self.redo_icon, "&Redo", self)
         self.redo_action.setShortcut("Ctrl+Shift+Z")
         self.redo_action.setStatusTip("Redo last undone action")
         self.redo_action.triggered.connect(self.redo)
@@ -257,7 +263,6 @@ class MainWindow(QMainWindow):
         toolbar.setIconSize(QSize(16, 16))
         toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
         self.addToolBar(toolbar)
-        toolbar.addAction(self.new_action)
         toolbar.addAction(self.save_action)
 
         edit_toolbar = QToolBar("Edit Toolbar")
@@ -273,13 +278,14 @@ class MainWindow(QMainWindow):
         self.addToolBar(sim_toolbar)
         sim_toolbar.addAction(self.create_symbol_action)
         sim_toolbar.addSeparator()
-        self.show_labels_cb = QCheckBox("Show Wire Labels")
-        self.show_labels_cb.setChecked(True)
-        self.show_labels_cb.stateChanged.connect(self._on_show_labels_changed)
-        sim_toolbar.addWidget(self.show_labels_cb)
+        self.show_labels_action = QAction(self.labels_icon, "Show Wire Labels", self)
+        self.show_labels_action.setCheckable(True)
+        self.show_labels_action.setChecked(True)
+        self.show_labels_action.toggled.connect(self._on_show_labels_changed)
+        sim_toolbar.addAction(self.show_labels_action)
 
-    def _on_show_labels_changed(self, state):
-        show = state == 2  # Qt.CheckState.Checked
+    def _on_show_labels_changed(self, checked):
+        show = checked
         for i in range(self.tabs.count()):
             widget = self.tabs.widget(i)
             if hasattr(widget, "scene"):

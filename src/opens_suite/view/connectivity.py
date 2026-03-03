@@ -424,6 +424,20 @@ class ConnectivityMixin:
                     for idx in group:
                         wires[idx].name = consensus
 
+        # 6. Evaluate Netlist Nodes for Labels
+        try:
+            # We silently simulate a netlist generation sequence using the live scene
+            # specifically to extract the calculated node map for wire visualization.
+            gen = NetlistGenerator(self.scene(), [], [])
+            gen.generate()
+            for w in wires:
+                net = gen.item_node_map.get(w)
+                if net:
+                    w.net_name = net
+                w.update()
+        except Exception:
+            pass
+
     def distance_point_to_line_segment(self, point, line):
         p = point
         a = line.p1()
