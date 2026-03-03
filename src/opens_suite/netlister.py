@@ -385,7 +385,11 @@ class NetlistGenerator:
             # 2. Template-based formatting
             template = getattr(item, "spice_template", None)
             if template:
-                fmt_args = {"name": item.name, "prefix": item.prefix}
+                idx = item.name
+                if item.prefix and item.name.startswith(item.prefix):
+                    idx = item.name[len(item.prefix) :]
+
+                fmt_args = {"name": idx, "prefix": item.prefix, "full_name": item.name}
                 pin_ids = list(getattr(item, "pins", {}).keys())
                 for pin_id in pin_ids:
                     node = self.item_node_map.get((item, pin_id), "0")
