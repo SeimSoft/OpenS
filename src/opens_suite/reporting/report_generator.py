@@ -284,11 +284,33 @@ class ReportGenerator:
                     out["_eval_scalar"] = val_str
 
                 elif isinstance(result, np.ndarray):
-                    x_axis = (
-                        scope["t"]
-                        if "vt" in expr or "it" in expr
-                        else scope.get("f", np.array([]))
-                    )
+                    # Smart x-axis selection
+                    x_axis = np.array([])
+                    # Use more specific hints to avoid matching 't' in 'plot' or 'out'
+                    if any(h in expr for h in ["vt(", "it(", "st(", ".t"]):
+                        x_axis = scope.get("t", x_axis)
+                    elif any(h in expr for h in ["vf(", "ifc(", "sf(", ".f"]):
+                        x_axis = scope.get("f", x_axis)
+                    elif any(h in expr for h in ["vdc(", "sdc(", "sw"]):
+                        x_axis = scope.get("sw", x_axis)
+
+                    if len(x_axis) != len(result):
+                        # Fallback: find any default vector with matching length
+                        # Prioritize sw if it matches, then t, then f
+                        for cand in ["sw", "t", "f"]:
+                            vec = scope.get(cand, [])
+                            if len(vec) == len(result) and len(vec) > 0:
+                                x_axis = vec
+                                break
+
+                    x_label, x_unit = None, None
+                    if np.array_equal(x_axis, scope.get("sw", np.array([1]))):
+                        x_label, x_unit = "Sweep", ""
+                    elif np.array_equal(x_axis, scope.get("t", np.array([1]))):
+                        x_label, x_unit = "Time", "s"
+                    elif np.array_equal(x_axis, scope.get("f", np.array([1]))):
+                        x_label, x_unit = "Frequency", "Hz"
+
                     if (
                         np.array_equal(x_axis, scope.get("f", np.array([])))
                         and np.iscomplexobj(result)
@@ -297,6 +319,9 @@ class ReportGenerator:
                         viewer.bode(result, label=name)
                     else:
                         viewer.plot(x_axis, result, label=name)
+                        if x_label:
+                            for p in viewer.plots:
+                                p.setLabel("bottom", x_label, x_unit)
 
                 if viewer and len(viewer.signals) > 0:
                     from PyQt6.QtWidgets import QApplication
@@ -447,14 +472,18 @@ class ReportGenerator:
         else:
             html.append("        <table>")
             html.append(
-                "            <tr><th>Name</th><th>Expression</th><th>Unit</th><th>Min</th><th>Value</th><th>Max</th></tr>"
+                "            <tr><th>Name</th><th>Expression</th><th>Unit</th><th>Min</th><th>Value</th><th>Max</th><th>Description</th></tr>"
             )
             for out in self.outputs:
+                if "_eval_scalar" not in out and not out.get("_eval_error"):
+                    continue
+
                 name = out.get("name", "Unnamed")
                 expr = out.get("expression", "")
                 unit = out.get("unit", "")
                 spec_min = out.get("min", "")
                 spec_max = out.get("max", "")
+                description = out.get("description", "")
 
                 html.append("            <tr>")
                 html.append(f"                <td>{name}</td>")
@@ -478,6 +507,7 @@ class ReportGenerator:
                     html.append(f"                <td class='error'>{err}</td>")
 
                 html.append(f"                <td>{spec_max}</td>")
+                html.append(f"                <td>{description}</td>")
 
                 html.append("            </tr>")
             html.append("        </table>")
@@ -493,6 +523,7 @@ class ReportGenerator:
                     continue
                 name = out.get("name", "Unnamed")
                 expr = out.get("expression", "")
+                description = out.get("description", "")
                 html.append(f"        <h3>{name}</h3>")
                 html.append(
                     f"        <p style='color: #666; font-size: 0.9em;'><code>{expr}</code></p>"
@@ -502,6 +533,10 @@ class ReportGenerator:
                     f"            <img src='{out['_eval_plot']}' alt='{name}' onclick='openLightbox(this)'>"
                 )
                 html.append("        </div>")
+                if description:
+                    html.append(
+                        f"        <p style='margin-bottom: 30px;'>{description}</p>"
+                    )
 
         # --- Section: Simulation Logs ---
         html.append("")

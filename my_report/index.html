@@ -53,33 +53,7 @@
 
         <h2 id='sect-outputs'>2. Output Expressions</h2>
         <table>
-            <tr><th>Name</th><th>Expression</th><th>Unit</th><th>Min</th><th>Value</th><th>Max</th></tr>
-            <tr>
-                <td>plotA</td>
-                <td><details><summary>show</summary><code>plot(sdc('N_2'), label="sdc('N_2')")</code></details></td>
-                <td></td>
-                <td></td>
-                <td>—</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>plotB</td>
-                <td><details><summary>show</summary><code>plot(sdc('N_2'), label="sdc('N_2')")
-plot(sdc('N_1'), label="sdc('N_1')")</code></details></td>
-                <td></td>
-                <td></td>
-                <td>—</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>plotC</td>
-                <td><details><summary>show</summary><code>plot(sdc('V1#branch'), label="sdc('V1#branch')")
-plot(sdc('V2#branch'), label="sdc('V2#branch')")</code></details></td>
-                <td></td>
-                <td></td>
-                <td>—</td>
-                <td></td>
-            </tr>
+            <tr><th>Name</th><th>Expression</th><th>Unit</th><th>Min</th><th>Value</th><th>Max</th><th>Description</th></tr>
             <tr>
                 <td>scalar_at_0_and_plots</td>
                 <td><details><summary>show</summary><code>plot(sdc('V1#branch'), label="sdc('V1#branch')")
@@ -90,6 +64,7 @@ value(sdc('sweep'), sdc('N_1'), at=0)</code></details></td>
                 <td></td>
                 <td style='background-color: transparent; font-weight: bold; white-space: nowrap;'>200m</td>
                 <td></td>
+                <td></td>
             </tr>
             <tr>
                 <td>just_scalar</td>
@@ -98,6 +73,7 @@ value(sdc('sweep'), sdc('N_1'), at=0)</code></details></td>
                 <td></td>
                 <td style='background-color: #d4edda; font-weight: bold; white-space: nowrap;'>200m</td>
                 <td>5</td>
+                <td></td>
             </tr>
         </table>
 
@@ -136,7 +112,7 @@ value(sdc('sweep'), sdc('N_1'), at=0)</code></p>
 ***** Welcome to the Xyce(TM) Parallel Electronic Simulator
 *****
 ***** This is version Xyce Release 7.10-opensource
-***** Date: Wed Mar 04 07:42:25 CET 2026
+***** Date: Wed Mar 04 09:45:44 CET 2026
 
 
 ***** Executing netlist /Users/rennekef/Documents/SchematicEntry/backup/tests/simulation/dc_sim.net
@@ -163,13 +139,13 @@ DEBUG checkIfModelValid: device_type=M, modelType=NMOS, modelLevel=1, isModelLev
 	Number Failed Linear Solves:		0
 	Number Residual Evaluations:		156
 	Number Nonlinear Convergence Failures:	0
-	Total Residual Load Time:		0.00109148 seconds
-	Total Jacobian Load Time:		0.000304699 seconds
-	Total Linear Solution Time:		0.00115991 seconds
+	Total Residual Load Time:		0.000746727 seconds
+	Total Jacobian Load Time:		0.000194788 seconds
+	Total Linear Solution Time:		0.000943899 seconds
 
 
-***** Total Simulation Solvers Run Time: 0.00769114 seconds
-***** Total Elapsed Run Time:            0.0142009 seconds
+***** Total Simulation Solvers Run Time: 0.00603104 seconds
+***** Total Elapsed Run Time:            0.011637 seconds
 *****
 ***** End of Xyce(TM) Simulation
 *****
@@ -177,22 +153,22 @@ DEBUG checkIfModelValid: device_type=M, modelType=NMOS, modelLevel=1, isModelLev
 Timing summary of 1 processor
                  Stats                   Count       CPU Time              Wall Time
 ---------------------------------------- ----- --------------------- ---------------------
-Xyce                                         1        0.037 (100.0%)        0.121 (100.0%)
-  Analysis                                   1        0.006 (16.84%)        0.008 ( 6.25%)
-    DC Sweep                                 1        0.006 (16.79%)        0.008 ( 6.23%)
-      Solve                                 51        0.005 (14.36%)        0.006 ( 5.07%)
-        Residual                           156        0.001 ( 3.20%)        0.001 ( 1.09%)
-        Jacobian                           104        0.000 ( 1.00%)        0.000 ( 0.36%)
-        Linear Solve                       104        0.001 ( 3.11%)        0.001 ( 1.10%)
-      Successful Step                       51        0.000 ( 0.99%)        0.001 ( 0.55%)
-  Netlist Import                             1        0.002 ( 5.18%)        0.003 ( 2.57%)
-    Parse Context                            1        0.000 ( 0.68%)        0.000 ( 0.32%)
-    Distribute Devices                       1        0.001 ( 1.91%)        0.001 ( 0.83%)
+Xyce                                         1        0.034 (100.0%)        0.112 (100.0%)
+  Analysis                                   1        0.005 (14.33%)        0.006 ( 5.33%)
+    DC Sweep                                 1        0.005 (14.28%)        0.006 ( 5.31%)
+      Solve                                 51        0.004 (12.42%)        0.005 ( 4.36%)
+        Residual                           156        0.001 ( 2.49%)        0.001 ( 0.83%)
+        Jacobian                           104        0.000 ( 0.79%)        0.000 ( 0.29%)
+        Linear Solve                       104        0.001 ( 2.91%)        0.001 ( 0.96%)
+      Successful Step                       51        0.000 ( 0.78%)        0.001 ( 0.53%)
+  Netlist Import                             1        0.002 ( 4.79%)        0.002 ( 2.20%)
+    Parse Context                            1        0.000 ( 0.71%)        0.000 ( 0.33%)
+    Distribute Devices                       1        0.001 ( 1.58%)        0.001 ( 0.58%)
     Verify Devices                           1        0.000 ( 0.03%)        0.000 ( 0.01%)
-    Instantiate                              1        0.000 ( 0.38%)        0.000 ( 0.14%)
-  Late Initialization                        1        0.001 ( 2.72%)        0.001 ( 1.20%)
-    Global Indices                           1        0.000 ( 0.17%)        0.000 ( 0.18%)
-  Setup Matrix Structure                     1        0.000 ( 0.45%)        0.000 ( 0.19%)
+    Instantiate                              1        0.000 ( 0.37%)        0.000 ( 0.13%)
+  Late Initialization                        1        0.001 ( 3.03%)        0.002 ( 1.35%)
+    Global Indices                           1        0.000 ( 0.17%)        0.000 ( 0.14%)
+  Setup Matrix Structure                     1        0.000 ( 0.47%)        0.000 ( 0.19%)
 
 </pre>
         </details>

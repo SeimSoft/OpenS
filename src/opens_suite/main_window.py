@@ -692,7 +692,7 @@ class MainWindow(QMainWindow):
         reply = QMessageBox.question(
             self,
             "Generate Report",
-            f"Generate HTML report into:\n{default_report_dir}?\n\n(This will execute the simulation headless)",
+            f"Generate HTML report into:\n{default_report_dir}?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.Yes,
         )
@@ -700,13 +700,13 @@ class MainWindow(QMainWindow):
         if reply == QMessageBox.StandardButton.Yes:
             from opens_suite.reporting.report_generator import ReportGenerator
 
-            self.update_status("Generating headless report... please wait.")
+            self.update_status("Generating report... please wait.")
 
             try:
                 # Force local save so it hits disk for snapshot
                 current_widget.save_schematic(
                     filename,
-                    self.analysis_dock.get_analyses(),
+                    self.analysis_dock.get_all_analyses(),
                     self.outputs_dock.get_expressions_data(),
                     self.variables_dock.get_variables(),
                 )

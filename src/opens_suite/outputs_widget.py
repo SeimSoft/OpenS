@@ -39,6 +39,7 @@ class OutputsWidget(QDockWidget):
     COL_UNIT = 3
     COL_MIN = 4
     COL_MAX = 5
+    COL_DESC = 6
 
     def __init__(self, parent=None):
         super().__init__("Output Expressions", parent)
@@ -50,9 +51,17 @@ class OutputsWidget(QDockWidget):
         layout = QVBoxLayout(container)
 
         self.table_view = QTableView()
-        self.model = QStandardItemModel(0, 6)
+        self.model = QStandardItemModel(0, 7)
         self.model.setHorizontalHeaderLabels(
-            ["Name", "Expression", "Value", "Unit", "Min Spec", "Max Spec"]
+            [
+                "Name",
+                "Expression",
+                "Value",
+                "Unit",
+                "Min Spec",
+                "Max Spec",
+                "Description",
+            ]
         )
 
         self.table_view.setModel(self.model)
@@ -78,6 +87,7 @@ class OutputsWidget(QDockWidget):
         header.setSectionResizeMode(self.COL_UNIT, QHeaderView.ResizeMode.Interactive)
         header.setSectionResizeMode(self.COL_MIN, QHeaderView.ResizeMode.Interactive)
         header.setSectionResizeMode(self.COL_MAX, QHeaderView.ResizeMode.Interactive)
+        header.setSectionResizeMode(self.COL_DESC, QHeaderView.ResizeMode.Stretch)
 
         layout.addWidget(self.table_view)
         layout.setContentsMargins(2, 2, 2, 2)
@@ -87,7 +97,9 @@ class OutputsWidget(QDockWidget):
         self._last_raw_path = None
         self._results_cache = {}  # name -> result_object
 
-    def add_expression(self, expression, min_spec="", max_spec="", name="", unit=""):
+    def add_expression(
+        self, expression, min_spec="", max_spec="", name="", unit="", description=""
+    ):
         if not expression and not name:
             return
 
@@ -103,9 +115,10 @@ class OutputsWidget(QDockWidget):
 
         item_min = QStandardItem(str(min_spec))
         item_max = QStandardItem(str(max_spec))
+        item_desc = QStandardItem(str(description))
 
         self.model.appendRow(
-            [item_name, item_expr, item_value, item_unit, item_min, item_max]
+            [item_name, item_expr, item_value, item_unit, item_min, item_max, item_desc]
         )
 
         if self._last_raw_path:
@@ -124,6 +137,7 @@ class OutputsWidget(QDockWidget):
                     "unit": self.model.item(i, self.COL_UNIT).text(),
                     "min": self.model.item(i, self.COL_MIN).text(),
                     "max": self.model.item(i, self.COL_MAX).text(),
+                    "description": self.model.item(i, self.COL_DESC).text(),
                 }
             )
         return data
@@ -148,6 +162,7 @@ class OutputsWidget(QDockWidget):
                     expr.get("max", ""),
                     expr.get("name", ""),
                     expr.get("unit", ""),
+                    expr.get("description", ""),
                 )
             else:
                 self.add_expression(expr)

@@ -351,6 +351,7 @@ class CalculatorDialog(QMainWindow):
 
         t = np.array([])
         f_vec = np.array([])
+        sw_vec = np.array([])
 
         if tran_plot:
             for k in tran_plot.keys():
@@ -362,6 +363,11 @@ class CalculatorDialog(QMainWindow):
                 if k.lower() == "frequency":
                     f_vec = np.array(ac_plot[k]).real
                     break
+        if dc_plot:
+            # First variable in DC plot is the swept one
+            first_key = list(dc_plot.keys())[0] if dc_plot else None
+            if first_key:
+                sw_vec = np.array(dc_plot[first_key])
 
         from opens_suite.spice_parser import SpiceRawParser
 
@@ -403,7 +409,25 @@ class CalculatorDialog(QMainWindow):
             return val[0] if len(val) > 0 else None
 
         def plot_func(x, y=None, label=None, title=None):
+            x_label, x_unit = None, None
+            if y is None:
+                y = x
+                # smart default x-axis
+                x = np.arange(len(y))  # default fallback
+                # Order matters here: sw_vec, then t, then f_vec
+                for cand, (lbl, unt) in [
+                    (sw_vec, ("Sweep", "")),
+                    (t, ("Time", "s")),
+                    (f_vec, ("Frequency", "Hz")),
+                ]:
+                    if cand is not None and len(cand) == len(y) and len(cand) > 0:
+                        x = cand
+                        x_label, x_unit = lbl, unt
+                        break
             self.viewer.plot(x, y, label=label)
+            if x_label and self.viewer:
+                for p in self.viewer.plots:
+                    p.setLabel("bottom", x_label, x_unit)
 
         def bode(target, plot=None, unwrap_phase=False, wrap_to_180=False):
             # Resolve target to complex array
@@ -469,7 +493,9 @@ class CalculatorDialog(QMainWindow):
             return np.interp(at, x, y)
 
         def subaxis(nrows, idx):
-            return self.viewer.subaxis(nrows, idx)
+            if self.viewer:
+                return self.viewer.subaxis(nrows, idx)
+            return None
 
         def st(name, plot=None):
             """Generic signal fetcher for Transient results."""
@@ -557,6 +583,7 @@ class CalculatorDialog(QMainWindow):
             "plot": plot_func,
             "t": t,
             "f": f_vec,
+            "sw": sw_vec,
             "mag": np.abs,
             "db": lambda x: 20 * np.log10(np.abs(x)),
             "dB": lambda x: 20 * np.log10(np.abs(x)),
@@ -565,7 +592,7 @@ class CalculatorDialog(QMainWindow):
             "plots": self.all_plots,
             "bode": bode,
             "f3db": f3db,
-            "subfigure": self.viewer.subaxis,
+            "subfigure": self.viewer.subaxis if self.viewer else lambda *args: None,
             "subaxis": subaxis,
         }
 

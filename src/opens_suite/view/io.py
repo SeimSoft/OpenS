@@ -352,6 +352,9 @@ class IOMixin:
                         elem.set("name", str(name_val))
                     if unit_val is not None and str(unit_val).strip() != "":
                         elem.set("unit", str(unit_val))
+                    desc_val = out.get("description")
+                    if desc_val is not None and str(desc_val).strip() != "":
+                        elem.set("description", str(desc_val))
                 else:
                     elem.text = str(out)
 

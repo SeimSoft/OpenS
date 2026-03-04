@@ -234,6 +234,7 @@ class XycePlugin(OpenSPlugin):
                 self.main_window.current_simulation_view.load_simulation_results(
                     self.main_window.current_raw_path
                 )
+                self.main_window.current_simulation_view.simulationFinished.emit()
 
             # Save the log to file as well if needed
             if hasattr(self.main_window, "current_log_path"):
