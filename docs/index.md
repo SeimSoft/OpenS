@@ -3,6 +3,7 @@
 Welcome to **OpenS**, a professional-grade, open-source simulation suite designed for both integrated semiconductor and discrete electronic design. OpenS bridges the gap between open-source flexibility and the robust feature sets typically reserved for commercial EDA tools.
 
 <center><img src="launcher.png" width="100"/></center>
+<center>![OpenS Application Screenshot](assets/images/app_screenshot.png)</center>
 
 
 By providing an intuitive interface coupled with high-performance automation, OpenS empowers engineers to go beyond basic simulation into comprehensive design verification and analysis.
@@ -13,3 +14,4 @@ By providing an intuitive interface coupled with high-performance automation, Op
 - **Advanced Waveform Visualization**: High-fidelity viewer for detailed signal analysis.
 - **Programmatic Design Control**: Automated design space exploration (DSE) and dynamic stimuli generation.
 - **Extensible Architecture**: Built for modern workflows that require more than just a schematic editor.
+- **Automated Reporting**: Generate professional HTML reports with one click. [View Example Report](example_report/index.html).

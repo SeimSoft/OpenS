@@ -84,6 +84,7 @@ Thumbs.db
 # Large simulation and binary files
 *.raw
 Xyce
+src/opens_suite/xyce/
 *.a
 *.o
 *.so*

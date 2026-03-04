@@ -27,6 +27,9 @@ jobs:
       - name: Install Dependencies
         run: uv sync
 
+      - name: Setup Xyce
+        run: ./scripts/setup_xyce.sh
+
       - name: Run PyLint
         run: uv run pylint src/opens_suite tests || true
 
