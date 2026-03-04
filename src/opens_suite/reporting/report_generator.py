@@ -277,11 +277,11 @@ class ReportGenerator:
                         val_str = f"{DesignPoints._format_si(result.real)} + j{DesignPoints._format_si(result.imag)}"
                     else:
                         val_str = DesignPoints._format_si(float(result))
-                    out["_eval_scalar"] = f"{val_str} {unit}".strip()
+                    out["_eval_scalar"] = val_str
 
                 elif isinstance(result, np.ndarray) and result.size == 1:
                     val_str = DesignPoints._format_si(float(result.item()))
-                    out["_eval_scalar"] = f"{val_str} {unit}".strip()
+                    out["_eval_scalar"] = val_str
 
                 elif isinstance(result, np.ndarray):
                     x_axis = (
@@ -386,11 +386,20 @@ class ReportGenerator:
         else:
             hierarchy_sect = None
 
-        toc_items.append((f"sect-{sect}", f"{sect}. Output Expressions"))
+        toc_items.append(("sect-outputs", f"{sect}. Output Expressions"))
         outputs_sect = sect
         sect += 1
 
-        toc_items.append((f"sect-{sect}", f"{sect}. Simulation Logs"))
+        # Check if any plots exist
+        has_plots = any(out.get("_eval_plot") for out in self.outputs)
+        if has_plots:
+            toc_items.append(("sect-plots", f"{sect}. Waveform Plots"))
+            plots_sect = sect
+            sect += 1
+        else:
+            plots_sect = None
+
+        toc_items.append(("sect-logs", f"{sect}. Simulation Logs"))
         logs_sect = sect
         sect += 1
 
@@ -430,7 +439,7 @@ class ReportGenerator:
 
         # --- Section: Output Expressions ---
         html.append(
-            f"        <h2 id='sect-{outputs_sect}'>{outputs_sect}. Output Expressions</h2>"
+            f"        <h2 id='sect-outputs'>{outputs_sect}. Output Expressions</h2>"
         )
 
         if not self.outputs:
@@ -438,7 +447,7 @@ class ReportGenerator:
         else:
             html.append("        <table>")
             html.append(
-                "            <tr><th>Name</th><th>Expression</th><th>Value</th><th>Unit</th><th>Min Spec</th><th>Max Spec</th><th>Plot</th></tr>"
+                "            <tr><th>Name</th><th>Expression</th><th>Unit</th><th>Min</th><th>Value</th><th>Max</th></tr>"
             )
             for out in self.outputs:
                 name = out.get("name", "Unnamed")
@@ -449,41 +458,54 @@ class ReportGenerator:
 
                 html.append("            <tr>")
                 html.append(f"                <td>{name}</td>")
-                html.append(f"                <td><code>{expr}</code></td>")
+                html.append(
+                    f"                <td><details><summary>show</summary><code>{expr}</code></details></td>"
+                )
+                html.append(f"                <td>{unit}</td>")
+                html.append(f"                <td>{spec_min}</td>")
 
                 # Value column with spec coloring
                 if out.get("_eval_success") and "_eval_scalar" in out:
                     scalar_val = out["_eval_scalar"]
                     cell_color = self._spec_color(scalar_val, spec_min, spec_max)
                     html.append(
-                        f"                <td style='background-color: {cell_color}; font-weight: bold;'>{scalar_val}</td>"
+                        f"                <td style='background-color: {cell_color}; font-weight: bold; white-space: nowrap;'>{scalar_val}</td>"
                     )
                 elif out.get("_eval_success"):
                     html.append("                <td>\u2014</td>")
                 else:
                     err = out.get("_eval_error", "Unknown Error")
-                    html.append(f"                <td class='error'>Error: {err}</td>")
+                    html.append(f"                <td class='error'>{err}</td>")
 
-                html.append(f"                <td>{unit}</td>")
-                html.append(f"                <td>{spec_min}</td>")
                 html.append(f"                <td>{spec_max}</td>")
-
-                # Plot column
-                if out.get("_eval_success") and "_eval_plot" in out:
-                    html.append(
-                        f"                <td><div class='plot-container'><img src='{out['_eval_plot']}' alt='Waveform Plot' onclick='openLightbox(this)'></div></td>"
-                    )
-                else:
-                    html.append("                <td>\u2014</td>")
 
                 html.append("            </tr>")
             html.append("        </table>")
 
+        # --- Section: Waveform Plots ---
+        if plots_sect is not None:
+            html.append("")
+            html.append(
+                f"        <h2 id='sect-plots'>{plots_sect}. Waveform Plots</h2>"
+            )
+            for out in self.outputs:
+                if not out.get("_eval_plot"):
+                    continue
+                name = out.get("name", "Unnamed")
+                expr = out.get("expression", "")
+                html.append(f"        <h3>{name}</h3>")
+                html.append(
+                    f"        <p style='color: #666; font-size: 0.9em;'><code>{expr}</code></p>"
+                )
+                html.append("        <div class='schematic'>")
+                html.append(
+                    f"            <img src='{out['_eval_plot']}' alt='{name}' onclick='openLightbox(this)'>"
+                )
+                html.append("        </div>")
+
         # --- Section: Simulation Logs ---
         html.append("")
-        html.append(
-            f"        <h2 id='sect-{logs_sect}'>{logs_sect}. Simulation Logs</h2>"
-        )
+        html.append(f"        <h2 id='sect-logs'>{logs_sect}. Simulation Logs</h2>")
 
         if self._log_path and os.path.exists(self._log_path):
             with open(self._log_path, "r") as lf:
