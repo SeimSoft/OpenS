@@ -21,13 +21,15 @@ class ReportGenerator:
         self._raw_path = ""
         self._netlist_path = ""
         self._log_path = ""
+        self.hierarchy_images = []  # [(label, filename), ...]
 
     def generate(self):
         """Main execution sequence to drive reporting."""
         print(f"Generating report in {self.report_dir}...")
         self._prepare_directory()
         self._load_and_snapshot()
-        self._simulate()
+        self._export_hierarchy()
+        self._find_simulation_results()
         self._evaluate_and_plot()
         self._build_html()
         print(
@@ -36,27 +38,25 @@ class ReportGenerator:
 
     def _prepare_directory(self):
         os.makedirs(self.report_dir, exist_ok=True)
-        # We don't wipe everything to be safe, but we will overwrite files.
+        # Copy the OpenS logo for the footer
+        logo_src = os.path.join(
+            os.path.dirname(__file__), "..", "assets", "launcher.png"
+        )
+        if os.path.exists(logo_src):
+            shutil.copy2(logo_src, os.path.join(self.report_dir, "launcher.png"))
 
-    def _load_and_snapshot(self):
-        print("Loading schematic and rendering snapshot...")
-        self.view = SchematicView()
-        self.view.filename = self.schematic_path
-        self.view.load_schematic(self.schematic_path)
-
-        # Force a refresh to resolve visual dependencies
-        self.view.recalculate_connectivity()
-
-        # Render QGraphicsScene to QImage
-        scene = self.view.scene()
+    def _render_scene_to_image(self, view, output_path):
+        """Render a SchematicView's scene to a PNG file."""
+        scene = view.scene()
         rect = scene.itemsBoundingRect()
         margin = 20
         rect.adjust(-margin, -margin, margin, margin)
 
-        # Create high-res image
+        # High-res: scale up by 2x for retina-quality
+        scale = 2
         img = QImage(
-            int(rect.width()),
-            int(rect.height()),
+            int(rect.width() * scale),
+            int(rect.height() * scale),
             QImage.Format.Format_ARGB32_Premultiplied,
         )
         img.fill(Qt.GlobalColor.white)
@@ -68,7 +68,18 @@ class ReportGenerator:
         scene.render(painter, target=QRectF(img.rect()), source=rect)
         painter.end()
 
-        img.save(os.path.join(self.report_dir, "circuit.png"))
+        img.save(output_path)
+
+    def _load_and_snapshot(self):
+        print("Loading schematic and rendering snapshot...")
+        self.view = SchematicView()
+        self.view.filename = self.schematic_path
+        self.view.load_schematic(self.schematic_path)
+        self.view.recalculate_connectivity()
+
+        self._render_scene_to_image(
+            self.view, os.path.join(self.report_dir, "circuit.png")
+        )
 
         # Extract analyses, variables, and outputs
         tree = ET.parse(self.schematic_path)
@@ -82,62 +93,150 @@ class ReportGenerator:
             dict(elem.attrib)
             for elem in root.iter("{http://opens-schematic.org}variable")
         ]
-        self.outputs = [
-            dict(elem.attrib)
-            for elem in root.iter("{http://opens-schematic.org}output")
+        self.outputs = []
+        for elem in root.iter("{http://opens-schematic.org}output"):
+            out_data = dict(elem.attrib)
+            out_data["expression"] = elem.text.strip() if elem.text else ""
+            self.outputs.append(out_data)
+
+    def _export_hierarchy(self):
+        """Walk scene items to find subcircuit references and export their schematics."""
+        print("Exporting hierarchy schematics...")
+        from opens_suite.schematic_item import SchematicItem
+
+        scene = self.view.scene()
+        visited = set()
+
+        for item in scene.items():
+            if not isinstance(item, SchematicItem):
+                continue
+            if not getattr(item, "prefix", "") == "X":
+                continue
+
+            model_param = item.parameters.get("MODEL", "")
+            if not model_param:
+                continue
+
+            # Resolve the schematic path for this subcircuit
+            sch_path = self._resolve_subcircuit_path(item)
+            if not sch_path or sch_path in visited:
+                continue
+
+            visited.add(sch_path)
+            label = os.path.splitext(os.path.basename(sch_path))[0]
+            filename = f"subcircuit_{label}.png"
+
+            try:
+                sub_view = SchematicView()
+                sub_view.filename = sch_path
+                sub_view.load_schematic(sch_path)
+                sub_view.recalculate_connectivity()
+                self._render_scene_to_image(
+                    sub_view, os.path.join(self.report_dir, filename)
+                )
+                self.hierarchy_images.append((label, filename))
+                print(f"  Exported subcircuit: {label}")
+
+                # Recurse: check subcircuits within this subcircuit
+                self._export_sub_hierarchy(sub_view, visited)
+            except Exception as e:
+                print(f"  Warning: Could not export subcircuit {label}: {e}")
+
+    def _export_sub_hierarchy(self, parent_view, visited):
+        """Recursively export subcircuit schematics from a parent view."""
+        from opens_suite.schematic_item import SchematicItem
+
+        scene = parent_view.scene()
+        for item in scene.items():
+            if not isinstance(item, SchematicItem):
+                continue
+            if not getattr(item, "prefix", "") == "X":
+                continue
+
+            sch_path = self._resolve_subcircuit_path(item)
+            if not sch_path or sch_path in visited:
+                continue
+
+            visited.add(sch_path)
+            label = os.path.splitext(os.path.basename(sch_path))[0]
+            filename = f"subcircuit_{label}.png"
+
+            try:
+                sub_view = SchematicView()
+                sub_view.filename = sch_path
+                sub_view.load_schematic(sch_path)
+                sub_view.recalculate_connectivity()
+                self._render_scene_to_image(
+                    sub_view, os.path.join(self.report_dir, filename)
+                )
+                self.hierarchy_images.append((label, filename))
+                print(f"  Exported subcircuit: {label}")
+                self._export_sub_hierarchy(sub_view, visited)
+            except Exception as e:
+                print(f"  Warning: Could not export subcircuit {label}: {e}")
+
+    def _resolve_subcircuit_path(self, item):
+        """Resolve the schematic .svg path for a subcircuit item."""
+        model_param = item.parameters.get("MODEL", "")
+        if not model_param:
+            return None
+
+        sym_dir = os.path.dirname(item.svg_path) if item.svg_path else ""
+        base_sch = model_param.replace(".sch", "").replace(".svg", "")
+
+        candidates = [
+            os.path.join(sym_dir, f"{base_sch}.svg"),
+            os.path.join(sym_dir, f"{base_sch}.sch.svg"),
+            os.path.join(sym_dir, "schematic.svg"),
+            os.path.join(sym_dir, "schematic.sch.svg"),
         ]
 
-    def _simulate(self):
-        print("Generating netlist and simulating...")
-        gen = NetlistGenerator(
-            self.view.scene(), self.analyses, variables=self.variables
-        )
-        self.netlist = gen.generate()
+        if item.svg_path and item.svg_path.endswith(".sym.svg"):
+            candidates.append(item.svg_path.replace(".sym.svg", ".sch.svg"))
+            candidates.append(item.svg_path.replace(".sym.svg", ".svg"))
 
-        self._netlist_path = os.path.join(self.report_dir, "simulation.net")
-        self._raw_path = os.path.join(self.report_dir, "simulation.raw")
-        self._log_path = os.path.join(self.report_dir, "simulation.log")
+        for path in candidates:
+            if os.path.exists(path):
+                return os.path.abspath(path)
 
-        with open(self._netlist_path, "w") as f:
-            f.write(self.netlist)
+        return None
 
-        runner = XyceRunner()
-        # Capture stdout to log file if possible. run_cli natively streams to terminal.
-        # So we write a simple wrapper or just let XyceRunner generate the raw file.
-        # Actually XyceRunner prints via Popen. We can redirect via subprocess if needed.
-        import subprocess
+    def _find_simulation_results(self):
+        print("Checking for existing simulation results...")
+        sim_dir = os.path.join(os.path.dirname(self.schematic_path), "simulation")
+        base = os.path.splitext(os.path.basename(self.schematic_path))[0]
 
-        try:
-            with open(self._log_path, "w") as log_file:
-                process = subprocess.Popen(
-                    ["Xyce", self._netlist_path, "-r", self._raw_path],
-                    stdout=log_file,
-                    stderr=subprocess.STDOUT,
-                )
-                process.wait()
-                if process.returncode != 0:
-                    print(f"Simulation failed with code {process.returncode}")
-        except FileNotFoundError:
-            print("Xyce executable not found on PATH. Simulation aborting.")
+        raw_target = os.path.join(sim_dir, f"{base}.raw")
+        log_target = os.path.join(sim_dir, f"{base}.log")
+
+        if os.path.exists(raw_target):
+            self._raw_path = raw_target
+        else:
+            print("No existing simulation raw file found.")
+            self._raw_path = None
+
+        if os.path.exists(log_target):
+            self._log_path = log_target
+        else:
+            self._log_path = None
 
     def _evaluate_and_plot(self):
         print("Evaluating outputs...")
-        if not os.path.exists(self._raw_path):
-            print("No raw file found. Skipping evaluation.")
-            return
-
         from opens_suite.waveform_viewer import WaveformViewer
         import ast
         import numpy as np
         from opens_suite.design_points import DesignPoints
 
-        # Load Calculator session
-        calc = CalculatorDialog(self._raw_path)
-        scope = calc._create_scope()
+        calc = None
+        scope = {}
+        viewer = None
 
-        # We need a headless waveform viewer to grab plots
-        viewer = WaveformViewer()
-        viewer.resize(800, 400)
+        if self._raw_path and os.path.exists(self._raw_path):
+            calc = CalculatorDialog(self._raw_path)
+            viewer = WaveformViewer()
+            viewer.resize(800, 400)
+            calc.viewer = viewer
+            scope = calc._create_scope()
 
         for i, out in enumerate(self.outputs):
             name = out.get("name", f"expr_{i}")
@@ -147,8 +246,15 @@ class ReportGenerator:
             if not expr:
                 continue
 
+            if not self._raw_path:
+                out["_eval_success"] = False
+                out["_eval_error"] = "No simulation results available"
+                continue
+
             try:
-                # Execute Expression
+                if viewer:
+                    viewer.clear()
+
                 tree = ast.parse(expr)
                 if not tree.body:
                     continue
@@ -163,34 +269,26 @@ class ReportGenerator:
                     result = eval(compile(eval_expr, "<string>", "eval"), scope)
                 else:
                     exec(expr, scope)
-                    continue
 
-                # Process Result
                 out["_eval_success"] = True
 
                 if isinstance(result, (int, float, np.number, complex)):
-                    # Scalar
                     if isinstance(result, complex):
                         val_str = f"{DesignPoints._format_si(result.real)} + j{DesignPoints._format_si(result.imag)}"
                     else:
                         val_str = DesignPoints._format_si(float(result))
-                    out["_eval_result"] = f"{val_str} {unit}".strip()
-                    out["_eval_type"] = "scalar"
+                    out["_eval_scalar"] = f"{val_str} {unit}".strip()
 
                 elif isinstance(result, np.ndarray) and result.size == 1:
-                    # Single item array scalar
                     val_str = DesignPoints._format_si(float(result.item()))
-                    out["_eval_result"] = f"{val_str} {unit}".strip()
-                    out["_eval_type"] = "scalar"
+                    out["_eval_scalar"] = f"{val_str} {unit}".strip()
 
                 elif isinstance(result, np.ndarray):
-                    # Array waveform
-                    viewer.clear()
-
-                    # Deduce X axis
-                    x_axis = scope["t"] if "vt" in expr or "it" in expr else scope["f"]
-
-                    # Need to map bode check
+                    x_axis = (
+                        scope["t"]
+                        if "vt" in expr or "it" in expr
+                        else scope.get("f", np.array([]))
+                    )
                     if (
                         np.array_equal(x_axis, scope.get("f", np.array([])))
                         and np.iscomplexobj(result)
@@ -200,122 +298,406 @@ class ReportGenerator:
                     else:
                         viewer.plot(x_axis, result, label=name)
 
-                    # Force render cycle headless
-                    viewer.show()
-                    import time
+                if viewer and len(viewer.signals) > 0:
                     from PyQt6.QtWidgets import QApplication
+                    import pyqtgraph.exporters as exporters
 
-                    QApplication.processEvents()
-                    time.sleep(0.1)  # Brief pause for GL viewport draw
                     QApplication.processEvents()
 
                     plot_filename = f"plot_{i}.png"
                     plot_path = os.path.join(self.report_dir, plot_filename)
-                    # Grab waveform image natively
-                    pixmap = viewer.grab()
-                    pixmap.save(plot_path)
 
-                    out["_eval_result"] = plot_filename
-                    out["_eval_type"] = "plot"
+                    exporter = exporters.ImageExporter(viewer.glw.scene())
+                    exporter.parameters()["width"] = 1600
+                    exporter.export(plot_path)
+
+                    out["_eval_plot"] = plot_filename
 
             except Exception as e:
+                import traceback
+
+                print(f"Error evaluating {name}: {e}\n{traceback.format_exc()}")
                 out["_eval_success"] = False
                 out["_eval_error"] = str(e)
 
-        viewer.close()
+        if viewer:
+            viewer.close()
 
     def _build_html(self):
         print("Building HTML file...")
+
+        # Section numbering
+        sect = 1
+
         html = [
             "<!DOCTYPE html>",
             "<html lang='en'>",
             "<head>",
             "    <meta charset='UTF-8'>",
+            "    <meta name='viewport' content='width=device-width, initial-scale=1.0'>",
             "    <title>OpenS Simulation Report</title>",
             "    <style>",
+            "        * { box-sizing: border-box; }",
             "        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; color: #333; }",
             "        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }",
             "        h1 { border-bottom: 2px solid #005A9C; padding-bottom: 10px; color: #005A9C; }",
             "        h2 { margin-top: 30px; color: #004080; }",
             "        .schematic { text-align: center; margin: 20px 0; }",
-            "        .schematic img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }",
+            "        .schematic img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; }",
             "        table { width: 100%; border-collapse: collapse; margin-top: 20px; }",
-            "        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }",
+            "        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: top; }",
             "        th { background-color: #005A9C; color: white; }",
             "        tr:nth-child(even) { background-color: #f9f9f9; }",
             "        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }",
             "        .plot-container { text-align: center; margin: 15px 0; border: 1px solid #eee; padding: 10px; background: #fafafa; }",
-            "        .plot-container img { max-width: 100%; }",
+            "        .plot-container img { max-width: 100%; cursor: pointer; }",
             "        .error { color: #d9534f; font-weight: bold; }",
+            # TOC Styles
+            "        .toc { background: #f0f4f8; border: 1px solid #d0d8e0; border-radius: 6px; padding: 20px; margin: 20px 0; }",
+            "        .toc h3 { margin-top: 0; color: #004080; }",
+            "        .toc ul { list-style: none; padding-left: 0; margin: 0; }",
+            "        .toc li { padding: 4px 0; }",
+            "        .toc a { text-decoration: none; color: #005A9C; }",
+            "        .toc a:hover { text-decoration: underline; }",
+            # Lightbox Styles
+            "        .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 9999; justify-content: center; align-items: center; cursor: zoom-out; }",
+            "        .lightbox-overlay.active { display: flex; }",
+            "        .lightbox-overlay img { max-width: 95vw; max-height: 95vh; object-fit: contain; touch-action: none; transform-origin: center center; transition: transform 0.1s ease; }",
+            "        .lightbox-close { position: fixed; top: 15px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 10000; font-weight: bold; line-height: 1; }",
             "    </style>",
             "</head>",
             "<body>",
             "    <div class='container'>",
             f"        <h1>Simulation Report: {os.path.basename(self.schematic_path)}</h1>",
-            "        ",
-            "        <h2>1. Circuit Schematic</h2>",
-            "        <div class='schematic'>",
-            "            <img src='circuit.png' alt='Circuit Schematic'>",
-            "        </div>",
             "",
-            "        <h2>2. Output Expressions</h2>",
         ]
+
+        # --- Table of Contents ---
+        toc_items = []
+
+        toc_items.append((f"sect-{sect}", f"{sect}. Top-Level Schematic"))
+        schematic_sect = sect
+        sect += 1
+
+        if self.hierarchy_images:
+            toc_items.append((f"sect-{sect}", f"{sect}. Subcircuit Schematics"))
+            hierarchy_sect = sect
+            sect += 1
+        else:
+            hierarchy_sect = None
+
+        toc_items.append((f"sect-{sect}", f"{sect}. Output Expressions"))
+        outputs_sect = sect
+        sect += 1
+
+        toc_items.append((f"sect-{sect}", f"{sect}. Simulation Logs"))
+        logs_sect = sect
+        sect += 1
+
+        html.append("        <div class='toc'>")
+        html.append("            <h3>Table of Contents</h3>")
+        html.append("            <ul>")
+        for anchor, label in toc_items:
+            html.append(f"                <li><a href='#{anchor}'>{label}</a></li>")
+        html.append("            </ul>")
+        html.append("        </div>")
+        html.append("")
+
+        # --- Section: Top-Level Schematic ---
+        html.append(
+            f"        <h2 id='sect-{schematic_sect}'>{schematic_sect}. Top-Level Schematic</h2>"
+        )
+        html.append("        <div class='schematic'>")
+        html.append(
+            "            <img src='circuit.png' alt='Circuit Schematic' onclick='openLightbox(this)'>"
+        )
+        html.append("        </div>")
+        html.append("")
+
+        # --- Section: Subcircuit Schematics ---
+        if hierarchy_sect is not None:
+            html.append(
+                f"        <h2 id='sect-{hierarchy_sect}'>{hierarchy_sect}. Subcircuit Schematics</h2>"
+            )
+            for label, filename in self.hierarchy_images:
+                html.append(f"        <h3>{label}</h3>")
+                html.append("        <div class='schematic'>")
+                html.append(
+                    f"            <img src='{filename}' alt='{label}' onclick='openLightbox(this)'>"
+                )
+                html.append("        </div>")
+            html.append("")
+
+        # --- Section: Output Expressions ---
+        html.append(
+            f"        <h2 id='sect-{outputs_sect}'>{outputs_sect}. Output Expressions</h2>"
+        )
 
         if not self.outputs:
             html.append("        <p>No outputs configured for this schematic.</p>")
         else:
             html.append("        <table>")
             html.append(
-                "            <tr><th>Name</th><th>Expression</th><th>Result / Plot</th></tr>"
+                "            <tr><th>Name</th><th>Expression</th><th>Value</th><th>Unit</th><th>Min Spec</th><th>Max Spec</th><th>Plot</th></tr>"
             )
             for out in self.outputs:
                 name = out.get("name", "Unnamed")
                 expr = out.get("expression", "")
+                unit = out.get("unit", "")
+                spec_min = out.get("min", "")
+                spec_max = out.get("max", "")
 
                 html.append("            <tr>")
                 html.append(f"                <td>{name}</td>")
                 html.append(f"                <td><code>{expr}</code></td>")
 
-                if out.get("_eval_success"):
-                    if out.get("_eval_type") == "scalar":
-                        res = out.get("_eval_result")
-                        html.append(f"                <td><strong>{res}</strong></td>")
-                    elif out.get("_eval_type") == "plot":
-                        img = out.get("_eval_result")
-                        html.append(
-                            f"                <td><div class='plot-container'><img src='{img}' alt='Waveform Plot'></div></td>"
-                        )
+                # Value column with spec coloring
+                if out.get("_eval_success") and "_eval_scalar" in out:
+                    scalar_val = out["_eval_scalar"]
+                    cell_color = self._spec_color(scalar_val, spec_min, spec_max)
+                    html.append(
+                        f"                <td style='background-color: {cell_color}; font-weight: bold;'>{scalar_val}</td>"
+                    )
+                elif out.get("_eval_success"):
+                    html.append("                <td>\u2014</td>")
                 else:
                     err = out.get("_eval_error", "Unknown Error")
                     html.append(f"                <td class='error'>Error: {err}</td>")
 
+                html.append(f"                <td>{unit}</td>")
+                html.append(f"                <td>{spec_min}</td>")
+                html.append(f"                <td>{spec_max}</td>")
+
+                # Plot column
+                if out.get("_eval_success") and "_eval_plot" in out:
+                    html.append(
+                        f"                <td><div class='plot-container'><img src='{out['_eval_plot']}' alt='Waveform Plot' onclick='openLightbox(this)'></div></td>"
+                    )
+                else:
+                    html.append("                <td>\u2014</td>")
+
                 html.append("            </tr>")
             html.append("        </table>")
 
-        html.extend(
-            [
-                "",
-                "        <h2>3. Simulation Logs</h2>",
-            ]
+        # --- Section: Simulation Logs ---
+        html.append("")
+        html.append(
+            f"        <h2 id='sect-{logs_sect}'>{logs_sect}. Simulation Logs</h2>"
         )
 
-        # Inject log file
-        log_content = "Log file not found or simulation skipped."
-        if os.path.exists(self._log_path):
+        if self._log_path and os.path.exists(self._log_path):
             with open(self._log_path, "r") as lf:
                 log_content = lf.read()
 
-        # Ensure log isn't too massive to embed directly. Truncate if > 100k
-        if len(log_content) > 100000:
-            log_content = (
-                log_content[:50000]
-                + "\n\n... [LOG TRUNCATED] ...\n\n"
-                + log_content[-50000:]
-            )
+            if len(log_content) > 100000:
+                log_content = (
+                    log_content[:50000]
+                    + "\n\n... [LOG TRUNCATED] ...\n\n"
+                    + log_content[-50000:]
+                )
 
-        html.append(f"        <pre>{log_content}</pre>")
+            html.append("        <details>")
+            html.append("            <summary>Click to view simulation log</summary>")
+            html.append(f"            <pre>{log_content}</pre>")
+            html.append("        </details>")
+        else:
+            html.append("        <p><em>No simulation log available.</em></p>")
 
-        html.extend(["    </div>", "</body>", "</html>"])
+        html.append("    </div>")
+        html.append("")
+
+        # --- Footer Banner ---
+        html.append(
+            "    <div style='text-align: center; margin: 30px auto 10px; padding: 15px; opacity: 0.7;'>"
+        )
+        html.append(
+            "        <a href='https://seimsoft.github.io/OpenS/' target='_blank' style='text-decoration: none; color: #666; display: inline-flex; align-items: center; gap: 8px;'>"
+        )
+        html.append(
+            "            <img src='launcher.png' alt='OpenS' style='height: 24px; width: 24px;'>"
+        )
+        html.append(
+            "            <span style='font-size: 12px;'>Created by OpenS</span>"
+        )
+        html.append("        </a>")
+        html.append("    </div>")
+        html.append("")
+
+        # --- Lightbox overlay ---
+        html.append(
+            "    <div class='lightbox-overlay' id='lightbox' onclick='closeLightbox(event)'>"
+        )
+        html.append(
+            "        <span class='lightbox-close' onclick='closeLightbox(event)'>&times;</span>"
+        )
+        html.append("        <img id='lightbox-img' src='' alt='Fullscreen'>")
+        html.append("    </div>")
+        html.append("")
+
+        # --- Lightbox JavaScript with pinch-zoom ---
+        html.append("    <script>")
+        html.append(
+            """
+        const overlay = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lightbox-img');
+
+        let scale = 1;
+        let translateX = 0, translateY = 0;
+        let isDragging = false;
+        let startX, startY;
+        let initialPinchDist = null;
+        let initialScale = 1;
+
+        function openLightbox(img) {
+            lbImg.src = img.src;
+            scale = 1; translateX = 0; translateY = 0;
+            applyTransform();
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(e) {
+            if (e.target === overlay || e.target.classList.contains('lightbox-close')) {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function applyTransform() {
+            lbImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
+
+        // Mouse wheel zoom
+        overlay.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale = Math.min(Math.max(0.2, scale * delta), 20);
+            applyTransform();
+        }, { passive: false });
+
+        // Mouse drag
+        lbImg.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            isDragging = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+            lbImg.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            translateX = e.clientX - startX;
+            translateY = e.clientY - startY;
+            applyTransform();
+        });
+
+        window.addEventListener('mouseup', function() {
+            isDragging = false;
+            lbImg.style.cursor = 'grab';
+        });
+
+        // Touch: pinch zoom + drag
+        lbImg.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 2) {
+                initialPinchDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialScale = scale;
+            } else if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - translateX;
+                startY = e.touches[0].clientY - translateY;
+            }
+        }, { passive: true });
+
+        lbImg.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 2 && initialPinchDist) {
+                e.preventDefault();
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                scale = Math.min(Math.max(0.2, initialScale * (dist / initialPinchDist)), 20);
+                applyTransform();
+            } else if (e.touches.length === 1 && isDragging) {
+                translateX = e.touches[0].clientX - startX;
+                translateY = e.touches[0].clientY - startY;
+                applyTransform();
+            }
+        }, { passive: false });
+
+        lbImg.addEventListener('touchend', function(e) {
+            if (e.touches.length < 2) initialPinchDist = null;
+            if (e.touches.length === 0) isDragging = false;
+        });
+
+        // ESC to close
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        """
+        )
+        html.append("    </script>")
+        html.append("</body>")
+        html.append("</html>")
 
         with open(os.path.join(self.report_dir, "index.html"), "w") as f:
             f.write("\n".join(html))
+
+    @staticmethod
+    def _spec_color(scalar_str, spec_min, spec_max):
+        """Return a CSS background color based on spec compliance."""
+        try:
+            # Parse numeric value from SI-formatted string
+            val_str = scalar_str.strip()
+            # Remove any trailing unit text
+            parts = val_str.split()
+            num_str = parts[0] if parts else val_str
+
+            si_suffixes = {
+                "y": 1e-24,
+                "z": 1e-21,
+                "a": 1e-18,
+                "f": 1e-15,
+                "p": 1e-12,
+                "n": 1e-9,
+                "u": 1e-6,
+                "µ": 1e-6,
+                "m": 1e-3,
+                "k": 1e3,
+                "K": 1e3,
+                "M": 1e6,
+                "G": 1e9,
+                "T": 1e12,
+            }
+
+            multiplier = 1.0
+            clean = num_str
+            if clean and clean[-1] in si_suffixes:
+                multiplier = si_suffixes[clean[-1]]
+                clean = clean[:-1]
+
+            val = float(clean) * multiplier
+
+            has_min = spec_min and spec_min.strip()
+            has_max = spec_max and spec_max.strip()
+
+            if not has_min and not has_max:
+                return "transparent"
+
+            in_spec = True
+            if has_min:
+                if val < float(spec_min):
+                    in_spec = False
+            if has_max:
+                if val > float(spec_max):
+                    in_spec = False
+
+            return "#d4edda" if in_spec else "#f8d7da"  # green / red
+
+        except (ValueError, TypeError, IndexError):
+            return "transparent"

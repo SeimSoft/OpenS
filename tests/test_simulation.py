@@ -78,4 +78,3 @@ def test_reporting_headless(qapp, tmp_path):
     assert os.path.exists(
         os.path.join(report_dir, "circuit.png")
     ), "Circuit PNG missing"
-    assert os.path.exists(os.path.join(report_dir, "simulation.net")), "Netlist missing"

@@ -1,0 +1,739 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../api/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.24">
+    
+    
+      
+        <title>Simulation Calculator - OpenS Suite Documentation</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="../assets/stylesheets/modern/main.28978c9b.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#simulation-calculator" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="./.." title="OpenS Suite Documentation" class="md-header__button md-logo" aria-label="OpenS Suite Documentation" data-md-component="logo">
+      
+  <img src="../launcher.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenS Suite Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Simulation Calculator
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="./.." title="OpenS Suite Documentation" class="md-nav__button md-logo" aria-label="OpenS Suite Documentation" data-md-component="logo">
+      
+  <img src="../launcher.png" alt="logo">
+
+    </a>
+    OpenS Suite Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculator
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="././" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calculator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#signal-fetching-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signal Fetching Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Signal Fetching Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-fetcher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General Fetcher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transient-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transient Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ac-analysis-frequency-domain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AC Analysis (Frequency Domain)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dc-sweep-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DC Sweep Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operating-point-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operating Point Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#math-measurement-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Math &amp; Measurement Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plotting-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plotting &amp; Visualization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#special-context-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Special Context Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Special Context Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#signal-fetching-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signal Fetching Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Signal Fetching Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general-fetcher" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        General Fetcher
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transient-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transient Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ac-analysis-frequency-domain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AC Analysis (Frequency Domain)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dc-sweep-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DC Sweep Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operating-point-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operating Point Analysis
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#math-measurement-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Math &amp; Measurement Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plotting-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plotting &amp; Visualization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#special-context-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Special Context Variables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Special Context Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+<h1 id="simulation-calculator">Simulation Calculator<a class="headerlink" href="#simulation-calculator" title="Permanent link">&para;</a></h1>
+<p>The <strong>Simulation Calculator</strong> provides a powerful Python-based environment to evaluate expressions, plot waveforms, and manipulate simulation data generated by OpenS.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>The Calculator uses an embedded Python execution environment. It automatically extracts vectors and variables from your simulation results when run (e.g., Transient, AC, DC, and Operating Point analyses). Any valid Python script can be evaluated here, and the results can be plotted to the Waveform Viewer or displayed in the Results dialog as scalars.</p>
+<blockquote>
+<p>[!NOTE]
+All NumPy functions are available natively via the <code>np</code> variable, which is automatically imported into your script's scope.</p>
+</blockquote>
+<hr />
+<h2 id="signal-fetching-functions">Signal Fetching Functions<a class="headerlink" href="#signal-fetching-functions" title="Permanent link">&para;</a></h2>
+<p>The Calculator provides built-in helper functions to easily fetch signals, arrays, and scalars from your simulation raw plots.</p>
+<h3 id="general-fetcher">General Fetcher<a class="headerlink" href="#general-fetcher" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>v(name, plot=None)</code></strong>: The generic voltage fetcher. It automatically tries to find the signal in your Transient, DC, AC, and Operating Point analyses consecutively.</li>
+</ul>
+<h3 id="transient-analysis">Transient Analysis<a class="headerlink" href="#transient-analysis" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>vt(name, plot=None)</code></strong> or <strong><code>st(name, plot=None)</code></strong>: Fetch a transient voltage signal array by name.</li>
+<li><strong><code>it(name, plot=None)</code></strong>: Fetch a transient current signal array by name.</li>
+<li><strong><code>t</code></strong>: The default time array (<code>numpy.ndarray</code>) for the current transient analysis.</li>
+</ul>
+<h3 id="ac-analysis-frequency-domain">AC Analysis (Frequency Domain)<a class="headerlink" href="#ac-analysis-frequency-domain" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>vf(name, plot=None)</code></strong> or <strong><code>sf(name, plot=None)</code></strong>: Fetch an AC voltage signal array (complex numbers) by name.</li>
+<li><strong><code>ifc(name, plot=None)</code></strong>: Fetch an AC current signal array (complex numbers) by name.</li>
+<li><strong><code>f</code></strong>: The default frequency array (<code>numpy.ndarray</code>) for the current AC analysis.</li>
+</ul>
+<h3 id="dc-sweep-analysis">DC Sweep Analysis<a class="headerlink" href="#dc-sweep-analysis" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>vdc(name, plot=None)</code></strong> or <strong><code>sdc(name, plot=None)</code></strong>: Fetch a DC sweep voltage signal array by name.</li>
+</ul>
+<h3 id="operating-point-analysis">Operating Point Analysis<a class="headerlink" href="#operating-point-analysis" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>op(name, plot=None)</code></strong> or <strong><code>sop(name, plot=None)</code></strong>: Fetch a scalar operating point value (voltage or current) by node name.</li>
+</ul>
+<hr />
+<h2 id="math-measurement-functions">Math &amp; Measurement Functions<a class="headerlink" href="#math-measurement-functions" title="Permanent link">&para;</a></h2>
+<p>You can analyze and process arrays returned by the fetcher functions. </p>
+<blockquote>
+<p>[!TIP]
+If a parameter like <code>t_start</code> or <code>t_stop</code> is omitted, the measurement applies to the entire array.</p>
+</blockquote>
+<ul>
+<li><strong><code>mean(x, y, t_start=None, t_stop=None)</code></strong>: Calculates the mean/average of <code>y</code> over the interval <code>[t_start, t_stop]</code> in <code>x</code>.</li>
+<li><strong><code>rms(x, y, t_start=None, t_stop=None)</code></strong>: Calculates the Root Mean Square (RMS) of <code>y</code> over the interval <code>[t_start, t_stop]</code> in <code>x</code>.</li>
+<li><strong><code>p2p(x, y, t_start=None, t_stop=None)</code></strong>: Calculates the Peak-to-Peak difference of <code>y</code> over the interval <code>[t_start, t_stop]</code>.</li>
+<li><strong><code>value(x, y, at)</code></strong>: Interpolates the value of <code>y</code> at the precise <code>x</code> coordinate specified by <code>at</code>.</li>
+<li><strong><code>f3db(result_array, plot_name=None)</code></strong>: Calculates the 3dB frequency (bandwidth) of a complex AC array.</li>
+<li><strong><code>mag(x)</code></strong>: Returns the absolute magnitude of a complex/real array (equivalent to <code>np.abs(x)</code>).</li>
+<li><strong><code>db(x)</code> / <code>dB(x)</code></strong>: Converts an array to decibels (<span class="arithmatex">\(20 \times \log_{10}(|x|)\)</span>).</li>
+<li><strong><code>ph(x)</code></strong>: Returns the phase angle in degrees (<code>np.angle(x, deg=True)</code>).</li>
+</ul>
+<hr />
+<h2 id="plotting-visualization">Plotting &amp; Visualization<a class="headerlink" href="#plotting-visualization" title="Permanent link">&para;</a></h2>
+<p>The calculator integrates seamlessly into the Waveform Viewer to plot your Python expressions.</p>
+<ul>
+<li><strong><code>plot(x, y=None, label=None, title=None)</code></strong>: Renders a standard 2D plot of <code>y</code> over <code>x</code>. If <code>y</code> is evaluated implicitly (e.g., just evaluating an array), the calculator defaults to using the <code>t</code> or <code>f</code> arrays as <code>x</code>.</li>
+<li><strong><code>bode(target, plot=None)</code></strong>: Renders a Bode plot. Target can be either the name of an AC signal (e.g., <code>'vout'</code>) or an evaluated complex NumPy array from an AC analysis. It automatically handles plotting both magnitude (in dB) and phase (in degrees).</li>
+<li><strong><code>subaxis(nrows, idx)</code></strong> / <strong><code>subfigure(nrows, idx)</code></strong>: Tools to divide the Waveform Viewer into horizontal subplots natively from scripts. </li>
+</ul>
+<h2 id="special-context-variables">Special Context Variables<a class="headerlink" href="#special-context-variables" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><code>np</code></strong>: Provides full access to the <code>numpy</code> library (e.g., <code>np.sin(t)</code>, <code>np.max(vt('out'))</code>).</li>
+<li><strong><code>plots</code></strong>: A dictionary containing raw Spice results covering all nodes.</li>
+</ul>
+<h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
+<p><strong>Measuring the 3dB cutoff of <code>vout</code>:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">bw</span> <span class="o">=</span> <span class="n">f3db</span><span class="p">(</span><span class="n">vf</span><span class="p">(</span><span class="s1">&#39;vout&#39;</span><span class="p">))</span>
+</span></code></pre></div></p>
+<p><strong>Plotting a signal in Decibels:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dB</span><span class="p">(</span><span class="n">vf</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Vout (dB)&quot;</span><span class="p">)</span>
+</span></code></pre></div></p>
+<p><strong>Plotting power dissipated by a resistor:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">v_resistor</span> <span class="o">=</span> <span class="n">vt</span><span class="p">(</span><span class="s1">&#39;N_1&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="n">vt</span><span class="p">(</span><span class="s1">&#39;N_2&#39;</span><span class="p">)</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">i_resistor</span> <span class="o">=</span> <span class="n">it</span><span class="p">(</span><span class="s1">&#39;R1&#39;</span><span class="p">)</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">v_resistor</span> <span class="o">*</span> <span class="n">i_resistor</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Power (W)&quot;</span><span class="p">)</span>
+</span></code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      
+      <script id="__config" type="application/json">{"annotate":null,"base":"..","features":[],"search":"../assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.16f8adc2.min.js"></script>
+      
+    
+  </body>
+</html>

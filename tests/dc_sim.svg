@@ -41,4 +41,14 @@
   </g>
   <circle cx="40.0" cy="70.0" r="3" fill="black" />
   <opens:analysis enabled="True" source="V1" start="0" step="0.1" stop="5" type="DC" />
+  <opens:output name="plotA">plot(sdc('N_2'), label="sdc('N_2')")</opens:output>
+  <opens:output name="plotB">plot(sdc('N_2'), label="sdc('N_2')")
+plot(sdc('N_1'), label="sdc('N_1')")</opens:output>
+  <opens:output name="plotC">plot(sdc('V1#branch'), label="sdc('V1#branch')")
+plot(sdc('V2#branch'), label="sdc('V2#branch')")</opens:output>
+  <opens:output name="scalar_at_0_and_plots" unit="V">plot(sdc('V1#branch'), label="sdc('V1#branch')")
+plot(sdc('V2#branch'), label="sdc('V2#branch')")
+
+value(sdc('sweep'), sdc('N_1'), at=0)</opens:output>
+  <opens:output max="5" name="just_scalar" unit="V">value(sdc('sweep'), sdc('N_1'), at=0.5)</opens:output>
 </svg>

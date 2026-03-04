@@ -58,3 +58,62 @@ def test_netlist_dc_sim(qapp):
 
     print("\nGenerated Netlist:")
     print(netlist)
+
+
+def test_netlist_ac_tran(qapp):
+    # Test that both AC and TRAN analyses can be emitted into the same netlist
+    view = SchematicView()
+
+    # We can just use an empty scene for this test since we're testing the analysis block
+    analyses = [
+        {
+            "type": "AC",
+            "ac_type": "DEC",
+            "points": "10",
+            "start": "1",
+            "stop": "1Meg",
+            "enabled": True,
+        },
+        {"type": "Tran", "step": "10n", "stop": "1u", "enabled": True},
+    ]
+
+    gen = NetlistGenerator(view.scene(), analyses)
+    netlist = gen.generate()
+
+    assert ".ac DEC 10 1 1Meg" in netlist
+    assert ".tran 10n 1u" in netlist
+    assert ".print ac " in netlist
+    assert ".print tran " in netlist
+
+
+def test_netlist_subcircuit(qapp, tmp_path):
+    # Create a minimal subcircuit test programmatically
+    # We will simulate a schematic item that uses a subcircuit
+    from opens_suite.schematic_item import SchematicItem
+    from opens_suite.netlister import NetlistGenerator
+
+    # 1. Provide fake subcircuit code representing what _generate_subcircuit would return
+    subcircuits_code = {"MY_SUBCKT": ".subckt MY_SUBCKT IN OUT\nR1 IN OUT 1k\n.ends\n"}
+
+    # 2. Add an item referencing the subcircuit to the scene
+    view = SchematicView()
+    scene = view.scene()
+
+    dummy_svg = tmp_path / "dummy.svg"
+    dummy_svg.write_text("<svg></svg>")
+    item = SchematicItem(str(dummy_svg))
+    item.name = "X1"
+    item.prefix = "X"
+    item.parameters = {"MODEL": "MY_SUBCKT"}
+    item.pins = {"IN": {"pos": [0, 0]}, "OUT": {"pos": [10, 0]}}
+    scene.addItem(item)
+
+    gen = NetlistGenerator(scene, [], subcircuits_code=subcircuits_code)
+    # The netlister internally relies on subckt_name resolution which happens when analyzing items
+    # We force the subckt resolution
+    gen.subcircuits_code = subcircuits_code
+    netlist = gen.generate()
+
+    assert ".subckt MY_SUBCKT IN OUT" in netlist
+    assert "X_X1" in netlist or "XX1" in netlist or "X1" in netlist
+    assert "MY_SUBCKT" in netlist

@@ -162,6 +162,9 @@ class OutputsWidget(QDockWidget):
         try:
             temp_calc = CalculatorDialog(raw_path)
             scope = temp_calc._create_scope()
+            scope["plot"] = lambda *args, **kwargs: None
+            scope["bode"] = lambda *args, **kwargs: None
+            scope["subaxis"] = lambda *args, **kwargs: None
             self._results_cache.clear()
 
             rows_to_eval = list(range(self.model.rowCount()))
@@ -215,6 +218,9 @@ class OutputsWidget(QDockWidget):
             try:
                 temp_calc = CalculatorDialog(raw_path)
                 scope = temp_calc._create_scope()
+                scope["plot"] = lambda *args, **kwargs: None
+                scope["bode"] = lambda *args, **kwargs: None
+                scope["subaxis"] = lambda *args, **kwargs: None
                 # Include existing results from other rows
                 scope.update(self._results_cache)
             except Exception:

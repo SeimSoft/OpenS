@@ -584,14 +584,14 @@ class NetlistGenerator:
                 )
                 if save_all:
                     output.append(f".print dc {voltages_str} {currents_str}")
-                break  # Only one analysis
+                # DC sweeps shouldn't generally be mixed with AC/TRAN because Xyce can complain about
+                # the time/freq scale vs stepped parameters depending on how it's defined, but we'll leave it up to the user.
             elif an_type == "AC":
                 output.append(
                     f".ac {config.get('ac_type')} {config.get('points')} {config.get('start')} {config.get('stop')}"
                 )
                 if save_all:
                     output.append(f".print ac {voltages_str} {currents_str}")
-                break
             elif an_type == "TRAN":
                 step = config.get("step") or "1u"
                 stop = config.get("stop") or "100u"
@@ -601,13 +601,11 @@ class NetlistGenerator:
                 output.append(line)
                 if save_all:
                     output.append(f".print tran {voltages_str} {currents_str}")
-                break
             elif an_type == "OP":
                 output.append(".op")
                 if save_all:
                     # In Xyce, for .op analysis, specify .print dc to get results in the raw file
                     output.append(f".print dc {voltages_str} {currents_str}")
-                break
 
         if not self.is_subcircuit:
             subckts_str = "\n".join(self.subcircuits_code.values())

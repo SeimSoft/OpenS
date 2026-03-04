@@ -28,6 +28,8 @@ class AnalysisWidget(QDockWidget):
         self.tree_view = QTreeView()
         self.tree_view.setHeaderHidden(True)
         self.tree_view.doubleClicked.connect(self.on_double_click)
+        self.tree_view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tree_view.customContextMenuRequested.connect(self.show_context_menu)
 
         self.model = QStandardItemModel(self)
         self.tree_view.setModel(self.model)
@@ -74,6 +76,33 @@ class AnalysisWidget(QDockWidget):
                 if dialog.exec():
                     new_config = dialog.get_config()
                     self.add_analysis(new_config, item)
+
+    def show_context_menu(self, position):
+        index = self.tree_view.indexAt(position)
+        if not index.isValid():
+            return
+
+        item = self.model.itemFromIndex(index)
+
+        # Don't show context menu for the placeholder or child items (parameters)
+        if item.text() == "Click here to add analysis" or item.parent() is not None:
+            return
+
+        from PyQt6.QtWidgets import QMenu
+
+        menu = QMenu()
+        remove_action = menu.addAction("Remove Analysis")
+
+        action = menu.exec(self.tree_view.viewport().mapToGlobal(position))
+        if action == remove_action:
+            if item.checkState() == Qt.CheckState.Checked:
+                # Need to emit signal if removing an active analysis
+                emit = True
+            else:
+                emit = False
+            self.model.removeRow(item.row())
+            if emit:
+                self.analysesChanged.emit()
 
     def add_analysis(self, config, existing_item=None):
         an_type = config.get("type")

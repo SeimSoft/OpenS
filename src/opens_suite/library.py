@@ -124,6 +124,11 @@ class LibraryWidget(QDockWidget):
         node_type = item.data(0, Qt.ItemDataRole.UserRole + 1)
         node_path = item.data(0, Qt.ItemDataRole.UserRole + 2)
 
+        if node_type == "REPORT":
+            self.preview_label.setText("HTML Report")
+            self.preview_label.setPixmap(QPixmap())
+            return
+
         # If it's a CELL, try to find a symbol view for preview
         if node_type == "CELL" and node_path and os.path.isdir(node_path):
             sym_path = os.path.join(node_path, "symbol.svg")
@@ -212,6 +217,23 @@ class LibraryWidget(QDockWidget):
                     or not os.path.isdir(lib_path)
                     or lib_name == "src"
                 ):
+                    continue
+
+                if os.path.exists(os.path.join(lib_path, "index.html")):
+                    report_item = QTreeWidgetItem(
+                        self.tree_widget, [f"📝 {lib_name} (Report)"]
+                    )
+                    report_item.setData(0, Qt.ItemDataRole.UserRole + 1, "REPORT")
+                    report_item.setData(0, Qt.ItemDataRole.UserRole + 2, lib_path)
+                    report_item.setData(
+                        0,
+                        Qt.ItemDataRole.UserRole,
+                        os.path.join(lib_path, "index.html"),
+                    )
+                    font = report_item.font(0)
+                    font.setBold(True)
+                    report_item.setFont(0, font)
+                    report_item.setForeground(0, QBrush(QColor("#005A9C")))
                     continue
 
                 lib_item = QTreeWidgetItem(self.tree_widget, [lib_name])
@@ -346,6 +368,10 @@ class LibraryWidget(QDockWidget):
         node_type = item.data(0, Qt.ItemDataRole.UserRole + 1)
         if node_type == "NEW_LIB":
             self._create_new_library()
+            return
+        elif node_type == "REPORT":
+            index_path = item.data(0, Qt.ItemDataRole.UserRole)
+            QDesktopServices.openUrl(QUrl.fromLocalFile(index_path))
             return
 
         path = item.data(0, Qt.ItemDataRole.UserRole)

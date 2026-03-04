@@ -348,8 +348,6 @@ class WaveformViewer(QMainWindow):
             y,
             pen=pg.mkPen(color, width=1.5),
             name=name,
-            autoDownsample=True,
-            clipToView=True,
         )
 
         # Make the curve selectable via left-click!

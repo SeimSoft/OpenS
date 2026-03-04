@@ -82,6 +82,9 @@ class MainWindow(QMainWindow):
         self.redo_icon = QIcon(
             os.path.join(os.path.dirname(__file__), "assets", "icons", "redo.svg")
         )
+        self.report_icon = QIcon(
+            os.path.join(os.path.dirname(__file__), "assets", "icons", "report.svg")
+        )
         self.symbol_icon = QIcon(
             os.path.join(os.path.dirname(__file__), "assets", "icons", "symbol.svg")
         )
@@ -209,6 +212,17 @@ class MainWindow(QMainWindow):
         )
         self.create_symbol_action.triggered.connect(self.create_symbol)
 
+        # Generate Report Action
+        self.generate_report_action = QAction(
+            self.report_icon,
+            "Generate Report",
+            self,
+        )
+        self.generate_report_action.setStatusTip(
+            "Generate a headless HTML simulation report for this schematic"
+        )
+        self.generate_report_action.triggered.connect(self.generate_report)
+
         # Exit Action
         self.exit_action = QAction(
             self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCloseButton),
@@ -255,6 +269,7 @@ class MainWindow(QMainWindow):
 
         tools_menu = menubar.addMenu("&Tools")
         tools_menu.addAction(self.create_symbol_action)
+        tools_menu.addAction(self.generate_report_action)
         tools_menu.addSeparator()
         tools_menu.addAction(self.settings_action)
 
@@ -277,6 +292,7 @@ class MainWindow(QMainWindow):
         sim_toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
         self.addToolBar(sim_toolbar)
         sim_toolbar.addAction(self.create_symbol_action)
+        sim_toolbar.addAction(self.generate_report_action)
         sim_toolbar.addSeparator()
         self.show_labels_action = QAction(self.labels_icon, "Show Wire Labels", self)
         self.show_labels_action.setCheckable(True)
@@ -657,6 +673,63 @@ class MainWindow(QMainWindow):
     def show_settings(self):
         dialog = SettingsDialog(self)
         dialog.exec()
+
+    def generate_report(self):
+        current_widget = self.tabs.currentWidget()
+        if not isinstance(current_widget, SchematicView) or not getattr(
+            current_widget, "filename", None
+        ):
+            QMessageBox.warning(
+                self,
+                "No file",
+                "Please save your schematic before generating a report.",
+            )
+            return
+
+        filename = current_widget.filename
+        default_report_dir = os.path.join(os.path.dirname(filename), "report")
+
+        reply = QMessageBox.question(
+            self,
+            "Generate Report",
+            f"Generate HTML report into:\n{default_report_dir}?\n\n(This will execute the simulation headless)",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.Yes,
+        )
+
+        if reply == QMessageBox.StandardButton.Yes:
+            from opens_suite.reporting.report_generator import ReportGenerator
+
+            self.update_status("Generating headless report... please wait.")
+
+            try:
+                # Force local save so it hits disk for snapshot
+                current_widget.save_schematic(
+                    filename,
+                    self.analysis_dock.get_analyses(),
+                    self.outputs_dock.get_expressions_data(),
+                    self.variables_dock.get_variables(),
+                )
+
+                gen = ReportGenerator(filename, default_report_dir)
+                gen.generate()
+                self.update_status(
+                    f"Report generated at {default_report_dir}/index.html"
+                )
+
+                # Auto-refresh library if library browser exists
+                if hasattr(self, "library_dock"):
+                    self.library_dock._populate_library()
+
+            except Exception as e:
+                import traceback
+
+                QMessageBox.critical(
+                    self,
+                    "Report Failed",
+                    f"Failed to generate report:\n{e}\n\n{traceback.format_exc()}",
+                )
+                self.update_status("Report generation failed.")
 
 
 class SettingsDialog(QDialog):
