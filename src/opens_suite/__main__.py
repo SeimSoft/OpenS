@@ -15,6 +15,12 @@ def main():
         "--netlist", action="store_true", help="Generate netlist and print to stdout"
     )
     parser.add_argument("--simulate", action="store_true", help="Run Xyce simulation")
+    parser.add_argument(
+        "--report",
+        type=str,
+        metavar="DIR",
+        help="Generate an HTML simulation report in the specified directory",
+    )
     args = parser.parse_args()
 
     project_dir = os.getcwd()
@@ -40,6 +46,23 @@ def main():
     app.setWindowIcon(
         QIcon(os.path.join(os.path.dirname(__file__), "assets", "launcher.png"))
     )
+
+    if args.report:
+        if not file_to_open:
+            print("Error: Specify a schematic file.")
+            sys.exit(1)
+        try:
+            from opens_suite.reporting.report_generator import ReportGenerator
+
+            generator = ReportGenerator(file_to_open, args.report)
+            generator.generate()
+        except Exception as e:
+            print(f"Error during report generation: {e}")
+            import traceback
+
+            traceback.print_exc()
+            sys.exit(1)
+        sys.exit(0)
 
     if args.netlist or args.simulate:
         if not file_to_open:

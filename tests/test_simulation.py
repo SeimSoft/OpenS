@@ -57,3 +57,25 @@ def test_simulation_dc_sim(qapp, tmp_path):
         pytest.skip(
             f"Xyce backend not available for end-to-end test execution at {runner.get_executable_path()}."
         )
+
+
+def test_reporting_headless(qapp, tmp_path):
+    """
+    Test the complete headless reporting automation pipeline natively.
+    """
+    from opens_suite.reporting.report_generator import ReportGenerator
+
+    test_dir = os.path.dirname(__file__)
+    svg_path = os.path.join(test_dir, "dc_sim.svg")
+    assert os.path.exists(svg_path), f"Test schematic missing at {svg_path}"
+
+    report_dir = str(tmp_path / "report")
+    gen = ReportGenerator(svg_path, report_dir)
+    gen.generate()
+
+    assert os.path.exists(report_dir)
+    assert os.path.exists(os.path.join(report_dir, "index.html")), "HTML missing"
+    assert os.path.exists(
+        os.path.join(report_dir, "circuit.png")
+    ), "Circuit PNG missing"
+    assert os.path.exists(os.path.join(report_dir, "simulation.net")), "Netlist missing"
