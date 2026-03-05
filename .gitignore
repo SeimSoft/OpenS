@@ -71,7 +71,7 @@ dmypy.json
 *.swp
 *.swo
 *~
-
+tmp
 # OS generated files
 .DS_Store
 .DS_Store?

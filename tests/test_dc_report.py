@@ -36,6 +36,8 @@ def test_dc_x_axis_evaluation(qapp, dc_setup):
 
     # We need to mock WaveformViewer to check what x-axis is passed to plot()
     mock_viewer = MagicMock(spec=WaveformViewer)
+    mock_plot_item = MagicMock()
+    mock_viewer.plots = [mock_plot_item]
 
     # We'll patch CalculatorDialog and WaveformViewer at their source since ReportGenerator uses local imports
     from opens_suite.calculator_widget import CalculatorDialog

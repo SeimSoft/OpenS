@@ -40,6 +40,14 @@ class XyceRunner(QObject):
             "bin",
             exe,
         )
+        # Fallback to system Xyce if bundled one is missing
+        if not os.path.exists(xyce_path):
+            import shutil
+
+            system_xyce = shutil.which("Xyce")
+            if system_xyce:
+                return system_xyce
+
         return xyce_path
 
     def run_cli(self, netlist_path, raw_path):

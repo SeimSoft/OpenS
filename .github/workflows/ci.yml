@@ -34,8 +34,13 @@ jobs:
         run: uv run pylint src/opens_suite tests || true
 
       - name: Run Tests & Coverage
-        run: xvfb-run -a uv run pytest --cov=src/opens_suite --cov-report=xml --cov-report=term tests/
-        continue-on-error: true
+        run: xvfb-run -a uv run pytest --cov=src/opens_suite --cov-report=xml --cov-report=term --junitxml=pytest.xml tests/
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v4
+        if: success() || failure()
+        with:
+          report_paths: 'pytest.xml'
 
       - name: Build MkDocs Documentation
         run: uv run zensical build

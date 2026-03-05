@@ -13,9 +13,11 @@ ARCH="$(uname -m)"
 case "${OS}" in
     Darwin*)
         PLATFORM="darwin"
-        ZIP_FILE="xyce-macos-latest.zip"
-        # Optional: Check for intel vs arm if the release eventually separates them
-        # For now, only latest and intel-26 are listed.
+        if [ "${ARCH}" = "x86_64" ]; then
+            ZIP_FILE="xyce-macos-26-intel.zip"
+        else
+            ZIP_FILE="xyce-macos-latest.zip"
+        fi
         ;;
     Linux*)
         PLATFORM="linux"

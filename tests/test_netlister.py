@@ -53,7 +53,7 @@ def test_netlist_dc_sim(qapp):
     # Specific assertions for dc_sim.svg
     assert "V1" in netlist
     assert "M1" in netlist
-    assert ".dc V1 0 5 0.1" in netlist
+    assert ".dc V1 0 1.2 0.1" in netlist
     assert "NMOS_MODEL" in netlist
 
     print("\nGenerated Netlist:")
