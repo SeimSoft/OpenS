@@ -56,11 +56,15 @@ class XyceRunner(QObject):
         if not os.path.exists(xyce_path):
             raise FileNotFoundError(f"Xyce executable not found at {xyce_path}")
 
+        # Use netlist directory as CWD
+        cwd = os.path.dirname(os.path.abspath(netlist_path))
+
         proc = subprocess.Popen(
             [xyce_path, "-r", raw_path, netlist_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            cwd=cwd,
         )
 
         for line in proc.stdout:
@@ -80,6 +84,10 @@ class XyceRunner(QObject):
 
         self.process = QProcess(self)
         self.process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
+
+        # Use netlist directory as CWD
+        cwd = os.path.dirname(os.path.abspath(netlist_path))
+        self.process.setWorkingDirectory(cwd)
 
         # Connect signals
         self.process.readyReadStandardOutput.connect(self._on_ready_read)

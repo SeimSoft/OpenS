@@ -404,16 +404,46 @@ class NetlistGenerator:
                             val = subckt_name
                         else:
                             val = v.replace(".sch", "").replace(".svg", "")
+                    elif k.upper() == "PYTHONPATH" and isinstance(v, str):
+                        import os
+
+                        # Resolve $SVG to the directory of the current schematic
+                        sch_dir = ""
+                        try:
+                            view = self.scene.views()[0]
+                            if hasattr(view, "filename") and view.filename:
+                                sch_dir = os.path.dirname(view.filename)
+                        except Exception:
+                            pass
+
+                        val = v.replace("$SVG", sch_dir)
+                        val = os.path.expandvars(val)
+                        val = os.path.abspath(val)
+
                     fmt_args[k] = val
                     fmt_args[k.lower()] = val
                     fmt_args[k.title()] = val
 
                 try:
-                    line = template.format(**fmt_args)
+                    import jinja2
+                    import re
+
+                    # Backward compatibility for str.format() style placeholders
+                    # Convert {var} to {{var}} if it's not already Jinja's {{var}} or {%...%}
+                    jinja_template_str = re.sub(
+                        r"(?<!\{)(?<!%)\{([a-zA-Z0-9_]+)\}(?!\})(?!%)",
+                        r"{{\1}}",
+                        template,
+                    )
+
+                    env = jinja2.Environment()
+                    t = env.from_string(jinja_template_str)
+                    line = t.render(**fmt_args)
+
                     output.append(line)
                     continue
-                except KeyError as e:
-                    output.append(f"* Error formatting {item.name}: Missing key {e}")
+                except Exception as e:
+                    output.append(f"* Error formatting {item.name}: {e}")
                     continue
 
             # 3. Hierarchical Fallback (if no template/pcell generated a line yet)

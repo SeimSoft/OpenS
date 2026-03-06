@@ -49,6 +49,15 @@ class CalculatorDialog(QMainWindow):
         self._load_data()
         self._populate_signals()
 
+    def _bring_to_front(self):
+        self.show()
+        self.raise_()
+        self.activateWindow()
+
+    def _refresh_and_replot(self):
+        self.refresh()
+        self.evaluate()
+
     def _setup_ui(self):
         self.setWindowTitle("Simulation Calculator")
         self.resize(900, 600)
@@ -229,6 +238,8 @@ class CalculatorDialog(QMainWindow):
         # Ensure viewer is ready
         if not self.viewer or self.viewer.isHidden():
             self.viewer = WaveformViewer(self)
+            self.viewer.openCalculatorRequested.connect(self._bring_to_front)
+            self.viewer.refreshRequested.connect(self._refresh_and_replot)
             self.viewer.show()
 
         self.viewer.clear()

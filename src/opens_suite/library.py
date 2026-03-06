@@ -141,7 +141,12 @@ class LibraryWidget(QDockWidget):
                         path = os.path.join(node_path, f)
                         break
 
-        if not path or not os.path.exists(path) or os.path.isdir(path):
+        if (
+            not path
+            or not os.path.exists(path)
+            or os.path.isdir(path)
+            or not path.lower().endswith(".svg")
+        ):
             self.preview_label.setText(item.text(0))
             self.preview_label.setPixmap(QPixmap())
             return
@@ -208,6 +213,8 @@ class LibraryWidget(QDockWidget):
 
         # Iterate all search paths
         for base_path in search_paths:
+            if not os.path.exists(base_path):
+                continue
             for lib_name in sorted(os.listdir(base_path)):
                 lib_path = os.path.join(base_path, lib_name)
                 # Ignore common non-library folders
@@ -239,142 +246,139 @@ class LibraryWidget(QDockWidget):
                 lib_item = QTreeWidgetItem(self.tree_widget, [lib_name])
                 lib_item.setData(0, Qt.ItemDataRole.UserRole + 1, "LIB")
                 lib_item.setData(0, Qt.ItemDataRole.UserRole + 2, lib_path)
-                lib_item.setExpanded(lib_name == "opensLib")
+                lib_item.setExpanded(
+                    lib_name == "opensLib"
+                    or lib_name == os.path.basename(self.project_dir)
+                )
 
-                for root, dirs, files in os.walk(lib_path):
-                    dirs[:] = [d for d in dirs if not d.startswith(".")]
+                # Flat list of subdirectories as cells
+                cells = [
+                    d
+                    for d in os.listdir(lib_path)
+                    if os.path.isdir(os.path.join(lib_path, d))
+                    and not d.startswith(".")
+                ]
 
-                    # Handle empty cell directories natively so they appear before files are added
-                    if root == lib_path:
-                        for d in dirs:
-                            cell_path = os.path.join(root, d)
-                            if not os.listdir(cell_path):  # if directory is empty
-                                self._get_or_create_node(
-                                    lib_item,
-                                    d,
-                                    node_type="CELL",
-                                    node_path=cell_path,
-                                    path_data=cell_path,  # Keep a reference path even if it's just a dir to avoid None issues
-                                )
+                for cell_name in sorted(cells):
+                    cell_path = os.path.join(lib_path, cell_name)
 
-                    for file in sorted(files):
-                        if file.endswith(".svg"):
-                            svg_path = os.path.join(root, file)
-                            rel_path = os.path.relpath(svg_path, lib_path)
-                            parts = rel_path.split(os.sep)
+                    # 1. Determine Category from symbol.svg
+                    category = "Uncategorized"
+                    symbol_path = os.path.join(cell_path, "symbol.svg")
+                    if os.path.exists(symbol_path):
+                        try:
+                            tree = ET.parse(symbol_path)
+                            for elem in tree.getroot().iter():
+                                if (
+                                    elem.tag.endswith("}symbol")
+                                    or elem.tag == "opens:symbol"
+                                ):
+                                    cat = elem.get("category")
+                                    if cat:
+                                        category = cat
+                                    break
+                        except Exception:
+                            pass
 
-                            # We expect at least Cell/View.svg or Category/Cell/View.svg
-                            if len(parts) >= 2:
-                                view_filename = parts[-1]
-                                view_name = view_filename.replace(".svg", "").replace(
-                                    ".sym", ""
-                                )
-                                cell_name = parts[-2]
-                                cell_path = os.path.dirname(svg_path)
+                    # 2. Get or create Category node
+                    category_node = lib_item
+                    if category:
+                        category_node = self._get_or_create_node(
+                            lib_item, category, node_type="CATEGORY"
+                        )
 
-                                category_from_xml = None
-                                try:
-                                    tree = ET.parse(svg_path)
-                                    root_xml = tree.getroot()
-                                    for elem in root_xml.iter():
-                                        if (
-                                            elem.tag.endswith("}symbol")
-                                            or elem.tag == "opens:symbol"
-                                        ):
-                                            bind = elem.get("bindkey")
-                                            if bind:
-                                                self.bindkey_map[bind.lower()] = (
-                                                    svg_path
-                                                )
-                                            if svg_path.endswith("symbol.svg"):
-                                                category_from_xml = elem.get("category")
-                                                if category_from_xml == "Uncategorized":
-                                                    category_from_xml = None
-                                            break
+                    # 3. Create Cell node
+                    cell_node = self._get_or_create_node(
+                        category_node,
+                        cell_name,
+                        node_type="CELL",
+                        node_path=cell_path,
+                        path_data=cell_path,
+                    )
 
-                                    # Always fetch category from symbol.svg if not this file
-                                    if not category_from_xml and not svg_path.endswith(
-                                        "symbol.svg"
-                                    ):
-                                        symbol_path = os.path.join(
-                                            cell_path, "symbol.svg"
-                                        )
-                                        if os.path.exists(symbol_path):
-                                            try:
-                                                tree_sym = ET.parse(symbol_path)
-                                                for elem in tree_sym.getroot().iter():
-                                                    if (
-                                                        elem.tag.endswith("}symbol")
-                                                        or elem.tag == "opens:symbol"
-                                                    ):
-                                                        cat = elem.get("category")
-                                                        if (
-                                                            cat
-                                                            and cat != "Uncategorized"
-                                                        ):
-                                                            category_from_xml = cat
-                                                        break
-                                            except Exception:
-                                                pass
+                    # 4. List Views
+                    views = []
+                    for f in sorted(os.listdir(cell_path)):
+                        f_path = os.path.join(cell_path, f)
+                        if os.path.isdir(f_path):
+                            continue
 
-                                except Exception:
-                                    pass
+                        v_name = f
+                        v_type = "FILE"
+                        icon = ""
 
-                                category_name = None
-                                if len(parts) > 2:
-                                    category_name = "/".join(parts[:-2])
-                                elif category_from_xml:
-                                    category_name = category_from_xml
+                        if f == "symbol.svg":
+                            v_name = "symbol"
+                            v_type = "VIEW"
+                            icon = "🎨 "
+                        elif (
+                            f == "schematic.svg"
+                            or f.endswith(".sch.svg")
+                            or f == "schematic.sch.svg"
+                        ):
+                            v_name = "schematic"
+                            v_type = "VIEW"
+                            icon = "📝 "
+                        elif f == "index.html":
+                            v_name = "report"
+                            v_type = "REPORT"
+                            icon = "📊 "
+                        elif (
+                            f == "report"
+                            and os.path.isdir(f_path)
+                            and os.path.exists(os.path.join(f_path, "index.html"))
+                        ):
+                            v_name = "report"
+                            v_type = "REPORT"
+                            icon = "📊 "
+                            f_path = os.path.join(f_path, "index.html")
+                        elif f.endswith(".ipynb"):
+                            v_type = "NOTEBOOK"
+                            icon = "📓 "
+                        elif f.endswith(".py"):
+                            v_type = "PYTHON"
+                            icon = "🐍 "
+                        else:
+                            continue  # Ignore other files
 
-                                parent_node = lib_item
-                                # Prefer XML category if one level deep
-                                if category_name:
-                                    for cat_part in category_name.split("/"):
-                                        parent_node = self._get_or_create_node(
-                                            parent_node, cat_part, node_type="CATEGORY"
-                                        )
-
-                                cell_item = self._get_or_create_node(
-                                    parent_node,
-                                    cell_name,
-                                    node_type="CELL",
-                                    node_path=cell_path,
-                                    path_data=svg_path,
-                                )
-                                view_item = self._get_or_create_node(
-                                    cell_item, view_name, svg_path, node_type="VIEW"
-                                )
-                                view_item.setToolTip(0, svg_path)
-
-                            elif len(parts) == 1:
-                                # Top level SVG in library treated as a cell with the same name
-                                cell_name = file.replace(".svg", "").replace(".sym", "")
-                                view_name = (
-                                    "schematic"
-                                    if "schematic" in file.lower()
-                                    else "symbol"
-                                )
-                                cell_item = self._get_or_create_node(
-                                    lib_item,
-                                    cell_name,
-                                    node_type="CELL",
-                                    node_path=svg_path,
-                                )
-                                view_item = self._get_or_create_node(
-                                    cell_item, view_name, svg_path, node_type="VIEW"
-                                )
+                        view_item = self._get_or_create_node(
+                            cell_node,
+                            f"{icon}{v_name}",
+                            path_data=f_path,
+                            node_type=v_type,
+                        )
+                        view_item.setToolTip(0, f_path)
 
     def _on_item_double_clicked(self, item, column):
         node_type = item.data(0, Qt.ItemDataRole.UserRole + 1)
+        path = item.data(0, Qt.ItemDataRole.UserRole)
+
         if node_type == "NEW_LIB":
             self._create_new_library()
             return
         elif node_type == "REPORT":
-            index_path = item.data(0, Qt.ItemDataRole.UserRole)
-            QDesktopServices.openUrl(QUrl.fromLocalFile(index_path))
+            QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+            return
+        elif node_type in ["PYTHON", "NOTEBOOK"]:
+            from PyQt6.QtCore import QSettings
+
+            settings = QSettings("OpenS", "OpenS")
+            editor_cmd = settings.value("editor_command", "code '%s'")
+
+            try:
+                import shlex
+                import subprocess
+
+                if "%s" in editor_cmd:
+                    cmd_str = editor_cmd.replace("%s", path)
+                else:
+                    cmd_str = f"{editor_cmd} '{path}'"
+                args = shlex.split(cmd_str)
+                subprocess.Popen(args)
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to open file: {e}")
             return
 
-        path = item.data(0, Qt.ItemDataRole.UserRole)
         if path and os.path.exists(path):
             main_window = self.window()
             if hasattr(main_window, "open_file"):
@@ -415,6 +419,9 @@ class LibraryWidget(QDockWidget):
             sym_action.triggered.connect(
                 lambda: self._create_new_view(node_path, "symbol")
             )
+            menu.addSeparator()
+            rename_action = menu.addAction("Rename Cell...")
+            rename_action.triggered.connect(lambda: self._rename_cell(node_path))
 
         if node_path or item.data(0, Qt.ItemDataRole.UserRole):
             p = node_path or item.data(0, Qt.ItemDataRole.UserRole)
@@ -448,6 +455,26 @@ class LibraryWidget(QDockWidget):
                     QMessageBox.warning(self, "Error", f"Failed to create cell: {e}")
             else:
                 QMessageBox.warning(self, "Error", "Cell already exists!")
+
+    def _rename_cell(self, cell_path):
+        import shutil
+
+        old_name = os.path.basename(cell_path)
+        new_name, ok = QInputDialog.getText(
+            self, "Rename Cell", "New Cell Name:", text=old_name
+        )
+        if ok and new_name and new_name != old_name:
+            new_path = os.path.join(os.path.dirname(cell_path), new_name)
+            if not os.path.exists(new_path):
+                try:
+                    os.rename(cell_path, new_path)
+                    self._populate_library()
+                except Exception as e:
+                    QMessageBox.warning(self, "Error", f"Failed to rename cell: {e}")
+            else:
+                QMessageBox.warning(
+                    self, "Error", "A cell with that name already exists!"
+                )
 
     def _create_new_view(self, cell_path, view_type):
         view_name, ok = QInputDialog.getText(

@@ -16,6 +16,15 @@ A PyQt6 application for Schematic Entry.
 
 ## Installation
 
+```markdown
+### Prerequisites
+
+- brew install python@3.14 (Required for Xyce)
+- brew install gcc@14 (Required for Xyce)
+- uv (Recommanded for package management)
+```
+
+
 ```bash
 uv pip install -e .
 # or

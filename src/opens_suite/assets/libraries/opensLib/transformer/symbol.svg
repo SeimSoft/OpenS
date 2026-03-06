@@ -10,8 +10,10 @@
     <opens:param xmlns:opens="http://opens-schematic.org" name="LP" value="1m" />
     <opens:param xmlns:opens="http://opens-schematic.org" name="LS" value="1m" />
     <opens:param xmlns:opens="http://opens-schematic.org" name="K" value="0.99" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="IC_P" value="" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="IC_S" value="" />
     <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="TX" bindkey="t" category="Passives" />
-    <opens:xyce xmlns:opens="http://opens-schematic.org" template="LP{name} {pin_p1} {pin_p2} {LP}&#10;LS{name} {pin_s1} {pin_s2} {LS}&#10;K{name} LP{name} LS{name} {K}" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="LP{name} {pin_p1} {pin_p2} {LP}{% if IC_P %} IC={{IC_P}}{% endif %}&#10;LS{name} {pin_s1} {pin_s2} {LS}{% if IC_S %} IC={{IC_S}}{% endif %}&#10;K{name} LP{name} LS{name} {K}" />
   </defs>
 
   <!-- Primary Winding (Vertical Coils) -->

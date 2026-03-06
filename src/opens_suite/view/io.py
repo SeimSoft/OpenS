@@ -383,6 +383,8 @@ class IOMixin:
         self.wire_preview_path.setVisible(False)
 
         try:
+            if os.path.isdir(filename):
+                raise IsADirectoryError(f"'{filename}' is a directory.")
             tree = ET.parse(filename)
             root = tree.getroot()
 

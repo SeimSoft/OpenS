@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns:opens="http://opens-schematic.org" width="1081.0" height="622.0" viewBox="-621.0 -241.0 1081.0 622.0" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(-170.0,40.0) rotate(0.0)" symbol_name="symbol" name="M1" save_v="True" save_i="False" param_MODEL="POWER_NMOS" param_L="1u" param_W="10u" param_M="1" library_path="opensLib/nmos/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">M1</text>
+  </g>
+  <g transform="translate(90.0,-70.0) rotate(0.0)" symbol_name="symbol" name="TX1" save_v="True" save_i="False" param_LP1="300u" param_LP2="300u" param_LS="1m" param_K="0.99" library_path="opensLib/transformer_ct/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">TX1</text>
+  </g>
+  <g transform="translate(-20.0,40.0) rotate(0.0)" symbol_name="symbol" name="M2" save_v="True" save_i="False" param_MODEL="POWER_NMOS" param_L="1u" param_W="10u" param_M="1" library_path="opensLib/nmos/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">M2</text>
+  </g>
+  <g transform="translate(-70.0,-30.0) rotate(0.0)" symbol_name="symbol" name="C1" save_v="True" save_i="False" param_C="2u" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">C1</text>
+  </g>
+  <line x1="90.0" y1="-30.0" x2="-130.0" y2="-30.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VIN" />
+  <line x1="90.0" y1="-50.0" x2="-110.0" y2="-50.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="90.0" y1="-10.0" x2="40.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(-130.0,160.0) rotate(0.0)" symbol_name="symbol" name="GND1" save_v="True" save_i="False" library_path="opensLib/gnd/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">GND1</text>
+  </g>
+  <g transform="translate(20.0,160.0) rotate(0.0)" symbol_name="symbol" name="GND2" save_v="True" save_i="False" library_path="opensLib/gnd/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">GND2</text>
+  </g>
+  <g transform="translate(160.0,160.0) rotate(0.0)" symbol_name="symbol" name="GND3" save_v="True" save_i="False" library_path="opensLib/gnd/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">GND3</text>
+  </g>
+  <line x1="180.0" y1="160.0" x2="180.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="180.0" y1="-10.0" x2="170.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="40.0" y1="160.0" x2="40.0" y2="130.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="50.0" y1="100.0" x2="50.0" y2="140.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="50.0" y1="140.0" x2="40.0" y2="140.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="-100.0" y1="100.0" x2="-100.0" y2="140.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="-100.0" y1="140.0" x2="-110.0" y2="140.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="-110.0" y1="140.0" x2="-110.0" y2="160.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="-110.0" y1="140.0" x2="-110.0" y2="130.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(-490.0,150.0) rotate(0.0)" symbol_name="symbol" name="GND4" save_v="True" save_i="False" library_path="opensLib/gnd/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">GND4</text>
+  </g>
+  <line x1="-470.0" y1="150.0" x2="-470.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(280.0,-40.0) rotate(90.0)" symbol_name="symbol" name="R1" save_v="True" save_i="False" param_R="100" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">R1</text>
+  </g>
+  <line x1="170.0" y1="-50.0" x2="170.0" y2="-90.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VOUT" />
+  <line x1="170.0" y1="-90.0" x2="260.0" y2="-90.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VOUT" />
+  <line x1="260.0" y1="-90.0" x2="260.0" y2="-40.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VOUT" />
+  <line x1="260.0" y1="20.0" x2="260.0" y2="70.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="260.0" y1="70.0" x2="190.0" y2="70.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="190.0" y1="70.0" x2="180.0" y2="70.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="-340.0" y1="40.0" x2="-370.0" y2="40.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VIN" />
+  <g transform="translate(-390.0,220.0) rotate(0.0)" symbol_name="symbol" name="GND5" save_v="True" save_i="False" library_path="opensLib/gnd/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">GND5</text>
+  </g>
+  <line x1="-370.0" y1="220.0" x2="-370.0" y2="180.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="0" />
+  <line x1="-370.0" y1="180.0" x2="-340.0" y2="180.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="0" />
+  <g transform="translate(40.0,210.0) rotate(0.0)" symbol_name="symbol" name=".model1" save_v="True" save_i="False" param_MODELNAME="POWER_NMOS" param_TYPE="NMOS" param_ARGS="(LEVEL=1 VTO=1 KP=0.5 LAMBDA=0.02 CGSO=100p CGDO=10p CBD=50p)" library_path="opensLib/model/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">.model1</text>
+  </g>
+  <g transform="translate(240.0,110.0) rotate(0.0)" symbol_name="symbol" name=".model2" save_v="True" save_i="False" param_MODEL_NAME="CONTROLLER" param_MODULE="controller" param_CLASS="Controller" param_PYTHONPATH="$SVG/" library_path="opensLib/python_model/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">.model2</text>
+  </g>
+  <line x1="40.0" y1="-10.0" x2="-10.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="-70.0" y1="-10.0" x2="-100.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(-340.0,20.0) rotate(0.0)" symbol_name="symbol" name="N1" save_v="True" save_i="False" param_MODEL_NAME="CONTROLLER" library_path="opensLib/python_device/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">N1</text>
+  </g>
+  <line x1="-160.0" y1="90.0" x2="-250.0" y2="90.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VL" />
+  <line x1="-250.0" y1="90.0" x2="-250.0" y2="80.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VL" />
+  <line x1="-250.0" y1="80.0" x2="-260.0" y2="80.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VL" />
+  <line x1="-340.0" y1="40.0" x2="-410.0" y2="40.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VIN" />
+  <line x1="-410.0" y1="40.0" x2="-410.0" y2="-30.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VIN" />
+  <line x1="-260.0" y1="100.0" x2="-190.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VR" />
+  <line x1="-190.0" y1="100.0" x2="-190.0" y2="230.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VR" />
+  <line x1="-190.0" y1="230.0" x2="-10.0" y2="230.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VR" />
+  <line x1="-10.0" y1="230.0" x2="-10.0" y2="90.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VR" />
+  <line x1="-470.0" y1="-30.0" x2="-470.0" y2="40.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VIN" />
+  <line x1="-360.0" y1="60.0" x2="-340.0" y2="60.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="-160.0" y1="-30.0" x2="-160.0" y2="40.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VIN" />
+  <line x1="-160.0" y1="40.0" x2="-260.0" y2="40.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VIN" />
+  <g transform="translate(-490.0,40.0) rotate(0.0)" symbol_name="symbol" name="V1" save_v="True" save_i="False" param_V="30" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">V1</text>
+  </g>
+  <line x1="-460.0" y1="-30.0" x2="-470.0" y2="-30.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VIN" />
+  <line x1="-100.0" y1="-10.0" x2="-110.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="-110.0" y1="-10.0" x2="-110.0" y2="-50.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(-20.0,-10.0) rotate(0.0)" symbol_name="symbol" name="V2" save_v="True" save_i="False" param_V="0" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">V2</text>
+  </g>
+  <g transform="translate(-130.0,-40.0) rotate(0.0)" symbol_name="symbol" name="V3" save_v="True" save_i="False" param_V="0" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">V3</text>
+  </g>
+  <line x1="-460.0" y1="-30.0" x2="-130.0" y2="-30.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VIN" />
+  <line x1="-110.0" y1="20.0" x2="-110.0" y2="50.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VL_D" />
+  <line x1="40.0" y1="50.0" x2="0.0" y2="50.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VR_D" />
+  <circle cx="-370.0" cy="40.0" r="3" fill="black" />
+  <circle cx="180.0" cy="70.0" r="3" fill="black" />
+  <circle cx="-110.0" cy="140.0" r="3" fill="black" />
+  <circle cx="-410.0" cy="-30.0" r="3" fill="black" />
+  <circle cx="40.0" cy="140.0" r="3" fill="black" />
+  <circle cx="-160.0" cy="-30.0" r="3" fill="black" />
+  <opens:analysis save_all="True" start="" step="0.01n" stop="50u" type="Tran" enabled="True" />
+  <opens:output name="inverter_switching">subaxis(2,1)
+plot(st('LP11#branch'), label="st('LP11#branch')")
+plot(st('LP21#branch'), label="st('LP21#branch')")
+subaxis(2,2)
+plot(st('VR'), label="st('VR')")
+plot(st('VL'), label="st('VL')")</opens:output>
+  <opens:output>subaxis(2,1)
+plot(st('LP11#branch'), label="st('LP11#branch')")
+plot(st('LP21#branch'), label="st('LP21#branch')")
+plot(st('V3#branch'), label="st('V3#branch')")
+plot(st('V2#branch'), label="st('V2#branch')")
+
+plot(st('C1#branch'), label="st('C1#branch')")
+
+subaxis(2,2)
+plot(st('VR'), label="st('VR')")
+plot(st('VL'), label="st('VL')")</opens:output>
+</svg>

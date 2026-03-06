@@ -7,9 +7,10 @@
       .value { font-family: Arial; font-size: 8px; fill: black; }
     </style>
     <opens:param xmlns:opens="http://opens-schematic.org" name="C" value="1u" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="IC" value="" />
     <opens:param xmlns:opens="http://opens-schematic.org" name="SUPPORTS_CURRENT" value="True" />
     <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="C" bindkey="c" category="Passives" />
-    <opens:xyce xmlns:opens="http://opens-schematic.org" template="C{name} {pin_1} {pin_2} {C}" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="C{name} {pin_1} {pin_2} {C}{% if IC %} IC={{IC}}{% endif %}" />
   </defs>
   <!-- Capacitor Plates -->
   <path class="symbol" d="M 0 20 L 26 20 M 34 20 L 60 20" />

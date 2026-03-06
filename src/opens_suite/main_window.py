@@ -42,6 +42,7 @@ from opens_suite.calculator_widget import CalculatorDialog
 from opens_suite.outputs_widget import OutputsWidget
 from opens_suite.results_selection_widget import ResultsSelectionWidget
 from opens_suite.plugin_manager import PluginManager
+from opens_suite.xyce_updater import XyceUpdater, XyceUpdateWorker
 import os
 import subprocess
 from opens_suite.theme import theme_manager
@@ -102,6 +103,76 @@ class MainWindow(QMainWindow):
         self.plugin_manager = PluginManager(self)
         self.plugin_manager.load_plugins()
         self._tabify_right_docks()
+
+        # Check for Xyce updates in the background
+        self._check_for_xyce_updates()
+
+    def _check_for_xyce_updates(self, force=False):
+        self._xyce_updater = XyceUpdater(self)
+        self._xyce_updater.updateAvailable.connect(self._on_xyce_update_available)
+        if force:
+            self._xyce_updater.noUpdateAvailable.connect(
+                lambda: QMessageBox.information(
+                    self, "Up to date", "Xyce is already up to date."
+                )
+            )
+            self._xyce_updater.errorOccurred.connect(
+                lambda msg: QMessageBox.warning(self, "Update Error", msg)
+            )
+        self._xyce_updater.check_for_updates(force=force)
+
+    def _on_xyce_update_available(self, info):
+        res = QMessageBox.question(
+            self,
+            "Xyce Update Available",
+            f"A new Xyce release ({info['version']}) is available. Do you want to download and install it now?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if res == QMessageBox.StandardButton.Yes:
+            self._install_xyce_update(info)
+
+    def _install_xyce_update(self, info):
+        self.update_status(f"Downloading Xyce {info['version']}...")
+        from PyQt6.QtWidgets import QProgressDialog
+
+        self.progress_dialog = QProgressDialog(
+            "Downloading Xyce...", "Cancel", 0, 100, self
+        )
+        self.progress_dialog.setWindowTitle("Xyce Update")
+        self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
+        self.progress_dialog.setMinimumDuration(0)
+
+        self._xyce_update_worker = XyceUpdateWorker(
+            info["download_url"], self._xyce_updater.base_dir
+        )
+        self._xyce_update_worker.progressChanged.connect(self._on_update_progress)
+        self._xyce_update_worker.finished.connect(
+            lambda s, m: self._on_update_finished(s, m, info)
+        )
+
+        self.progress_dialog.canceled.connect(self._xyce_update_worker.terminate)
+        self._xyce_update_worker.start()
+
+    def _on_update_progress(self, percent, text):
+        if hasattr(self, "progress_dialog"):
+            self.progress_dialog.setLabelText(text)
+            self.progress_dialog.setValue(percent)
+
+    def _on_update_finished(self, success, message, info):
+        if hasattr(self, "progress_dialog"):
+            self.progress_dialog.close()
+
+        if success:
+            self._xyce_updater.save_local_info(info)
+            self.update_status("Xyce updated successfully.")
+            QMessageBox.information(
+                self, "Update Complete", "Xyce update installed successfully."
+            )
+        else:
+            self.update_status("Xyce update failed.")
+            QMessageBox.critical(
+                self, "Update Failed", f"Failed to install Xyce update:\n{message}"
+            )
 
     def closeEvent(self, event):
         """Auto-save all tabs and close all child windows on exit."""
@@ -713,9 +784,15 @@ class MainWindow(QMainWindow):
 
                 gen = ReportGenerator(filename, default_report_dir)
                 gen.generate()
-                self.update_status(
-                    f"Report generated at {default_report_dir}/index.html"
-                )
+
+                report_file = os.path.join(default_report_dir, "index.html")
+                self.update_status(f"Report generated at {report_file}")
+
+                # Auto-open in browser
+                from PyQt6.QtGui import QDesktopServices
+                from PyQt6.QtCore import QUrl
+
+                QDesktopServices.openUrl(QUrl.fromLocalFile(report_file))
 
                 # Auto-refresh library if library browser exists
                 if hasattr(self, "library_dock"):
@@ -787,6 +864,15 @@ class SettingsDialog(QDialog):
 
         layout.addLayout(form)
 
+        # Xyce update button
+        update_layout = QHBoxLayout()
+        update_btn = QPushButton("Force Reinstall Xyce")
+        update_btn.clicked.connect(self._force_update_xyce)
+        update_layout.addWidget(QLabel("Manage Xyce Simulator:"))
+        update_layout.addWidget(update_btn)
+        update_layout.addStretch()
+        layout.addLayout(update_layout)
+
         # Separator Line
         line = QFrame()
         line.setFrameShape(QFrame.Shape.HLine)
@@ -834,6 +920,11 @@ class SettingsDialog(QDialog):
         buttons.accepted.connect(self.save)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
+
+    def _force_update_xyce(self):
+        if self.parent() and hasattr(self.parent(), "_check_for_xyce_updates"):
+            self.parent()._check_for_xyce_updates(force=True)
+            self.accept()
 
     def _show_lib_paths_menu(self, pos):
         menu = QMenu(self)

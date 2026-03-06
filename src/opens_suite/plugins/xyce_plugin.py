@@ -170,17 +170,16 @@ class XycePlugin(OpenSPlugin):
                 self._on_simulation_send_input
             )
 
-            # Start Xyce
-            # -r: Raw data file
-            self.main_window.simulation_process.start(
-                "Xyce", ["-r", raw_path, netlist_path]
-            )
-
-            if not self.main_window.simulation_process.waitForStarted():
-                self.main_window.status_bar.showMessage("Failed to start Xyce")
-                self.simulate_action.setIcon(self.main_window.play_icon)
-                self.simulate_action.setText("Simulate")
-                self.main_window.simulation_process = None
+            # run_async already starts the process. No need to call start() again.
+            if (
+                self.main_window.simulation_process.state()
+                == QProcess.ProcessState.NotRunning
+            ):
+                if not self.main_window.simulation_process.waitForStarted():
+                    self.main_window.status_bar.showMessage("Failed to start Xyce")
+                    self.simulate_action.setIcon(self.main_window.play_icon)
+                    self.simulate_action.setText("Simulate")
+                    self.main_window.simulation_process = None
 
         except FileNotFoundError:
             QMessageBox.critical(

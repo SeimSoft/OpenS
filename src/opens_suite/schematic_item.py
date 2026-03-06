@@ -546,6 +546,74 @@ class SchematicItem(QGraphicsObject):
         Detect model symbols by filename or presence of ARGS parameter.
         """
         try:
+            # Special case for Python Model: Resolve PYTHONPATH/MODULE and open script
+            if self.svg_path and "python_model" in self.svg_path.lower():
+                import os
+
+                ppath = self.parameters.get("PYTHONPATH", ".")
+                module = self.parameters.get("MODULE", "controller")
+                cls_name = self.parameters.get("CLASS", "Controller")
+
+                # Resolve $SVG to the directory of the current schematic
+                sch_dir = ""
+                try:
+                    view = self.scene().views()[0]
+                    if hasattr(view, "filename") and view.filename:
+                        sch_dir = os.path.dirname(view.filename)
+                except Exception:
+                    pass
+
+                ppath = ppath.replace("$SVG", sch_dir)
+                ppath = os.path.expandvars(ppath)
+                abs_ppath = os.path.abspath(ppath)
+                script_path = os.path.join(abs_ppath, f"{module}.py")
+
+                if not os.path.exists(script_path):
+                    # Ensure directory exists
+                    os.makedirs(abs_ppath, exist_ok=True)
+                    # Create template
+                    template = f"""#
+# Python Model (16 Pins available)
+#
+
+class {cls_name}:
+    def __init__(self):
+        \"\"\"Setup input/outputs\"\"\"
+        self.VDD = Input(0)  # 3.3 volt
+        self.VSS = Input(15)
+
+        self.VOUT = ResistorOutput(10, 10.0, self.VDD, self.VSS)
+        self.VOUT.set_pwm(0.5, 1 / 100e3)
+
+    def update(self, time):
+        # Update each time point
+        pass
+"""
+                    with open(script_path, "w") as f:
+                        f.write(template)
+
+                # Open with configured editor
+                from PyQt6.QtCore import QSettings
+
+                settings = QSettings("OpenS", "OpenS")
+                editor_cmd = settings.value("editor_command", "code '%s'")
+
+                try:
+                    import shlex
+                    import subprocess
+
+                    if "%s" in editor_cmd:
+                        cmd_str = editor_cmd.replace("%s", script_path)
+                    else:
+                        cmd_str = f"{editor_cmd} '{script_path}'"
+                    args = shlex.split(cmd_str)
+                    subprocess.Popen(args)
+                except Exception as e:
+                    from PyQt6.QtWidgets import QMessageBox
+
+                    QMessageBox.critical(None, "Error", f"Failed to open script: {e}")
+                return
+
             is_model = False
             if self.svg_path and self.svg_path.lower().endswith("model.svg"):
                 is_model = True

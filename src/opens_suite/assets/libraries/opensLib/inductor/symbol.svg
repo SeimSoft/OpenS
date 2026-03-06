@@ -8,9 +8,10 @@
     </style>
     <opens:param xmlns:opens="http://opens-schematic.org" name="L" value="1m" />
     <opens:param xmlns:opens="http://opens-schematic.org" name="RSER" value="0.1" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="IC" value="" />
     <opens:param xmlns:opens="http://opens-schematic.org" name="SUPPORTS_CURRENT" value="True" />
     <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="L" bindkey="l" category="Passives" />
-    <opens:xyce xmlns:opens="http://opens-schematic.org" template="L{name} {pin_1} int_{name} {L}&#10;R{name}_ser int_{name} {pin_2} {RSER}" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="L{name} {pin_1} int_{name} {L}{% if IC %} IC={{IC}}{% endif %}&#10;R{name}_ser int_{name} {pin_2} {RSER}" />
   </defs>
   <!-- Inductor Coils (3 Semicircles) -->
   <path class="symbol" d="M 0 20 L 10 20" />

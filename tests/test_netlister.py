@@ -117,3 +117,37 @@ def test_netlist_subcircuit(qapp, tmp_path):
     assert ".subckt MY_SUBCKT IN OUT" in netlist
     assert "X_X1" in netlist or "XX1" in netlist or "X1" in netlist
     assert "MY_SUBCKT" in netlist
+
+
+def test_jinja2_optional_template_blocks(qapp, tmp_path):
+    from opens_suite.schematic_item import SchematicItem
+    from opens_suite.netlister import NetlistGenerator
+
+    view = SchematicView()
+    scene = view.scene()
+
+    dummy_svg = tmp_path / "dummy.svg"
+    dummy_svg.write_text("<svg></svg>")
+
+    item1 = SchematicItem(str(dummy_svg))
+    item1.name = "L1"
+    item1.prefix = "L"
+    item1.parameters = {"L": "1m", "IC": ""}
+    item1.spice_template = "L{name} {pin_1} {pin_2} {L}{% if IC %} IC={{IC}}{% endif %}"
+    item1.pins = {"1": {"pos": [0, 0]}, "2": {"pos": [10, 0]}}
+    scene.addItem(item1)
+
+    item2 = SchematicItem(str(dummy_svg))
+    item2.name = "L2"
+    item2.prefix = "L"
+    item2.parameters = {"L": "2m", "IC": "5V"}
+    item2.spice_template = "L{name} {pin_1} {pin_2} {L}{% if IC %} IC={{IC}}{% endif %}"
+    item2.pins = {"1": {"pos": [0, 20]}, "2": {"pos": [10, 20]}}
+    scene.addItem(item2)
+
+    gen = NetlistGenerator(scene, [])
+    netlist = gen.generate()
+
+    assert "L1 0 0 1m" in netlist
+    assert "IC=5V" in netlist
+    assert "L2 0 0 2m IC=5V" in netlist

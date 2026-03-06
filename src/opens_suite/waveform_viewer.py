@@ -35,6 +35,9 @@ class SignalItem:
 
 
 class WaveformViewer(QMainWindow):
+    openCalculatorRequested = pyqtSignal()
+    refreshRequested = pyqtSignal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Waveform Viewer")
@@ -49,6 +52,12 @@ class WaveformViewer(QMainWindow):
         self.custom_markers = []
         self.markers_data = {}
         self.selected_signal = None
+
+        self.hover_text = pg.TextItem(
+            "", color="black", fill=pg.mkBrush(255, 255, 255, 200)
+        )
+        self.hover_text.setZValue(100)
+        self.hover_text_added_to = None
 
         self._setup_ui()
         self._setup_toolbar()
@@ -68,6 +77,7 @@ class WaveformViewer(QMainWindow):
         self.signal_tree.setHeaderLabels(["Plot / Signal", "Value"])
         self.signal_tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.signal_tree.customContextMenuRequested.connect(self._show_browser_menu)
+        self.signal_tree.itemSelectionChanged.connect(self._on_tree_selection_changed)
         self.browser_dock.setWidget(self.signal_tree)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.browser_dock)
 
@@ -94,11 +104,77 @@ class WaveformViewer(QMainWindow):
     def on_mouse_moved(self, pos):
         self.last_mouse_scene_pos = pos
 
+        view_box = None
+        plot_item = None
+        for p in self.plots:
+            vb = p.getViewBox()
+            if vb.sceneBoundingRect().contains(pos):
+                view_box = vb
+                plot_item = p
+                break
+
+        if not view_box:
+            if self.hover_text_added_to:
+                try:
+                    self.hover_text_added_to.removeItem(self.hover_text)
+                except Exception:
+                    pass
+                self.hover_text_added_to = None
+            return
+
+        mouse_point = view_box.mapSceneToView(pos)
+        mx, my = mouse_point.x(), mouse_point.y()
+
+        min_dist = float("inf")
+        best_pt = None
+        best_name = None
+        rect = view_box.viewRect()
+        rx, ry = rect.width(), rect.height()
+        if rx == 0 or ry == 0:
+            return
+
+        for sig in self.signals.values():
+            if len(self.plots) > sig.axis_idx and self.plots[sig.axis_idx] == plot_item:
+                dx = (sig.x - mx) / rx
+                dy = (sig.y - my) / ry
+                dist = dx**2 + dy**2
+                idx = np.argmin(dist)
+                d = dist[idx]
+                if d < 0.005 and d < min_dist:
+                    min_dist = d
+                    best_pt = (sig.x[idx], sig.y[idx])
+                    best_name = sig.name
+
+        if best_pt:
+            from opens_suite.design_points import DesignPoints
+
+            x_str = DesignPoints._format_si(best_pt[0])
+            y_str = DesignPoints._format_si(best_pt[1])
+            self.hover_text.setText(f"{best_name}\nx={x_str}\ny={y_str}")
+            self.hover_text.setPos(best_pt[0], best_pt[1])
+            if self.hover_text_added_to != plot_item:
+                if self.hover_text_added_to:
+                    try:
+                        self.hover_text_added_to.removeItem(self.hover_text)
+                    except Exception:
+                        pass
+                plot_item.addItem(self.hover_text)
+                self.hover_text_added_to = plot_item
+        else:
+            if self.hover_text_added_to:
+                try:
+                    self.hover_text_added_to.removeItem(self.hover_text)
+                except Exception:
+                    pass
+                self.hover_text_added_to = None
+
     def keyPressEvent(self, event):
         key = event.text().upper()
         if key == "F":
             for p in self.plots:
                 p.autoRange()
+        elif key == "R":
+            self.refreshRequested.emit()
         elif key in ["A", "B", "V", "H", "E"]:
             self.handle_cursor_key(key)
         else:
@@ -282,6 +358,16 @@ class WaveformViewer(QMainWindow):
     def _setup_toolbar(self):
         toolbar = self.addToolBar("Cursor Tools")
 
+        # Calculator
+        calc_icon = QIcon(
+            os.path.join(os.path.dirname(__file__), "assets", "icons", "calculator.svg")
+        )
+        self.calc_action = QAction(calc_icon, "Calculator", self)
+        self.calc_action.triggered.connect(self.openCalculatorRequested.emit)
+        toolbar.addAction(self.calc_action)
+
+        toolbar.addSeparator()
+
         # Rect Zoom Mode (standard)
         self.rect_zoom_action = QAction("Rect Zoom", self)
         self.rect_zoom_action.setCheckable(True)
@@ -383,6 +469,36 @@ class WaveformViewer(QMainWindow):
             sig.axis_idx = target_idx
             self._update_tree()
 
+    def _highlight_signal(self, name):
+        """Highlight a signal by making it bold and bringing it to top."""
+        self.selected_signal = name
+        for sig_name, sig in self.signals.items():
+            # In pyqtgraph, pen is stored in opts['pen']
+            old_pen = sig.plot_data_item.opts.get("pen")
+
+            if sig_name == name:
+                width = 4
+                sig.plot_data_item.setZValue(10)
+            else:
+                width = 1.5
+                sig.plot_data_item.setZValue(0)
+
+            # Create a new pen with the same color but different width
+            new_pen = pg.mkPen(old_pen)
+            new_pen.setWidthF(width)
+            sig.plot_data_item.setPen(new_pen)
+
+    def _on_tree_selection_changed(self):
+        selected_items = self.signal_tree.selectedItems()
+        if not selected_items:
+            return
+
+        item = selected_items[0]
+        # Check if it's a signal item (has a parent)
+        if item.parent():
+            sig_name = item.text(0)
+            self._highlight_signal(sig_name)
+
     def _on_curve_clicked(self, name, curve_item, event):
         if event.button() != Qt.MouseButton.LeftButton:
             return
@@ -392,22 +508,10 @@ class WaveformViewer(QMainWindow):
             name, Qt.MatchFlag.MatchExactly | Qt.MatchFlag.MatchRecursive
         )
         if match:
+            # Block signals to avoid recursion if we want, but here it's fine
             self.signal_tree.setCurrentItem(match[0])
 
-        # Highlight this curve and unhighlight others
-        self.selected_signal = name
-        for sig_name, sig in self.signals.items():
-            pen = sig.plot_data_item.pen()
-            if sig_name == name:
-                # bold
-                pen.setWidth(4)
-                # Ensure it draws on top
-                sig.plot_data_item.setZValue(10)
-            else:
-                pen.setWidth(1.5)
-                sig.plot_data_item.setZValue(0)
-            sig.plot_data_item.setPen(pen)
-
+        self._highlight_signal(name)
         event.accept()
 
     def _show_browser_menu(self, pos):

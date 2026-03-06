@@ -5,10 +5,10 @@
       .label { font-family: Arial; font-size: 9px; fill: blue; font-weight: bold; }
       .value { font-family: Arial; font-size: 8px; fill: black; }
     </style>
-    <opens:param xmlns:opens="http://opens-schematic.org" name="MODEL_NAME" value="py_res" />
-    <opens:param xmlns:opens="http://opens-schematic.org" name="MODULE" value="test_module" />
-    <opens:param xmlns:opens="http://opens-schematic.org" name="CLASS" value="attiny13_model" />
-    <opens:param xmlns:opens="http://opens-schematic.org" name="PYTHONPATH" value="." />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="MODEL_NAME" value="CONTROLLER" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="MODULE" value="controller" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="CLASS" value="Controller" />
+    <opens:param xmlns:opens="http://opens-schematic.org" name="PYTHONPATH" value="$SVG/" />
     <opens:symbol xmlns:opens="http://opens-schematic.org" prefix=".model" bindkey="" category="Python" />
     <opens:xyce xmlns:opens="http://opens-schematic.org" template=".model {MODEL_NAME} npy MODULE={MODULE} CLASS={CLASS} PYTHONPATH={PYTHONPATH}" />
   </defs>

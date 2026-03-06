@@ -66,13 +66,38 @@ def main():
 
     if args.netlist or args.simulate:
         if not file_to_open:
-            print("Error: Specify a schematic file.")
+            print("Error: Specify a schematic or netlist file.")
             sys.exit(1)
 
+        is_netlist = file_to_open.lower().endswith((".net", ".cir", ".spice"))
+
+        if is_netlist:
+            if args.netlist:
+                with open(file_to_open, "r") as f:
+                    print(f.read())
+
+            if args.simulate:
+                print(f"Starting Xyce simulation for netlist {file_to_open}...")
+                sim_dir = os.path.dirname(file_to_open)
+                base = os.path.splitext(os.path.basename(file_to_open))[0]
+                raw_path = os.path.join(sim_dir, f"{base}.raw")
+
+                from opens_suite.xyce_runner import XyceRunner
+
+                runner = XyceRunner()
+                returncode = runner.run_cli(file_to_open, raw_path)
+
+                if returncode == 0:
+                    print(f"\nSimulation finished successfully. Results in {raw_path}")
+                else:
+                    print(f"\nSimulation failed with exit code {returncode}")
+                    sys.exit(returncode)
+            sys.exit(0)
+
+        # Schematic handling
         from opens_suite.view.core import SchematicView
         from opens_suite.netlister import NetlistGenerator
         import xml.etree.ElementTree as ET
-        import subprocess
 
         view = SchematicView()
         # Ensure we set the filename so hierarchical resolution works

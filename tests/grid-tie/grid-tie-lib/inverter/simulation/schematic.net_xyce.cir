@@ -1,0 +1,46 @@
+XYCE-generated Netlist file copy:  TIME='08:13:25 AM' DATE='Mar 06, 2026' 
+*Original Netlist Title:  
+
+** OpenS Generated Netlist
+
+*.preprocess addresistors nodcpath 1G
+*Xyce:  ".PREPROCESS ADDRESISTORS" statement automatically commented out in netlist copy.
+.model POWER_NMOS NMOS (LEVEL=1 VTO=1 KP=0.5 LAMBDA=0.02 CGSO=100p CGDO=10p CBD=50p)
+.model CONTROLLER npy MODULE=controller CLASS=Controller PYTHONPATH=/Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/inverter
+C1 N_1 N_2 2u IC=0
+M1 VL_D VL 0 0 POWER_NMOS L=1u W=10u m=1
+M2 VR_D VR 0 0 POWER_NMOS L=1u W=10u m=1
+N1 VIN N_3 N_4 N_5 N_6 N_7 N_8 0 N_9 N_10 N_11 N_12 VR VL N_13 VIN CONTROLLER
+R1 VOUT 0 100
+LP11 N_1 VIN 300u
+LP21 VIN N_2 300u
+LS1 VOUT 0 1m
+K_1 LP11 LP21 LS1 0.99
+V1 VIN 0 dc 30 ac 0
+V2 N_2 VR_D dc 0 ac 0
+V3 N_1 VL_D dc 0 ac 0
+.tran 0.01n 50u
+.print tran v(*) 
+
+
+*XYCE-GENERATED OUTPUT:  Adding resistors between ground and nodes connected to only 1 device terminal:
+
+RONETERM1 N_3 0 
+RONETERM2 N_4 0 
+RONETERM3 N_5 0 
+RONETERM4 N_6 0 
+RONETERM5 N_7 0 
+RONETERM6 N_8 0 
+RONETERM7 N_9 0 
+RONETERM8 N_10 0 
+RONETERM9 N_11 0 
+RONETERM10 N_12 0 
+RONETERM11 N_13 0 
+
+
+*XYCE-GENERATED OUTPUT:  Adding resistors between ground and nodes with no DC path to ground:
+
+RNODCPATH1 VR 0 1G
+RNODCPATH2 VL 0 1G
+
+.END
