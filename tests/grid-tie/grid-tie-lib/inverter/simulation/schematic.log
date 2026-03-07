@@ -3,7 +3,7 @@
 ***** Welcome to the Xyce(TM) Parallel Electronic Simulator
 *****
 ***** This is version Xyce Release 7.10-opensource
-***** Date: Fri Mar 06 08:13:25 CET 2026
+***** Date: Sat Mar 07 10:02:07 CET 2026
 
 
 ***** Executing netlist /Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/inverter/simulation/schematic.net
@@ -14,6 +14,10 @@ DEBUG checkIfModelValid: device_type=M, modelType=NMOS, modelLevel=1, isModelLev
 DEBUG checkIfModelValid: device_type=N, modelType=NPY, modelLevel=1, isModelLevelValid=1, isModelTypeValid=1, numNodes=16
 ***** Setting up topology...
 
+DEBUG createDevice: sys.path = [/Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/inverter, , /Library/Frameworks/Python.framework/Versions/3.11/lib/python311.zip, /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11, /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/lib-dynload, /Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages, ., /Users/rennekef/Documents/XYCE-Python]
+DEBUG createDevice: loaded module controller from /Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/inverter/controller.py
+DEBUG ResistorOutput CTOR index=13 vhigh_idx=0 vlow_idx=7
+DEBUG ResistorOutput CTOR index=12 vhigh_idx=0 vlow_idx=7
 Netlist warning: Voltage Node (N_3) connected to only 1 device Terminal
 Netlist warning: Voltage Node (N_4) connected to only 1 device Terminal
 Netlist warning: Voltage Node (N_5) connected to only 1 device Terminal
@@ -54,96 +58,744 @@ Netlist warning: Voltage Node (N_13) does not have a DC path to ground
 
 ***** Beginning Transient Calculation...
 
-***** Percent complete: 1.3107 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 1.07374 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 2.62142 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 2.14749 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 5.24286 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 4.29497 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
+***** Percent complete: 8.58994 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+DEBUG loadDAEFVector t=4.9999989999999993226e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999989999999993226e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999989999999993226e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999989999999993226e-06 state=0 outIdx=12 vhigh=0 vlow=7
 ***** Percent complete: 10 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 11.4 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+DEBUG loadDAEFVector t=4.9999990999999992619e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999990999999992619e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999990999999992619e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999990999999992619e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999992999999991403e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999992999999991403e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999992999999991403e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999992999999991403e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999996999999988973e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999996999999988973e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999996999999988973e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.9999996999999988973e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.999999999999999562e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.999999999999999562e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.999999999999999562e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=4.999999999999999562e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000000799999998522e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000002399999995855e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000002399999995855e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000002399999995855e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000002399999995855e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000002399999995855e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000002399999995855e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000002399999995855e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000002399999995855e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000002399999995855e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000002399999995855e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000005599999998993e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000009999999998013e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000009999999998013e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000009999999998013e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000009999999998013e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000009999999998013e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000009999999998013e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000009999999998013e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000009999999998013e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000009999999998013e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000009999999998013e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000010640000000335e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000010640000000335e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000010640000000335e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000010640000000335e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000010640000000335e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000010640000000335e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000011919999996508e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000011919999996508e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000011919999996508e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000011919999996508e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000011919999996508e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000011919999996508e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000014479999997324e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000014479999997324e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000014479999997324e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000014479999997324e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000014479999997324e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000014479999997324e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000019599999998956e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000019599999998956e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000019599999998956e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000019599999998956e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000019599999998956e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000019599999998956e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000019599999998956e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000019599999998956e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000002984000000222e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000002984000000222e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000002984000000222e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000002984000000222e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000002984000000222e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000002984000000222e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000002984000000222e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000002984000000222e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000050320000008749e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000050320000008749e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000050320000008749e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000050320000008749e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000050320000008749e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000050320000008749e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000050320000008749e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000050320000008749e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000091280000021806e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000091280000021806e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000091280000021806e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000091280000021806e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000091280000021806e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000091280000021806e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000091280000021806e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000091280000021806e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000173200000039449e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000173200000039449e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000173200000039449e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000173200000039449e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000173200000039449e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000173200000039449e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000173200000039449e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000173200000039449e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000337040000074736e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000337040000074736e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000337040000074736e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000337040000074736e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000337040000074736e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0000337040000074736e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000066472000015378e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000066472000015378e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000066472000015378e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000066472000015378e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000066472000015378e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.000066472000015378e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0001320080000311868e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0001320080000311868e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0001320080000311868e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0001320080000311868e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0001320080000311868e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0001320080000311868e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0002630800000628044e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0002630800000628044e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0002630800000628044e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0002630800000628044e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0002630800000628044e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0002630800000628044e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0005252240001251925e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0005252240001251925e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0005252240001251925e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0005252240001251925e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0005252240001251925e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0005252240001251925e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0010495120002508159e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0010495120002508159e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0010495120002508159e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0010495120002508159e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0010495120002508159e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0010495120002508159e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0020980880005020625e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0020980880005020625e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0020980880005020625e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0020980880005020625e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0020980880005020625e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0020980880005020625e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0041952400010037089e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0041952400010037089e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0041952400010037089e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0041952400010037089e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0041952400010037089e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0041952400010037089e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0083895440020078486e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0083895440020078486e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0083895440020078486e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0083895440020078486e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0083895440020078486e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0083895440020078486e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0167781520040161279e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0167781520040161279e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0167781520040161279e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0167781520040161279e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0167781520040161279e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0167781520040161279e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0335553680080318396e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0335553680080318396e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0335553680080318396e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0335553680080318396e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0335553680080318396e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0335553680080318396e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0671098000160632631e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0671098000160632631e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0671098000160632631e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0671098000160632631e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0671098000160632631e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.0671098000160632631e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.134218664032126957e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.134218664032126957e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.134218664032126957e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.134218664032126957e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.134218664032126957e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.134218664032126957e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.2684363920642534977e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.2684363920642534977e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.2684363920642534977e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.2684363920642534977e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.2684363920642534977e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.2684363920642534977e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.5368718481285065792e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.5368718481285065792e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.5368718481285065792e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.5368718481285065792e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.5368718481285065792e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.5368718481285065792e-06 state=0 outIdx=12 vhigh=0 vlow=7
+***** Percent complete: 11.0737 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 12.48 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+DEBUG loadDAEFVector t=5.9999989999999990656e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999989999999990656e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999989999999990656e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999989999999990656e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999989999999990656e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999989999999990656e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999990999999990048e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999990999999990048e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999990999999990048e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999990999999990048e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999990999999990048e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999990999999990048e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999992999999988833e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999992999999988833e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999992999999988833e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999992999999988833e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999992999999988833e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999992999999988833e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999996999999986402e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999996999999986402e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999996999999986402e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999996999999986402e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999996999999986402e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.9999996999999986402e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.999999999999999305e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.999999999999999305e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.999999999999999305e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.999999999999999305e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.999999999999999305e-06 state=1 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=5.999999999999999305e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000000799999995952e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000000799999995952e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000000799999995952e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000000799999995952e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000000799999995952e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000000799999995952e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000000799999995952e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000000799999995952e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000000799999995952e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000000799999995952e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000002399999993285e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000005599999996423e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000005599999996423e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000005599999996423e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000005599999996423e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000005599999996423e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000005599999996423e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000005599999996423e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000005599999996423e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000009999999995443e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000009999999995443e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000009999999995443e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000009999999995443e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000009999999995443e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000009999999995443e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000009999999995443e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000009999999995443e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000010639999997765e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000010639999997765e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000010639999997765e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000010639999997765e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000010639999997765e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000010639999997765e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000011919999993938e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000011919999993938e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000011919999993938e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000011919999993938e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000011919999993938e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000011919999993938e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000014479999994754e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000014479999994754e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000014479999994754e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000014479999994754e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000014479999994754e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000014479999994754e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000019599999996386e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000019599999996386e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000019599999996386e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000019599999996386e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000019599999996386e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000019599999996386e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000002983999999965e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000002983999999965e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000002983999999965e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000002983999999965e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000002983999999965e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000002983999999965e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000050320000006179e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000050320000006179e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000050320000006179e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000050320000006179e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000050320000006179e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000050320000006179e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000091280000019235e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000091280000019235e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000091280000019235e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000091280000019235e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000091280000019235e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000091280000019235e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000173200000036879e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000173200000036879e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000173200000036879e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000173200000036879e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000173200000036879e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000173200000036879e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000337040000072166e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000337040000072166e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000337040000072166e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000337040000072166e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000337040000072166e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000337040000072166e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000337040000072166e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0000337040000072166e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000066472000015121e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000066472000015121e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000066472000015121e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000066472000015121e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000066472000015121e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000066472000015121e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000066472000015121e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.000066472000015121e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0001320080000309298e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0001320080000309298e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0001320080000309298e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0001320080000309298e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0001320080000309298e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0001320080000309298e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0001320080000309298e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0001320080000309298e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0002630800000625474e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0002630800000625474e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0002630800000625474e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0002630800000625474e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0002630800000625474e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0002630800000625474e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0002630800000625474e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0002630800000625474e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0005252240001249355e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0005252240001249355e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0005252240001249355e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0005252240001249355e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0005252240001249355e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0005252240001249355e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0005252240001249355e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0005252240001249355e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0010495120002505589e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0010495120002505589e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0010495120002505589e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0010495120002505589e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0010495120002505589e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0010495120002505589e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0010495120002505589e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0010495120002505589e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0020980880005018055e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0020980880005018055e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0020980880005018055e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0020980880005018055e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0020980880005018055e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0020980880005018055e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0020980880005018055e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0020980880005018055e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0041952400010034519e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0062923920015050982e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0083895440020067445e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0125838480030108842e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0209724560050191636e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0377496720090348753e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0377496720090348753e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0377496720090348753e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0377496720090348753e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0377496720090348753e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0377496720090348753e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0377496720090348753e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0377496720090348753e-06 state=0 outIdx=12 vhigh=0 vlow=7
+***** Percent complete: 12.0755 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 14.4 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=12 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=13 vhigh=0 vlow=7
+DEBUG loadDAEFVector t=6.0713041040170662987e-06 state=0 outIdx=12 vhigh=0 vlow=7
+***** Percent complete: 13.0821 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 16.96 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 14.1559 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 16.3034 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
 ***** Percent complete: 18.8 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 20.336 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 19.8737 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 22.384 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 20.9475 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 23.095 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
 ***** Percent complete: 25.6 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 26.8288 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 26.6821 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 28.4672 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 27.7559 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 31.744 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 29.9034 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 38.2976 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 34.1983 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 48.2976 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 35.6 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 58.2976 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 36.6737 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 68.2976 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 37.7342 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 78.2976 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 39.7475 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 88.2976 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 41.895 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 98.2976 %
-***** Current system time: Fri Mar  6 08:13:25 2026
+***** Percent complete: 44.4 %
+***** Current system time: Sat Mar  7 10:02:07 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Problem read in and set up time: 0.0722699 seconds
- ***** DCOP time: 0.00237799 seconds.  Breakdown follows:
+***** Percent complete: 45.4737 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 46.5475 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 48.695 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 51.2 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 52.2821 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 53.3559 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 55.5034 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 59.7983 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 61.2 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 62.2737 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 63.3342 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 65.3475 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 67.495 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 70 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 71.0737 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 72.1475 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 74.295 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 76.8 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 77.8821 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 78.9559 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 81.1034 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 85.3983 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 86.8 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 87.8737 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 88.9342 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 90.9475 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 93.095 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 95.6 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 96.6737 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 97.7475 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 99.895 %
+***** Current system time: Sat Mar  7 10:02:07 2026
+***** Estimated time to completion:  0 sec.
+
+***** Problem read in and set up time: 0.0683191 seconds
+ ***** DCOP time: 0.00179601 seconds.  Breakdown follows:
 	Number Successful Steps Taken:		1
 	Number Failed Steps Attempted:		0
 	Number Jacobians Evaluated:		5
@@ -151,38 +803,38 @@ Netlist warning: Voltage Node (N_13) does not have a DC path to ground
 	Number Failed Linear Solves:		0
 	Number Residual Evaluations:		7
 	Number Nonlinear Convergence Failures:	0
-	Total Residual Load Time:		0.000129461 seconds
-	Total Jacobian Load Time:		4.60148e-05 seconds
-	Total Linear Solution Time:		0.000335693 seconds
+	Total Residual Load Time:		0.000133276 seconds
+	Total Jacobian Load Time:		3.50475e-05 seconds
+	Total Linear Solution Time:		0.000221014 seconds
 
- ***** Transient Stepping time: 0.00784898 seconds.  Breakdown follows:
-	Number Successful Steps Taken:		45
-	Number Failed Steps Attempted:		0
-	Number Jacobians Evaluated:		112
-	Number Linear Solves:			112
+ ***** Transient Stepping time: 0.127458 seconds.  Breakdown follows:
+	Number Successful Steps Taken:		557
+	Number Failed Steps Attempted:		1
+	Number Jacobians Evaluated:		2069
+	Number Linear Solves:			2069
 	Number Failed Linear Solves:		0
-	Number Residual Evaluations:		157
-	Number Nonlinear Convergence Failures:	0
-	Total Residual Load Time:		0.000954628 seconds
-	Total Jacobian Load Time:		0.000463247 seconds
-	Total Linear Solution Time:		0.00169611 seconds
+	Number Residual Evaluations:		2627
+	Number Nonlinear Convergence Failures:	1
+	Total Residual Load Time:		0.02542 seconds
+	Total Jacobian Load Time:		0.00754356 seconds
+	Total Linear Solution Time:		0.0304399 seconds
 
 
 ***** Solution Summary *****
-	Number Successful Steps Taken:		46
-	Number Failed Steps Attempted:		0
-	Number Jacobians Evaluated:		117
-	Number Linear Solves:			117
+	Number Successful Steps Taken:		558
+	Number Failed Steps Attempted:		1
+	Number Jacobians Evaluated:		2074
+	Number Linear Solves:			2074
 	Number Failed Linear Solves:		0
-	Number Residual Evaluations:		164
-	Number Nonlinear Convergence Failures:	0
-	Total Residual Load Time:		0.00108409 seconds
-	Total Jacobian Load Time:		0.000509262 seconds
-	Total Linear Solution Time:		0.0020318 seconds
+	Number Residual Evaluations:		2634
+	Number Nonlinear Convergence Failures:	1
+	Total Residual Load Time:		0.0255532 seconds
+	Total Jacobian Load Time:		0.00757861 seconds
+	Total Linear Solution Time:		0.0306609 seconds
 
 
-***** Total Simulation Solvers Run Time: 0.0104511 seconds
-***** Total Elapsed Run Time:            0.082701 seconds
+***** Total Simulation Solvers Run Time: 0.12946 seconds
+***** Total Elapsed Run Time:            0.197769 seconds
 *****
 ***** End of Xyce(TM) Simulation
 *****
@@ -190,21 +842,23 @@ Netlist warning: Voltage Node (N_13) does not have a DC path to ground
 Timing summary of 1 processor
                  Stats                   Count       CPU Time              Wall Time
 ---------------------------------------- ----- --------------------- ---------------------
-Xyce                                         1        0.062 (100.0%)        0.089 (100.0%)
-  Analysis                                   1        0.008 (13.25%)        0.010 (11.75%)
-    Transient                                1        0.008 (13.22%)        0.010 (11.73%)
-      Nonlinear Solve                       46        0.006 ( 9.35%)        0.007 ( 7.46%)
-        Residual                           164        0.001 ( 1.93%)        0.001 ( 1.49%)
-        Jacobian                           117        0.001 ( 0.95%)        0.001 ( 0.77%)
-        Linear Solve                       117        0.002 ( 3.27%)        0.002 ( 2.49%)
-      Successful DCOP Steps                  1        0.001 ( 0.87%)        0.001 ( 1.16%)
-      Successful Step                       45        0.001 ( 1.54%)        0.002 ( 1.84%)
-  Netlist Import                             1        0.046 (74.85%)        0.067 (75.36%)
-    Parse Context                            1        0.001 ( 0.82%)        0.001 ( 0.92%)
-    Distribute Devices                       1        0.002 ( 3.08%)        0.002 ( 2.52%)
-    Verify Devices                           1        0.000 ( 0.02%)        0.000 ( 0.03%)
-    Instantiate                              1        0.043 (69.11%)        0.061 (69.40%)
-  Late Initialization                        1        0.002 ( 3.69%)        0.004 ( 4.27%)
-    Global Indices                           1        0.001 ( 0.82%)        0.002 ( 1.82%)
-  Setup Matrix Structure                     1        0.000 ( 0.58%)        0.000 ( 0.56%)
+Xyce                                         1        0.150 (100.0%)        0.202 (100.0%)
+  Analysis                                   1        0.106 (70.36%)        0.129 (63.91%)
+    Transient                                1        0.106 (70.36%)        0.129 (63.91%)
+      Nonlinear Solve                      559        0.084 (56.15%)        0.100 (49.55%)
+        Residual                          2634        0.023 (15.36%)        0.029 (14.38%)
+        Jacobian                          2074        0.009 ( 5.76%)        0.010 ( 5.08%)
+        Linear Solve                      2074        0.030 (20.21%)        0.034 (16.56%)
+      Successful DCOP Steps                  1        0.000 ( 0.27%)        0.001 ( 0.39%)
+      Successful Step                      557        0.015 (10.23%)        0.022 (10.67%)
+      Failed Steps                           1        0.000 (<0.01%)        0.000 (<0.01%)
+        Nonlinear Failure                    1        0.000 (<0.01%)        0.000 (<0.01%)
+  Netlist Import                             1        0.039 (25.70%)        0.064 (31.50%)
+    Parse Context                            1        0.001 ( 0.47%)        0.001 ( 0.55%)
+    Distribute Devices                       1        0.002 ( 1.01%)        0.002 ( 0.88%)
+    Verify Devices                           1        0.000 (<0.01%)        0.000 ( 0.01%)
+    Instantiate                              1        0.035 (23.49%)        0.059 (29.02%)
+  Late Initialization                        1        0.002 ( 1.14%)        0.003 ( 1.40%)
+    Global Indices                           1        0.000 ( 0.23%)        0.001 ( 0.54%)
+  Setup Matrix Structure                     1        0.000 ( 0.21%)        0.000 ( 0.22%)
 

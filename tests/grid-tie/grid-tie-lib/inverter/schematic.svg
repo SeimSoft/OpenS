@@ -113,7 +113,7 @@
   <circle cx="-410.0" cy="-30.0" r="3" fill="black" />
   <circle cx="40.0" cy="140.0" r="3" fill="black" />
   <circle cx="-160.0" cy="-30.0" r="3" fill="black" />
-  <opens:analysis save_all="True" start="" step="0.01n" stop="50u" type="Tran" enabled="True" />
+  <opens:analysis enabled="True" save_all="True" start="" step="0.01n" stop="50u" type="Tran" />
   <opens:output name="inverter_switching">subaxis(2,1)
 plot(st('LP11#branch'), label="st('LP11#branch')")
 plot(st('LP21#branch'), label="st('LP21#branch')")

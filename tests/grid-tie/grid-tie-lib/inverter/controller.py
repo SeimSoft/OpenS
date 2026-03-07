@@ -12,9 +12,9 @@ class Controller:
         self.VR = ResistorOutput(12, 10.0, self.VDD, self.VSS)
         # Initialize to low state
 
-        self.VL.pattern(f"0, dt=5u, 1, dt=1u, 0, dt=3.4e-6, 0, dt=3.4u, 0")
+        self.VL.pattern(f"[0, dt=5u, 1, dt=1u, 0, dt=3.4e-6, 0, dt=3.4u, 0]*5")
 
-        self.VR.pattern(f"0, dt=5u, 0, dt=1u, 0, dt=3.4e-6, 1, dt=3.4u, 0")
+        self.VR.pattern(f"[0, dt=5u, 0, dt=1u, 0, dt=3.4e-6, 1, dt=3.4u, 0]*5")
 
         # self.VL.set_state(0)
         # self.VR.set_state(0)

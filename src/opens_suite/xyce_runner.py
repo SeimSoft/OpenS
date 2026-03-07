@@ -40,6 +40,17 @@ class XyceRunner(QObject):
             "bin",
             exe,
         )
+
+        generic_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "xyce",
+            "bin",
+            exe,
+        )
+
+        if not os.path.exists(xyce_path) and os.path.exists(generic_path):
+            xyce_path = generic_path
+
         # Fallback to system Xyce if bundled one is missing
         if not os.path.exists(xyce_path):
             import shutil

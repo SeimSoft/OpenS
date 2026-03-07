@@ -20,8 +20,9 @@ class XyceUpdateWorker(QThread):
         try:
             self.progressChanged.emit(0, "Downloading Xyce...")
 
-            # Create a temporary file path
-            temp_zip = os.path.join(self.target_dir, "xyce_update.zip")
+            # Determine extension
+            ext = ".zip" if self.download_url.endswith(".zip") else ".tar.gz"
+            temp_file = os.path.join(self.target_dir, f"xyce_update{ext}")
 
             def report_hook(count, block_size, total_size):
                 if total_size > 0:
@@ -29,17 +30,21 @@ class XyceUpdateWorker(QThread):
                     self.progressChanged.emit(percent, f"Downloading: {percent}%")
 
             urllib.request.urlretrieve(
-                self.download_url, temp_zip, reporthook=report_hook
+                self.download_url, temp_file, reporthook=report_hook
             )
 
             self.progressChanged.emit(100, "Extracting files...")
 
-            with zipfile.ZipFile(temp_zip, "r") as zip_ref:
-                # We extract directly into the target dir. GitHub releases might have an inner folder.
-                # We'll just extract all.
-                zip_ref.extractall(self.target_dir)
+            if ext == ".zip":
+                with zipfile.ZipFile(temp_file, "r") as zip_ref:
+                    zip_ref.extractall(self.target_dir)
+            else:
+                import tarfile
 
-            os.remove(temp_zip)
+                with tarfile.open(temp_file, "r:gz") as tar_ref:
+                    tar_ref.extractall(self.target_dir)
+
+            os.remove(temp_file)
 
             # Fix permissions for unix executables
             self.progressChanged.emit(100, "Setting permissions...")
@@ -123,7 +128,9 @@ class XyceUpdater(QObject):
                 for asset in data.get("assets", []):
                     # Pick the first asset matching our platform
                     name = asset.get("name", "").lower()
-                    if self.asset_keyword in name and name.endswith(".zip"):
+                    if self.asset_keyword in name and (
+                        name.endswith(".zip") or name.endswith(".tar.gz")
+                    ):
                         # If there are multiple macos, prefer intel specifically if we asked for it
                         if self.asset_keyword == "macos":
                             # General macos - if it's the intel one, skip it unless we are intel
