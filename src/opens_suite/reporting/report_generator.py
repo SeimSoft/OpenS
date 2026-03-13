@@ -354,50 +354,7 @@ class ReportGenerator:
         # Section numbering
         sect = 1
 
-        html = [
-            "<!DOCTYPE html>",
-            "<html lang='en'>",
-            "<head>",
-            "    <meta charset='UTF-8'>",
-            "    <meta name='viewport' content='width=device-width, initial-scale=1.0'>",
-            "    <title>OpenS Simulation Report</title>",
-            "    <style>",
-            "        * { box-sizing: border-box; }",
-            "        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; color: #333; }",
-            "        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }",
-            "        h1 { border-bottom: 2px solid #005A9C; padding-bottom: 10px; color: #005A9C; }",
-            "        h2 { margin-top: 30px; color: #004080; }",
-            "        .schematic { text-align: center; margin: 20px 0; }",
-            "        .schematic img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; }",
-            "        table { width: 100%; border-collapse: collapse; margin-top: 20px; }",
-            "        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: top; }",
-            "        th { background-color: #005A9C; color: white; }",
-            "        tr:nth-child(even) { background-color: #f9f9f9; }",
-            "        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }",
-            "        .plot-container { text-align: center; margin: 15px 0; border: 1px solid #eee; padding: 10px; background: #fafafa; }",
-            "        .plot-container img { max-width: 100%; cursor: pointer; }",
-            "        .error { color: #d9534f; font-weight: bold; }",
-            # TOC Styles
-            "        .toc { background: #f0f4f8; border: 1px solid #d0d8e0; border-radius: 6px; padding: 20px; margin: 20px 0; }",
-            "        .toc h3 { margin-top: 0; color: #004080; }",
-            "        .toc ul { list-style: none; padding-left: 0; margin: 0; }",
-            "        .toc li { padding: 4px 0; }",
-            "        .toc a { text-decoration: none; color: #005A9C; }",
-            "        .toc a:hover { text-decoration: underline; }",
-            # Lightbox Styles
-            "        .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 9999; justify-content: center; align-items: center; cursor: zoom-out; }",
-            "        .lightbox-overlay.active { display: flex; }",
-            "        .lightbox-overlay img { max-width: 95vw; max-height: 95vh; object-fit: contain; touch-action: none; transform-origin: center center; transition: transform 0.1s ease; }",
-            "        .lightbox-close { position: fixed; top: 15px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 10000; font-weight: bold; line-height: 1; }",
-            "    </style>",
-            "</head>",
-            "<body>",
-            "    <div class='container'>",
-            f"        <h1>Simulation Report: {os.path.basename(self.schematic_path)}</h1>",
-            "",
-        ]
-
-        # --- Table of Contents ---
+        # --- Table of Contents Logic ---
         toc_items = []
 
         toc_items.append((f"sect-{sect}", f"{sect}. Top-Level Schematic"))
@@ -428,14 +385,60 @@ class ReportGenerator:
         logs_sect = sect
         sect += 1
 
-        html.append("        <div class='toc'>")
-        html.append("            <h3>Table of Contents</h3>")
-        html.append("            <ul>")
+        html = [
+            "<!DOCTYPE html>",
+            "<html lang='en'>",
+            "<head>",
+            "    <meta charset='UTF-8'>",
+            "    <meta name='viewport' content='width=device-width, initial-scale=1.0'>",
+            "    <title>OpenS Simulation Report</title>",
+            "    <style>",
+            "        * { box-sizing: border-box; }",
+            "        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; color: #333; }",
+            "        .layout-wrapper { display: flex; gap: 30px; max-width: 1400px; margin: 0 auto; align-items: flex-start; }",
+            "        .main-content { flex: 1; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow-x: auto; min-width: 0; }",
+            "        h1 { border-bottom: 2px solid #005A9C; padding-bottom: 10px; color: #005A9C; margin-top: 0; }",
+            "        h2 { margin-top: 30px; color: #004080; }",
+            "        .schematic { text-align: center; margin: 20px 0; }",
+            "        .schematic img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: zoom-in; }",
+            "        table { width: 100%; border-collapse: collapse; margin-top: 20px; }",
+            "        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: top; }",
+            "        th { background-color: #005A9C; color: white; }",
+            "        tr:nth-child(even) { background-color: #f9f9f9; }",
+            "        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }",
+            "        .plot-container { text-align: center; margin: 15px 0; border: 1px solid #eee; padding: 10px; background: #fafafa; }",
+            "        .plot-container img { max-width: 100%; cursor: zoom-in; }",
+            "        .error { color: #d9534f; font-weight: bold; }",
+            "        .toc-sidebar { flex: 0 0 280px; position: sticky; top: 20px; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-height: calc(100vh - 40px); overflow-y: auto; }",
+            "        .toc-sidebar h3 { margin-top: 0; color: #004080; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.1em; }",
+            "        .toc-sidebar ul { list-style: none; padding-left: 0; margin: 0; }",
+            "        .toc-sidebar li { padding: 8px 0; border-bottom: 1px solid #f5f5f5; }",
+            "        .toc-sidebar li:last-child { border-bottom: none; }",
+            "        .toc-sidebar a { text-decoration: none; color: #444; font-size: 0.95em; display: block; transition: color 0.2s; }",
+            "        .toc-sidebar a:hover { color: #005A9C; }",
+            "        .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 9999; justify-content: center; align-items: center; cursor: zoom-out; }",
+            "        .lightbox-overlay.active { display: flex; }",
+            "        .lightbox-overlay img { max-width: 95vw; max-height: 95vh; object-fit: contain; touch-action: none; transform-origin: center center; transition: transform 0.1s ease; }",
+            "        .lightbox-close { position: fixed; top: 15px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 10000; font-weight: bold; line-height: 1; }",
+            "    </style>",
+            "</head>",
+            "<body>",
+            "    <div class='layout-wrapper'>",
+            "        <div class='toc-sidebar'>",
+            "            <h3>Table of Contents</h3>",
+            "            <ul>",
+        ]
+
         for anchor, label in toc_items:
             html.append(f"                <li><a href='#{anchor}'>{label}</a></li>")
-        html.append("            </ul>")
-        html.append("        </div>")
-        html.append("")
+            
+        html.extend([
+            "            </ul>",
+            "        </div>",
+            "        <div class='main-content'>",
+            f"            <h1>Simulation Report: {os.path.basename(self.schematic_path)}</h1>",
+            "",
+        ])
 
         # --- Section: Top-Level Schematic ---
         html.append(
@@ -560,6 +563,7 @@ class ReportGenerator:
         else:
             html.append("        <p><em>No simulation log available.</em></p>")
 
+        html.append("        </div>")
         html.append("    </div>")
         html.append("")
 

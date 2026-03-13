@@ -24,21 +24,22 @@ V1 N_1 P1 dc 0 ac 0
 .preprocess addresistors nodcpath 1G
 .model CONTROLLER npy MODULE=controller_llc CLASS=Controller PYTHONPATH=/Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/LLC
 .model BOOTDIODE D (IS=1e-14 N=1 RS=0 CJO=1p M=0.5 TT=1n)
-C1 P1 N_1 1.364u
-C3 0 T2 100n
-C4 VZW T2 100n
+C1 P1 N_2 1.364u IC=0
+C3 0 T2 100n IC=0
+C4 VZW T2 100n IC=0
 D2 T1 VZW BOOTDIODE
 D3 0 T1 BOOTDIODE
-L1 N_1 int_1 1.858u
-R1_ser int_1 N_2 0.1
-N1 VIN N_4 N_5 N_6 N_7 N_8 N_9 N_10 0 N_11 N_12 en2 en1 N_13 N_14 N_15 CONTROLLER
-R3 VIN N_3 0.001
-R4 VZW 0 160
+L1 N_2 int_1 1.858u IC=0
+R1_ser int_1 N_3 0.1
+N1 VIN N_5 N_6 N_7 N_8 N_9 N_10 N_11 0 N_12 N_13 en2 en1 N_14 N_15 N_16 CONTROLLER
+R3 VIN N_4 1
+R4 N_1 0 160k
 * Skipping SCRIPT1: No template
-LP1 N_2 P2 5.573u
-LS1 T1 T2 247.7u
+LP1 N_3 P2 5.573u IC=0
+LS1 T1 T2 247.7u IC=0
 K1 LP1 LS1 0.99
-V1 N_3 0 dc 30 ac 0
+V1 N_4 0 dc 30 ac 0
+V2 VZW N_1 dc 1 ac 0
 X_1 0 P1 P2 VIN en1 en2 h_bridge
 .tran 1n 300u
 .print tran v(*) i(R4)

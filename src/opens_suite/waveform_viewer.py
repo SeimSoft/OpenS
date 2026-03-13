@@ -372,15 +372,23 @@ class WaveformViewer(QMainWindow):
         toolbar.addAction(self.calc_action)
 
         # Run Simulation
-        self.sim_action = QAction(
-            self.style().standardIcon(
-                pg.Qt.QtWidgets.QStyle.StandardPixmap.SP_MediaPlay
-            ),
-            "Run Simulation",
-            self,
-        )
-        self.sim_action.triggered.connect(self.runSimulationRequested.emit)
-        toolbar.addAction(self.sim_action)
+        main_window = self.parent()
+        while main_window and not hasattr(main_window, "simulate_action"):
+            main_window = main_window.parent()
+            
+        if main_window and hasattr(main_window, "simulate_action"):
+            self.sim_action = main_window.simulate_action
+            toolbar.addAction(self.sim_action)
+        else:
+            self.sim_action = QAction(
+                self.style().standardIcon(
+                    pg.Qt.QtWidgets.QStyle.StandardPixmap.SP_MediaPlay
+                ),
+                "Run Simulation",
+                self,
+            )
+            self.sim_action.triggered.connect(self.runSimulationRequested.emit)
+            toolbar.addAction(self.sim_action)
 
         toolbar.addSeparator()
 

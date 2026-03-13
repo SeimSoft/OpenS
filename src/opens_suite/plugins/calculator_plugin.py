@@ -89,10 +89,11 @@ class CalculatorPlugin(OpenSPlugin):
         self._update_action_state()
         if hasattr(self.main_window, "active_calculators"):
             # Filter out hidden or deleted calculators
+            # Exclude them if they are hidden AND their viewer is also hidden/missing.
             self.main_window.active_calculators = [
                 c
                 for c in self.main_window.active_calculators
-                if c is not None and not c.isHidden()
+                if c is not None and (not c.isHidden() or (getattr(c, "viewer", None) and not c.viewer.isHidden()))
             ]
             for calc in self.main_window.active_calculators:
                 calc._refresh_and_replot()
@@ -128,7 +129,7 @@ class CalculatorPlugin(OpenSPlugin):
             self.main_window.active_calculators = []
         self.main_window.active_calculators.append(dialog)
         dialog.sendToOutputsRequested.connect(
-            lambda expr: self.main_window.outputs_dock.add_expression(expr)
+            lambda expr: self.main_window.outputs_dock.update_or_add_expression(expr, origin_row=None)
         )
         dialog.probeRequested.connect(lambda: self._start_probing_for_calc(dialog))
         dialog.show()
@@ -148,6 +149,11 @@ class CalculatorPlugin(OpenSPlugin):
             return
 
         dialog = CalculatorDialog(raw_path, self.main_window)
+        if not hasattr(self.main_window, "active_calculators"):
+            self.main_window.active_calculators = []
+        self.main_window.active_calculators.append(dialog)
+        dialog.probeRequested.connect(lambda: self._start_probing_for_calc(dialog))
+        
         # Use simple evaluate from dialog
         dialog.script_edit.setPlainText(expression)
         dialog.evaluate()
@@ -192,11 +198,12 @@ class CalculatorPlugin(OpenSPlugin):
         self.main_window.active_calculators.append(dialog)
         dialog.script_edit.setPlainText("\n".join(expressions))
         dialog.sendToOutputsRequested.connect(
-            lambda expr: self.main_window.outputs_dock.add_expression(expr)
+            lambda expr: self.main_window.outputs_dock.update_or_add_expression(expr, origin_row=None)
         )
+        dialog.probeRequested.connect(lambda: self._start_probing_for_calc(dialog))
         dialog.show()
 
-    def _send_output_to_calculator(self, expression):
+    def _send_output_to_calculator(self, row, expression):
         view = self.main_window.tabs.currentWidget()
         filename = getattr(view, "filename", None) if view else None
         if not filename:
@@ -215,8 +222,9 @@ class CalculatorPlugin(OpenSPlugin):
         self.main_window.active_calculators.append(dialog)
         dialog.script_edit.setPlainText(expression)
         dialog.sendToOutputsRequested.connect(
-            lambda expr: self.main_window.outputs_dock.add_expression(expr)
+            lambda expr: self.main_window.outputs_dock.update_or_add_expression(expr, origin_row=row)
         )
+        dialog.probeRequested.connect(lambda: self._start_probing_for_calc(dialog))
         dialog.show()
 
     def _plot_output_expressions_bulk(self, expressions):
@@ -233,6 +241,11 @@ class CalculatorPlugin(OpenSPlugin):
             return
 
         dialog = CalculatorDialog(raw_path, self.main_window)
+        if not hasattr(self.main_window, "active_calculators"):
+            self.main_window.active_calculators = []
+        self.main_window.active_calculators.append(dialog)
+        dialog.probeRequested.connect(lambda: self._start_probing_for_calc(dialog))
+        
         # Construct multiline script
         script = "\n".join([f"plot({expr}, label='{expr}')" for expr in expressions])
         dialog.script_edit.setPlainText(script)
@@ -266,7 +279,8 @@ class CalculatorPlugin(OpenSPlugin):
             )
             if has_calcs:
                 self.main_window.active_calculators = [
-                    c for c in self.main_window.active_calculators if not c.isHidden()
+                    c for c in self.main_window.active_calculators 
+                    if c is not None and (not c.isHidden() or (getattr(c, "viewer", None) and not c.viewer.isHidden()))
                 ]
 
             if has_calcs and self.main_window.active_calculators:

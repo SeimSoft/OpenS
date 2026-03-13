@@ -228,30 +228,74 @@ class IOMixin:
                 )
 
                 g = ET.SubElement(root, "g", attribs)
-                # Fallback visuals for external viewers
-                ET.SubElement(
-                    g,
-                    "rect",
-                    {
-                        "width": "40",
-                        "height": "40",
-                        "rx": "5",
-                        "fill": "none",
-                        "stroke": "blue",
-                        "stroke-width": "0.5",
-                        "style": "stroke-dasharray: 2,2;",
-                    },
-                )
-                label = ET.SubElement(
-                    g,
-                    "text",
-                    {
-                        "y": "35",
-                        "fill": "blue",
-                        "style": "font-size: 6px; font-family: sans-serif;",
-                    },
-                )
-                label.text = f"{item.name or sym_name}"
+                
+                # Embed symbol directly for external SVG viewers
+                try:
+                    symbol_root = ET.fromstring(item.svg_template)
+                    
+                    full_name = getattr(item, "name", "") or ""
+                    idx = full_name
+                    prefix = getattr(item, "prefix", "")
+                    if idx and prefix and idx.startswith(prefix):
+                        idx = idx[len(prefix):]
+                        
+                    for elem in symbol_root.iter():
+                        # Remove namespace to prevent <ns0: prefix issues
+                        if '}' in elem.tag:
+                            elem.tag = elem.tag.split('}', 1)[1]
+                            
+                        # Replace text placeholders
+                        if elem.tag == "text" and elem.text:
+                            text = elem.text
+                            text = text.replace("{name}", full_name)
+                            text = text.replace("{index}", idx)
+                            text = text.replace("{fullName}", full_name)
+                            text = text.replace("{Name}", full_name)
+                            
+                            if hasattr(item, "parameters"):
+                                import re
+                                for k, v in item.parameters.items():
+                                    try:
+                                        pattern = re.compile(r"\{" + re.escape(k) + r"\}", flags=re.IGNORECASE)
+                                        text = pattern.sub(str(v), text)
+                                    except re.error:
+                                        text = text.replace(f"{{{k}}}", str(v))
+                                if item.parameters:
+                                    try:
+                                        val_pattern = re.compile(r"\{value\}", flags=re.IGNORECASE)
+                                        text = val_pattern.sub(str(list(item.parameters.values())[0]), text)
+                                    except re.error:
+                                        if "{value}" in text:
+                                            text = text.replace("{value}", str(list(item.parameters.values())[0]))
+                            elem.text = text
+                            
+                    g.append(symbol_root)
+                except Exception as e:
+                    print(f"Failed to embed symbol preview for {getattr(item, 'name', 'unknown')}: {e}")
+                    # Fallback visuals for external viewers
+                    ET.SubElement(
+                        g,
+                        "rect",
+                        {
+                            "width": "40",
+                            "height": "40",
+                            "rx": "5",
+                            "fill": "none",
+                            "stroke": "blue",
+                            "stroke-width": "0.5",
+                            "style": "stroke-dasharray: 2,2;",
+                        },
+                    )
+                    label = ET.SubElement(
+                        g,
+                        "text",
+                        {
+                            "y": "35",
+                            "fill": "blue",
+                            "style": "font-size: 6px; font-family: sans-serif;",
+                        },
+                    )
+                    label.text = f"{getattr(item, 'name', '') or sym_name}"
 
             elif isinstance(item, Wire):
                 line = item.line()

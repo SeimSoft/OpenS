@@ -29,7 +29,7 @@ class ValueColumnDelegate(QStyledItemDelegate):
 
 class OutputsWidget(QDockWidget):
     expressionPlotTriggered = pyqtSignal(str)
-    expressionCalculatorTriggered = pyqtSignal(str)
+    expressionCalculatorTriggered = pyqtSignal(object, str)
     expressionsChanged = pyqtSignal()
     bulkPlotTriggered = pyqtSignal(list)
 
@@ -125,6 +125,14 @@ class OutputsWidget(QDockWidget):
             self.evaluate_row(row, self._last_raw_path)
 
         self.expressionsChanged.emit()
+
+    def update_or_add_expression(self, expression, origin_row=None):
+        if origin_row is not None and 0 <= origin_row < self.model.rowCount():
+            item_expr = self.model.item(origin_row, self.COL_EXPR)
+            if item_expr.text() != str(expression):
+                item_expr.setText(str(expression))
+        else:
+            self.add_expression(expression)
 
     def get_expressions_data(self):
         """Returns complex data including specs."""
@@ -385,7 +393,7 @@ class OutputsWidget(QDockWidget):
             if action.text() == "Plot":
                 self.expressionPlotTriggered.emit(expr)
             elif action.text() == "Send to Calculator":
-                self.expressionCalculatorTriggered.emit(expr)
+                self.expressionCalculatorTriggered.emit(row, expr)
             elif action.text() == "Remove":
                 self.model.removeRow(row)
                 self.expressionsChanged.emit()
