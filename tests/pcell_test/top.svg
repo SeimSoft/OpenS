@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000">
+    <g symbol_name="gain_block" library_path="gain_block/symbol.svg" name="X1" transform="translate(100,100)" param_gain="10"/>
+    <g symbol_name="gain_block" library_path="gain_block/symbol.svg" name="X2" transform="translate(100,200)" param_gain="20"/>
+    <line x1="0" y1="100" x2="100" y2="100" stroke="black" stroke-width="2" net_name="IN1"/>
+    <line x1="0" y1="200" x2="100" y2="200" stroke="black" stroke-width="2" net_name="IN2"/>
+</svg>

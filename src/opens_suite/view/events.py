@@ -142,16 +142,51 @@ class EventsMixin:
                 self._transform_selection(mode="mirror")
         else:
             # Check for symbol bindkeys: require Shift + <letter> to avoid collisions
-            if (
-                event.modifiers() == Qt.KeyboardModifier.ShiftModifier
-                and len(event.text()) == 1
-            ):
-                # event.text() will be uppercase when Shift is pressed; normalize to lower
-                key = event.text().lower()
-                # Get library from main window
-                from PyQt6.QtWidgets import QApplication
+            modifiers = event.modifiers()
+            # On some systems (esp. macOS), Shift+[KEY] can include other bits like KeypadModifier.
+            # We want to check if Shift is pressed AND no major modifiers (Ctrl, Alt, Meta) are pressed.
+            major_modifiers = (
+                Qt.KeyboardModifier.ControlModifier
+                | Qt.KeyboardModifier.AltModifier
+                | Qt.KeyboardModifier.MetaModifier
+            )
+            is_allowed_modifier = (
+                modifiers == Qt.KeyboardModifier.NoModifier
+                or modifiers == Qt.KeyboardModifier.ShiftModifier
+            )
 
-                main_window = QApplication.instance().activeWindow()
+            # Use key() for more robust matching, especially on macOS
+            key_code = event.key()
+            is_alpha = Qt.Key.Key_A <= key_code <= Qt.Key.Key_Z
+
+            if is_allowed_modifier and is_alpha:
+                key = chr(key_code).lower()
+
+                # Get library from main window - more robust traversal
+                main_window = self.window()
+                from opens_suite.main_window import MainWindow
+
+                # If current window isn't MainWindow, try to find it
+                if not isinstance(main_window, MainWindow):
+                    parent = self.parent()
+                    found = False
+                    while parent:
+                        if isinstance(parent, MainWindow):
+                            main_window = parent
+                            found = True
+                            break
+                        parent = parent.parent()
+
+                    if not found:
+                        # Final fallback: search all top level widgets
+                        from PyQt6.QtWidgets import QApplication
+
+                        for widget in QApplication.topLevelWidgets():
+                            if isinstance(widget, MainWindow):
+                                main_window = widget
+                                found = True
+                                break
+
                 if hasattr(main_window, "library_dock"):
                     symbol_path = main_window.library_dock.get_symbol_by_bindkey(key)
                     if symbol_path:

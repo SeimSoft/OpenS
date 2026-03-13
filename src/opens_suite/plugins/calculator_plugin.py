@@ -56,7 +56,12 @@ class CalculatorPlugin(OpenSPlugin):
         view = self.main_window.tabs.widget(index)
         if isinstance(view, SchematicView):
             self._connect_view(view)
-        # Also update calculator action state
+        self._update_action_state(view)
+
+    def _update_action_state(self, view=None):
+        if view is None:
+            view = self.main_window.tabs.currentWidget()
+
         has_results = False
         filename = getattr(view, "filename", None) if view else None
         if filename:
@@ -78,8 +83,10 @@ class CalculatorPlugin(OpenSPlugin):
         view.netSignalsPlotRequested.connect(self._plot_net_signals)
         view.netProbed.connect(self._on_net_probed)
         view.simulationFinished.connect(self.refresh_calculators)
+        self._update_action_state(view)
 
     def refresh_calculators(self):
+        self._update_action_state()
         if hasattr(self.main_window, "active_calculators"):
             # Filter out hidden or deleted calculators
             self.main_window.active_calculators = [
@@ -88,7 +95,7 @@ class CalculatorPlugin(OpenSPlugin):
                 if c is not None and not c.isHidden()
             ]
             for calc in self.main_window.active_calculators:
-                calc.refresh()
+                calc._refresh_and_replot()
 
     def open_calculator(self):
         view = self.main_window.tabs.currentWidget()

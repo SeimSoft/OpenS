@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>OpenS Simulation Report</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { border-bottom: 2px solid #005A9C; padding-bottom: 10px; color: #005A9C; }
+        h2 { margin-top: 30px; color: #004080; }
+        .schematic { text-align: center; margin: 20px 0; }
+        .schematic img { max-width: 100%; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: top; }
+        th { background-color: #005A9C; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }
+        .plot-container { text-align: center; margin: 15px 0; border: 1px solid #eee; padding: 10px; background: #fafafa; }
+        .plot-container img { max-width: 100%; cursor: pointer; }
+        .error { color: #d9534f; font-weight: bold; }
+        .toc { background: #f0f4f8; border: 1px solid #d0d8e0; border-radius: 6px; padding: 20px; margin: 20px 0; }
+        .toc h3 { margin-top: 0; color: #004080; }
+        .toc ul { list-style: none; padding-left: 0; margin: 0; }
+        .toc li { padding: 4px 0; }
+        .toc a { text-decoration: none; color: #005A9C; }
+        .toc a:hover { text-decoration: underline; }
+        .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.92); z-index: 9999; justify-content: center; align-items: center; cursor: zoom-out; }
+        .lightbox-overlay.active { display: flex; }
+        .lightbox-overlay img { max-width: 95vw; max-height: 95vh; object-fit: contain; touch-action: none; transform-origin: center center; transition: transform 0.1s ease; }
+        .lightbox-close { position: fixed; top: 15px; right: 25px; color: white; font-size: 35px; cursor: pointer; z-index: 10000; font-weight: bold; line-height: 1; }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>Simulation Report: schematic.svg</h1>
+
+        <div class='toc'>
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href='#sect-1'>1. Top-Level Schematic</a></li>
+                <li><a href='#sect-outputs'>2. Output Expressions</a></li>
+                <li><a href='#sect-plots'>3. Waveform Plots</a></li>
+                <li><a href='#sect-logs'>4. Simulation Logs</a></li>
+            </ul>
+        </div>
+
+        <h2 id='sect-1'>1. Top-Level Schematic</h2>
+        <div class='schematic'>
+            <img src='circuit.png' alt='Circuit Schematic' onclick='openLightbox(this)'>
+        </div>
+
+        <h2 id='sect-outputs'>2. Output Expressions</h2>
+        <table>
+            <tr><th>Name</th><th>Expression</th><th>Unit</th><th>Min</th><th>Value</th><th>Max</th><th>Description</th></tr>
+        </table>
+
+        <h2 id='sect-plots'>3. Waveform Plots</h2>
+        <h3>Unnamed</h3>
+        <p style='color: #666; font-size: 0.9em;'><code>subaxis(2,1)
+plot(st('VSW'), label="st('VSW')")
+plot(st('VL'), label="st('VL')")
+plot(st('VH'), label="st('VH')")
+plot(st('VCAP'), label="st('VCAP')")
+
+subaxis(2,2)
+plot(st('I_SENSE'), label="st('I_SENSE')")</code></p>
+        <div class='schematic'>
+            <img src='plot_0.png' alt='Unnamed' onclick='openLightbox(this)'>
+        </div>
+        <h3>Unnamed</h3>
+        <p style='color: #666; font-size: 0.9em;'><code>plot(st('I_SENSE'), label="st('I_SENSE')")
+plot(st('VL'), label="st('VL')")
+plot(st('VH'), label="st('VH')")
+plot(st('LP1#branch'), label="st('LP1#branch')")
+plot(st('LP2#branch'), label="st('LP2#branch')")</code></p>
+        <div class='schematic'>
+            <img src='plot_1.png' alt='Unnamed' onclick='openLightbox(this)'>
+        </div>
+
+        <h2 id='sect-logs'>4. Simulation Logs</h2>
+        <details>
+            <summary>Click to view simulation log</summary>
+            <pre>
+*****
+***** Welcome to the Xyce(TM) Parallel Electronic Simulator
+*****
+***** This is version Xyce Release 7.10-opensource
+***** Date: Sat Mar 07 17:17:25 CET 2026
+
+
+***** Executing netlist /Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/LLC/simulation/schematic.net
+
+***** Reading and parsing netlist...
+DEBUG checkIfModelValid: device_type=D, modelType=D, modelLevel=1, isModelLevelValid=1, isModelTypeValid=1, numNodes=2
+DEBUG checkIfModelValid: device_type=M, modelType=NMOS, modelLevel=1, isModelLevelValid=1, isModelTypeValid=1, numNodes=4
+DEBUG checkIfModelValid: device_type=M, modelType=NMOS, modelLevel=1, isModelLevelValid=1, isModelTypeValid=1, numNodes=4
+DEBUG checkIfModelValid: device_type=N, modelType=NPY, modelLevel=1, isModelLevelValid=1, isModelTypeValid=1, numNodes=16
+***** Setting up topology...
+
+Netlist warning: Voltage Node (N_4) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_5) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_6) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_7) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_8) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_9) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_10) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_11) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_12) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_13) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_4) does not have a DC path to ground
+Netlist warning: Voltage Node (N_5) does not have a DC path to ground
+Netlist warning: Voltage Node (N_6) does not have a DC path to ground
+Netlist warning: Voltage Node (VL) does not have a DC path to ground
+Netlist warning: Voltage Node (N_7) does not have a DC path to ground
+Netlist warning: Voltage Node (N_10) does not have a DC path to ground
+Netlist warning: Voltage Node (N_11) does not have a DC path to ground
+Netlist warning: Voltage Node (N_12) does not have a DC path to ground
+Netlist warning: Voltage Node (N_13) does not have a DC path to ground
+Netlist warning: Voltage Node (N_8) does not have a DC path to ground
+Netlist warning: Voltage Node (N_9) does not have a DC path to ground
+Netlist warning: Voltage Node (VH) does not have a DC path to ground
+***** Device Count Summary ...
+       C level 1 (Capacitor)                        2
+       D level 1,2 (Diode)                          1
+       K level 1 (Linear Mutual Inductor)           2
+       M level 1 (MOSFET level 1)                   2
+       NPY level 1 (Python Device) (Python Device)  1
+       R level 1 (Resistor)                         3
+       V level 1 (Independent Voltage Source)       1
+       ----------------------------------------------
+       Total Devices                               12
+***** Setting up matrix structure...
+***** Number of Unknowns = 26
+***** Initializing...
+
+***** Beginning DC Operating Point Calculation...
+
+***** Beginning Transient Calculation...
+
+***** Percent complete: 1 %
+***** Current system time: Sat Mar  7 17:17:25 2026
+***** Estimated time to completion: 10 sec.
+
+***** Percent complete: 2 %
+***** Current system time: Sat Mar  7 17:17:25 2026
+***** Estimated time to completion: 10 sec.
+
+***** Percent complete: 3.0217 %
+***** Current system time: Sat Mar  7 17:17:25 2026
+***** Estimated time to completion:  9 sec.
+
+***** Percent complete: 4.02831 %
+***** Current system time: Sat Mar  7 17:17:25 2026
+***** Estimated time to completion:  8 sec.
+
+***** Percent complete: 5.04349 %
+***** Current system time: Sat Mar  7 17:17:25 2026
+***** Estimated time to completion:  7 sec.
+
+***** Percent complete: 6.04501 %
+***** Current system time: Sat Mar  7 17:17:25 2026
+***** Estimated time to completion:  7 sec.
+
+***** Percent complete: 7.06228 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  7 sec.
+
+***** Percent complete: 8.07769 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  6 sec.
+
+***** Percent complete: 9.09033 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  6 sec.
+
+***** Percent complete: 10.0966 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  6 sec.
+
+***** Percent complete: 11.1042 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  6 sec.
+
+***** Percent complete: 12.12 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  6 sec.
+
+***** Percent complete: 13.1262 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  6 sec.
+
+***** Percent complete: 14.1381 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 15.1546 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 16.1667 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 17.1839 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 18.1933 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 19.2116 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 20.2291 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 21.2358 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 22.248 %
+***** Current system time: Sat Mar  7 17:17:26 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 23.2539 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 24.2705 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  5 sec.
+
+***** Percent complete: 25.2747 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 26.2805 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 27.3151 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 28.324 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 29.329 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 30.3333 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 31.3476 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 32.3598 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 33.3781 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 34.3891 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 35.4024 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 36.4148 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  4 sec.
+
+***** Percent complete: 37.4282 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 38.4323 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 39.4365 %
+***** Current system time: Sat Mar  7 17:17:27 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 40.4471 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 41.4595 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 42.4673 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 43.4972 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 44.5 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 45.5142 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 46.549 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 47.5646 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 48.5734 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 49.5915 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  3 sec.
+
+***** Percent complete: 50.6037 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 51.6177 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 52.6232 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 53.6412 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 54.6586 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 55.6932 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 56.7089 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 57.7223 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 58.7357 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 59.7481 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 60.7616 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 61.7697 %
+***** Current system time: Sat Mar  7 17:17:28 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 62.7858 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 63.8028 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  2 sec.
+
+***** Percent complete: 64.8376 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 65.8397 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 66.8416 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 67.8465 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 68.8476 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 69.8823 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 70.8984 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 71.9069 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 72.9248 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 73.937 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 74.9636 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 75.9765 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 76.9795 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 77.9919 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 79.0265 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 80.0423 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  1 sec.
+
+***** Percent complete: 81.0556 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 82.069 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 83.0814 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 84.0949 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 85.1031 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 86.1191 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 87.1362 %
+***** Current system time: Sat Mar  7 17:17:29 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 88.1709 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 89.1731 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 90.1749 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 91.1799 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 92.1809 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 93.2156 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 94.2317 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 95.2402 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 96.2582 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 97.2704 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 98.2969 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 99.3098 %
+***** Current system time: Sat Mar  7 17:17:30 2026
+***** Estimated time to completion:  0 sec.
+
+***** Problem read in and set up time: 0.157998 seconds
+ ***** DCOP time: 0.017298 seconds.  Breakdown follows:
+	Number Successful Steps Taken:		1
+	Number Failed Steps Attempted:		0
+	Number Jacobians Evaluated:		10
+	Number Linear Solves:			10
+	Number Failed Linear Solves:		0
+	Number Residual Evaluations:		11
+	Number Nonlinear Convergence Failures:	0
+	Total Residual Load Time:		0.000180006 seconds
+	Total Jacobian Load Time:		0.000518084 seconds
+	Total Linear Solution Time:		0.00280261 seconds
+
+ ***** Transient Stepping time: 4.91015 seconds.  Breakdown follows:
+	Number Successful Steps Taken:		17431
+	Number Failed Steps Attempted:		1089
+	Number Jacobians Evaluated:		56030
+	Number Linear Solves:			56030
+	Number Failed Linear Solves:		0
+	Number Residual Evaluations:		74550
+	Number Nonlinear Convergence Failures:	0
+	Total Residual Load Time:		0.406399 seconds
+	Total Jacobian Load Time:		0.179853 seconds
+	Total Linear Solution Time:		0.717741 seconds
+
+
+***** Solution Summary *****
+	Number Successful Steps Taken:		17432
+	Number Failed Steps Attempted:		1089
+	Number Jacobians Evaluated:		56040
+	Number Linear Solves:			56040
+	Number Failed Linear Solves:		0
+	Number Residual Evaluations:		74561
+	Number Nonlinear Convergence Failures:	0
+	Total Residual Load Time:		0.406579 seconds
+	Total Jacobian Load Time:		0.180372 seconds
+	Total Linear Solution Time:		0.720543 seconds
+
+
+***** Total Simulation Solvers Run Time: 4.92795 seconds
+***** Total Elapsed Run Time:            5.08593 seconds
+*****
+***** End of Xyce(TM) Simulation
+*****
+
+Timing summary of 1 processor
+                 Stats                   Count       CPU Time              Wall Time
+---------------------------------------- ----- --------------------- ---------------------
+Xyce                                         1        4.417 (100.0%)        5.106 (100.0%)
+  Analysis                                   1        4.372 (98.99%)        4.928 (96.52%)
+    Transient                                1        4.372 (98.99%)        4.928 (96.52%)
+      Nonlinear Solve                    18521        1.920 (43.47%)        2.167 (42.45%)
+        Residual                         74561        0.440 ( 9.96%)        0.491 ( 9.62%)
+        Jacobian                         56040        0.208 ( 4.71%)        0.240 ( 4.70%)
+        Linear Solve                     56040        0.735 (16.64%)        0.787 (15.42%)
+      Successful DCOP Steps                  1        0.001 ( 0.01%)        0.002 ( 0.04%)
+      Successful Step                    17431        2.308 (52.25%)        2.593 (50.80%)
+      Failed Steps                        1089        0.002 ( 0.04%)        0.002 ( 0.05%)
+  Netlist Import                             1        0.039 ( 0.87%)        0.114 ( 2.23%)
+    Parse Context                            1        0.001 ( 0.02%)        0.005 ( 0.11%)
+    Distribute Devices                       1        0.001 ( 0.03%)        0.004 ( 0.07%)
+    Verify Devices                           1        0.000 (<0.01%)        0.000 (<0.01%)
+    Instantiate                              1        0.035 ( 0.79%)        0.076 ( 1.48%)
+  Late Initialization                        1        0.002 ( 0.05%)        0.019 ( 0.37%)
+    Global Indices                           1        0.000 (<0.01%)        0.001 ( 0.03%)
+  Setup Matrix Structure                     1        0.000 (<0.01%)        0.007 ( 0.13%)
+
+</pre>
+        </details>
+    </div>
+
+    <div style='text-align: center; margin: 30px auto 10px; padding: 15px; opacity: 0.7;'>
+        <a href='https://seimsoft.github.io/OpenS/' target='_blank' style='text-decoration: none; color: #666; display: inline-flex; align-items: center; gap: 8px;'>
+            <img src='launcher.png' alt='OpenS' style='height: 24px; width: 24px;'>
+            <span style='font-size: 12px;'>Created by OpenS</span>
+        </a>
+    </div>
+
+    <div class='lightbox-overlay' id='lightbox' onclick='closeLightbox(event)'>
+        <span class='lightbox-close' onclick='closeLightbox(event)'>&times;</span>
+        <img id='lightbox-img' src='' alt='Fullscreen'>
+    </div>
+
+    <script>
+
+        const overlay = document.getElementById('lightbox');
+        const lbImg = document.getElementById('lightbox-img');
+
+        let scale = 1;
+        let translateX = 0, translateY = 0;
+        let isDragging = false;
+        let startX, startY;
+        let initialPinchDist = null;
+        let initialScale = 1;
+
+        function openLightbox(img) {
+            lbImg.src = img.src;
+            scale = 1; translateX = 0; translateY = 0;
+            applyTransform();
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(e) {
+            if (e.target === overlay || e.target.classList.contains('lightbox-close')) {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function applyTransform() {
+            lbImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        }
+
+        // Mouse wheel zoom
+        overlay.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale = Math.min(Math.max(0.2, scale * delta), 20);
+            applyTransform();
+        }, { passive: false });
+
+        // Mouse drag
+        lbImg.addEventListener('mousedown', function(e) {
+            e.preventDefault();
+            isDragging = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+            lbImg.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            translateX = e.clientX - startX;
+            translateY = e.clientY - startY;
+            applyTransform();
+        });
+
+        window.addEventListener('mouseup', function() {
+            isDragging = false;
+            lbImg.style.cursor = 'grab';
+        });
+
+        // Touch: pinch zoom + drag
+        lbImg.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 2) {
+                initialPinchDist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                initialScale = scale;
+            } else if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - translateX;
+                startY = e.touches[0].clientY - translateY;
+            }
+        }, { passive: true });
+
+        lbImg.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 2 && initialPinchDist) {
+                e.preventDefault();
+                const dist = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                scale = Math.min(Math.max(0.2, initialScale * (dist / initialPinchDist)), 20);
+                applyTransform();
+            } else if (e.touches.length === 1 && isDragging) {
+                translateX = e.touches[0].clientX - startX;
+                translateY = e.touches[0].clientY - startY;
+                applyTransform();
+            }
+        }, { passive: false });
+
+        lbImg.addEventListener('touchend', function(e) {
+            if (e.touches.length < 2) initialPinchDist = null;
+            if (e.touches.length === 0) isDragging = false;
+        });
+
+        // ESC to close
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+    </script>
+</body>
+</html>

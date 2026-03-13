@@ -58,6 +58,21 @@ class CalculatorDialog(QMainWindow):
         self.refresh()
         self.evaluate()
 
+    def _request_simulation(self):
+        """Trigger simulation via the main window."""
+        main_window = self.parent()
+        # Find main window if parented differently
+        while main_window and not hasattr(main_window, "simulate_action"):
+            main_window = main_window.parent()
+
+        if main_window and hasattr(main_window, "simulate_action"):
+            main_window.simulate_action.trigger()
+            # The calculator will be refreshed by the plugin once the simulation completes
+        else:
+            QMessageBox.warning(
+                self, "Error", "Could not find simulation action in main window."
+            )
+
     def _setup_ui(self):
         self.setWindowTitle("Simulation Calculator")
         self.resize(900, 600)
@@ -240,6 +255,7 @@ class CalculatorDialog(QMainWindow):
             self.viewer = WaveformViewer(self)
             self.viewer.openCalculatorRequested.connect(self._bring_to_front)
             self.viewer.refreshRequested.connect(self._refresh_and_replot)
+            self.viewer.runSimulationRequested.connect(self._request_simulation)
             self.viewer.show()
 
         self.viewer.clear()
@@ -575,9 +591,27 @@ class CalculatorDialog(QMainWindow):
             logf = logf1 + (logf2 - logf1) * (target_db - db1) / (db2 - db1)
             return 10**logf
 
-        scope = {
+        scope = {}
+
+        # Add outputs from the outputs_dock if available
+        try:
+            # Look for outputs_dock in the main window
+            main_window = self.parent()
+            # If parent is not MainWindow, try to find it
+            while main_window and not hasattr(main_window, "outputs_dock"):
+                main_window = main_window.parent()
+
+            if main_window and hasattr(main_window, "outputs_dock"):
+                outputs_scope = main_window.outputs_dock.get_results_scope()
+                # Merge outputs into scope
+                scope.update(outputs_scope)
+        except Exception as e:
+            print(f"Note: Could not load output expressions into calculator scope: {e}")
+
+        # Ensure core calculator functions/variables ALWAYS override everything else
+        core_scope = {
             "v": v,
-            "vt": st,  # Aliased for backward compatibility
+            "vt": st,
             "it": st,
             "vf": sf,
             "ifc": sf,
@@ -606,20 +640,6 @@ class CalculatorDialog(QMainWindow):
             "subfigure": self.viewer.subaxis if self.viewer else lambda *args: None,
             "subaxis": subaxis,
         }
-
-        # Add outputs from the outputs_dock if available
-        try:
-            # Look for outputs_dock in the main window
-            main_window = self.parent()
-            # If parent is not MainWindow, try to find it
-            while main_window and not hasattr(main_window, "outputs_dock"):
-                main_window = main_window.parent()
-
-            if main_window and hasattr(main_window, "outputs_dock"):
-                outputs_scope = main_window.outputs_dock.get_results_scope()
-                # Prioritize calculator functions over outputs by merging them last
-                scope = {**outputs_scope, **scope}
-        except Exception as e:
-            print(f"Note: Could not load output expressions into calculator scope: {e}")
+        scope.update(core_scope)
 
         return scope

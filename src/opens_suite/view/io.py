@@ -414,9 +414,13 @@ class IOMixin:
 
                     search_paths.append(os.getcwd())  # For local backward compatibility
                     if getattr(self, "filename", None):
-                        search_paths.append(
-                            os.path.dirname(os.path.abspath(self.filename))
-                        )
+                        cell_dir = os.path.dirname(os.path.abspath(self.filename))
+                        search_paths.append(cell_dir)
+                        # Assume structure: project_dir / lib / cell / view.svg
+                        lib_dir = os.path.dirname(cell_dir)
+                        proj_dir = os.path.dirname(lib_dir)
+                        if proj_dir not in search_paths:
+                            search_paths.append(proj_dir)
 
                     # If path is relative, attempt to resolve through search paths
                     if path and not os.path.isabs(path):

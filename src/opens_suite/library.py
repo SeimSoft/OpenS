@@ -164,7 +164,13 @@ class LibraryWidget(QDockWidget):
             self.preview_label.setText("Invalid preview")
 
     def _get_or_create_node(
-        self, parent_item, text, path_data=None, node_type=None, node_path=None
+        self,
+        parent_item,
+        text,
+        path_data=None,
+        node_type=None,
+        node_path=None,
+        editable=True,
     ):
         for i in range(parent_item.childCount()):
             child = parent_item.child(i)
@@ -179,6 +185,7 @@ class LibraryWidget(QDockWidget):
             item.setData(0, Qt.ItemDataRole.UserRole + 1, node_type)
         if node_path:
             item.setData(0, Qt.ItemDataRole.UserRole + 2, node_path)
+        item.setData(0, Qt.ItemDataRole.UserRole + 3, editable)
         return item
 
     def _populate_library(self):
@@ -211,10 +218,15 @@ class LibraryWidget(QDockWidget):
         if os.path.exists(self.project_dir) and self.project_dir not in search_paths:
             search_paths.append(self.project_dir)
 
+        self.bindkey_map.clear()
         # Iterate all search paths
         for base_path in search_paths:
             if not os.path.exists(base_path):
                 continue
+
+            # Determine if this search path is considered "internal" (non-editable)
+            is_path_editable = base_path != default_lib
+
             for lib_name in sorted(os.listdir(base_path)):
                 lib_path = os.path.join(base_path, lib_name)
                 # Ignore common non-library folders
@@ -233,6 +245,9 @@ class LibraryWidget(QDockWidget):
                     report_item.setData(0, Qt.ItemDataRole.UserRole + 1, "REPORT")
                     report_item.setData(0, Qt.ItemDataRole.UserRole + 2, lib_path)
                     report_item.setData(
+                        0, Qt.ItemDataRole.UserRole + 3, is_path_editable
+                    )
+                    report_item.setData(
                         0,
                         Qt.ItemDataRole.UserRole,
                         os.path.join(lib_path, "index.html"),
@@ -246,6 +261,7 @@ class LibraryWidget(QDockWidget):
                 lib_item = QTreeWidgetItem(self.tree_widget, [lib_name])
                 lib_item.setData(0, Qt.ItemDataRole.UserRole + 1, "LIB")
                 lib_item.setData(0, Qt.ItemDataRole.UserRole + 2, lib_path)
+                lib_item.setData(0, Qt.ItemDataRole.UserRole + 3, is_path_editable)
                 lib_item.setExpanded(
                     lib_name == "opensLib"
                     or lib_name == os.path.basename(self.project_dir)
@@ -262,7 +278,7 @@ class LibraryWidget(QDockWidget):
                 for cell_name in sorted(cells):
                     cell_path = os.path.join(lib_path, cell_name)
 
-                    # 1. Determine Category from symbol.svg
+                    # 1. Determine Category and Bindkey from symbol.svg
                     category = "Uncategorized"
                     symbol_path = os.path.join(cell_path, "symbol.svg")
                     if os.path.exists(symbol_path):
@@ -276,6 +292,10 @@ class LibraryWidget(QDockWidget):
                                     cat = elem.get("category")
                                     if cat:
                                         category = cat
+
+                                    bk = elem.get("bindkey")
+                                    if bk:
+                                        self.bindkey_map[bk.lower()] = symbol_path
                                     break
                         except Exception:
                             pass
@@ -284,7 +304,11 @@ class LibraryWidget(QDockWidget):
                     category_node = lib_item
                     if category:
                         category_node = self._get_or_create_node(
-                            lib_item, category, node_type="CATEGORY"
+                            lib_item,
+                            category,
+                            node_type="CATEGORY",
+                            node_path=lib_path,
+                            editable=is_path_editable,
                         )
 
                     # 3. Create Cell node
@@ -294,10 +318,10 @@ class LibraryWidget(QDockWidget):
                         node_type="CELL",
                         node_path=cell_path,
                         path_data=cell_path,
+                        editable=is_path_editable,
                     )
 
                     # 4. List Views
-                    views = []
                     for f in sorted(os.listdir(cell_path)):
                         f_path = os.path.join(cell_path, f)
                         if os.path.isdir(f_path):
@@ -323,15 +347,6 @@ class LibraryWidget(QDockWidget):
                             v_name = "report"
                             v_type = "REPORT"
                             icon = "📊 "
-                        elif (
-                            f == "report"
-                            and os.path.isdir(f_path)
-                            and os.path.exists(os.path.join(f_path, "index.html"))
-                        ):
-                            v_name = "report"
-                            v_type = "REPORT"
-                            icon = "📊 "
-                            f_path = os.path.join(f_path, "index.html")
                         elif f.endswith(".ipynb"):
                             v_type = "NOTEBOOK"
                             icon = "📓 "
@@ -346,20 +361,30 @@ class LibraryWidget(QDockWidget):
                             f"{icon}{v_name}",
                             path_data=f_path,
                             node_type=v_type,
+                            editable=is_path_editable,
                         )
                         view_item.setToolTip(0, f_path)
 
     def _on_item_double_clicked(self, item, column):
         node_type = item.data(0, Qt.ItemDataRole.UserRole + 1)
         path = item.data(0, Qt.ItemDataRole.UserRole)
+        is_editable = item.data(0, Qt.ItemDataRole.UserRole + 3)
 
         if node_type == "NEW_LIB":
             self._create_new_library()
+            return
+        elif node_type == "CELL":
+            # Just expand/collapse, do NOT try to open directory
             return
         elif node_type == "REPORT":
             QDesktopServices.openUrl(QUrl.fromLocalFile(path))
             return
         elif node_type in ["PYTHON", "NOTEBOOK"]:
+            # Even if non-editable, viewing code might be okay, but user said
+            # "double clicking on a view there will not open a new tab"
+            if not is_editable:
+                return
+
             from PyQt6.QtCore import QSettings
 
             settings = QSettings("OpenS", "OpenS")
@@ -380,6 +405,11 @@ class LibraryWidget(QDockWidget):
             return
 
         if path and os.path.exists(path):
+            # View (schematic/symbol) double click
+            if not is_editable:
+                # Do not open views from internal libs in new tabs
+                return
+
             main_window = self.window()
             if hasattr(main_window, "open_file"):
                 main_window.open_file(path)
@@ -404,29 +434,33 @@ class LibraryWidget(QDockWidget):
 
         node_type = item.data(0, Qt.ItemDataRole.UserRole + 1)
         node_path = item.data(0, Qt.ItemDataRole.UserRole + 2)
+        is_editable = item.data(0, Qt.ItemDataRole.UserRole + 3)
 
         menu = QMenu(self.tree_widget)
 
-        if node_type == "LIB":
-            action = menu.addAction("Create New Cell...")
-            action.triggered.connect(lambda: self._create_new_cell(node_path))
-        elif node_type == "CELL":
-            sch_action = menu.addAction("Create Schematic View...")
-            sch_action.triggered.connect(
-                lambda: self._create_new_view(node_path, "schematic")
-            )
-            sym_action = menu.addAction("Create Symbol View...")
-            sym_action.triggered.connect(
-                lambda: self._create_new_view(node_path, "symbol")
-            )
-            menu.addSeparator()
-            rename_action = menu.addAction("Rename Cell...")
-            rename_action.triggered.connect(lambda: self._rename_cell(node_path))
+        if is_editable:
+            if node_type in ["LIB", "CATEGORY"]:
+                action = menu.addAction("Create New Cell...")
+                # For LIB, node_path is lib_path. For CATEGORY, it is also lib_path.
+                action.triggered.connect(lambda: self._create_new_cell(node_path))
+            elif node_type == "CELL":
+                sch_action = menu.addAction("Create Schematic View...")
+                sch_action.triggered.connect(
+                    lambda: self._create_new_view(node_path, "schematic")
+                )
+                sym_action = menu.addAction("Create Symbol View...")
+                sym_action.triggered.connect(
+                    lambda: self._create_new_view(node_path, "symbol")
+                )
+                menu.addSeparator()
+                rename_action = menu.addAction("Rename Cell...")
+                rename_action.triggered.connect(lambda: self._rename_cell(node_path))
 
         if node_path or item.data(0, Qt.ItemDataRole.UserRole):
             p = node_path or item.data(0, Qt.ItemDataRole.UserRole)
             if p and os.path.exists(p):
-                menu.addSeparator()
+                if not menu.isEmpty():
+                    menu.addSeparator()
                 browse_action = menu.addAction(
                     "Show in Finder"
                     if os.uname().sysname == "Darwin"
@@ -450,7 +484,17 @@ class LibraryWidget(QDockWidget):
             if not os.path.exists(cell_path):
                 try:
                     os.makedirs(cell_path)
+                    # Create default schematic.svg
+                    sch_path = os.path.join(cell_path, "schematic.svg")
+                    with open(sch_path, "w") as f:
+                        f.write(
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"></svg>'
+                        )
                     self._populate_library()
+                    # Open the new schematic
+                    main_window = self.window()
+                    if hasattr(main_window, "open_file"):
+                        main_window.open_file(sch_path)
                 except Exception as e:
                     QMessageBox.warning(self, "Error", f"Failed to create cell: {e}")
             else:

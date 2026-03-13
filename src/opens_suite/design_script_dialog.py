@@ -314,6 +314,60 @@ class DesignScriptDialog(QDialog):
             )
 
     @staticmethod
+    def execute_notebook_sync(abs_script_path):
+        """Synchronously execute a notebook using nbconvert."""
+        if not abs_script_path or not os.path.exists(abs_script_path):
+            return False, f"Notebook file not found at: {abs_script_path}"
+
+        # Prepare environment
+        src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        notebook_dir = os.path.dirname(abs_script_path)
+
+        env = os.environ.copy()
+        pythonpath_entries = [src_path, notebook_dir]
+        if "PYTHONPATH" in env:
+            env["PYTHONPATH"] = os.pathsep.join(
+                pythonpath_entries + [env["PYTHONPATH"]]
+            )
+        else:
+            env["PYTHONPATH"] = os.pathsep.join(pythonpath_entries)
+
+        # Prepare command
+        cmd = [
+            sys.executable,
+            "-m",
+            "jupyter",
+            "nbconvert",
+            "--to",
+            "notebook",
+            "--execute",
+            "--inplace",
+            "--ExecutePreprocessor.timeout=None",
+            "--ExecutePreprocessor.kernel_name=python3",
+            abs_script_path,
+        ]
+
+        try:
+            process = subprocess.Popen(
+                cmd,
+                env=env,
+                cwd=notebook_dir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            stdout, stderr = process.communicate()
+            if process.returncode == 0:
+                return True, ""
+            else:
+                return (
+                    False,
+                    stderr or stdout or f"Exited with code {process.returncode}",
+                )
+        except Exception as e:
+            return False, str(e)
+
+    @staticmethod
     def execute_and_apply(item):
         script_path = item.parameters.get("SCRIPT", "")
         if not script_path:
@@ -323,21 +377,9 @@ class DesignScriptDialog(QDialog):
             return
 
         # Resolve absolute path very robustly
-        abs_script_path = ""
-        try:
-            if os.path.isabs(script_path):
-                abs_script_path = script_path
-            else:
-                # Try to resolve relative to current schematic
-                view = item.scene().views()[0]
-                if hasattr(view, "filename") and view.filename:
-                    abs_script_path = os.path.abspath(
-                        os.path.join(os.path.dirname(view.filename), script_path)
-                    )
-                else:
-                    abs_script_path = os.path.abspath(script_path)
-        except Exception:
-            abs_script_path = os.path.abspath(script_path)
+        abs_script_path = DesignScriptDialog.get_absolute_path_for_item(
+            item, script_path
+        )
 
         if not abs_script_path or not os.path.exists(abs_script_path):
             QMessageBox.warning(
@@ -345,9 +387,7 @@ class DesignScriptDialog(QDialog):
             )
             return
 
-        # Prepare environment
-        # Find the 'src' directory (parent of 'opens' package)
-        # This file is at src/opens/design_script_dialog.py, so we go up two levels.
+        # Prepare environment (for UI display purposes, we still use worker to avoid blocking)
         src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         notebook_dir = os.path.dirname(abs_script_path)
 
@@ -415,7 +455,7 @@ class DesignScriptDialog(QDialog):
         item._script_worker = worker
 
     @staticmethod
-    def apply_json_to_item_scene(item, json_path):
+    def apply_json_to_item_scene(item, json_path, headless=False):
         if not os.path.exists(json_path):
             return 0
 
@@ -423,7 +463,10 @@ class DesignScriptDialog(QDialog):
             with open(json_path, "r") as f:
                 data = json.load(f)
         except Exception as e:
-            QMessageBox.critical(None, "Error", f"Failed to parse JSON: {e}")
+            if not headless:
+                QMessageBox.critical(None, "Error", f"Failed to parse JSON: {e}")
+            else:
+                print(f"Error parsing JSON: {e}")
             return 0
 
         scene = item.scene()
@@ -434,11 +477,12 @@ class DesignScriptDialog(QDialog):
 
         # Access Variables dock
         main_window = None
-        if scene.views():
+        variables_dock = None
+        if not headless and scene.views():
             view = scene.views()[0]
             main_window = view.window()
+            variables_dock = getattr(main_window, "variables_dock", None)
 
-        variables_dock = getattr(main_window, "variables_dock", None)
         current_variables = []
         if variables_dock:
             current_variables = variables_dock.get_variables()
@@ -509,6 +553,9 @@ class DesignScriptDialog(QDialog):
                 view.recalculate_connectivity()
 
         scene.update()
+
+        if headless:
+            return applied_count
 
         # Build message
         detail_msg = "\n".join(details)

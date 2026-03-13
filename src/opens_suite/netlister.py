@@ -17,10 +17,44 @@ class NetlistGenerator:
         self.subckt_pins = kwargs.get("subckt_pins", [])
         self.subcircuits_code = kwargs.get("subcircuits_code", {})
 
-    def _generate_subcircuit(self, sch_path, subckt_name):
+    def _generate_subcircuit(self, sch_path, subckt_base_name, instance_params=None):
         import os
+        import json
+        import hashlib
         from opens_suite.view.core import SchematicView
         from opens_suite.symbol_generator import SymbolGenerator
+        from opens_suite.design_script_dialog import DesignScriptDialog
+
+        # PCell Detection
+        dir_name = os.path.dirname(sch_path)
+        json_path = os.path.join(dir_name, "parameters.json")
+        pcell_params = {}
+        is_pcell = False
+        variant_name = subckt_base_name
+
+        if os.path.exists(json_path):
+            is_pcell = True
+            try:
+                with open(json_path, "r") as f:
+                    pcell_params = json.load(f)
+            except Exception as e:
+                print(f"Error loading parameters.json for {subckt_base_name}: {e}")
+
+            # Merge instance parameters
+            if instance_params:
+                for k, v in instance_params.items():
+                    # We accept any parameter provided by the instance
+                    pcell_params[k] = v
+
+            # Hashing
+            # Filter out non-serializable or internal parameters if any
+            clean_params = {str(k): str(v) for k, v in pcell_params.items()}
+            param_str = json.dumps(clean_params, sort_keys=True)
+            h = hashlib.md5(param_str.encode("utf-8")).hexdigest()[:8]
+            variant_name = f"{subckt_base_name}_{h}"
+
+        if variant_name in self.subcircuits_code:
+            return variant_name
 
         pins = SymbolGenerator._extract_pins_from_schematic(sch_path)
         subckt_pins = [p["name"] for p in pins]
@@ -29,16 +63,78 @@ class NetlistGenerator:
         view.filename = sch_path
         view.load_schematic(sch_path)
 
+        # Apply parameters to the subcircuit scene items BEFORE netlisting
+        for item in view.scene().items():
+            if isinstance(item, SchematicItem):
+                for k, v in pcell_params.items():
+                    item.parameters[k] = v
+
+        if is_pcell:
+            # 1. Update parameters.json for design scripts
+            original_json = None
+            if os.path.exists(json_path):
+                with open(json_path, "r") as f:
+                    original_json = f.read()
+
+            try:
+                with open(json_path, "w") as f:
+                    json.dump(pcell_params, f, indent=4)
+
+                # 2. Execute Design Scripts
+                design_items = []
+                for it in view.scene().items():
+                    if isinstance(it, SchematicItem) and it.svg_path:
+                        lower = it.svg_path.lower()
+                        if (
+                            "design_script.svg" in lower
+                            or "design_script/symbol.svg" in lower
+                            or "stimuli_generator.svg" in lower
+                            or "stimuli_generator/symbol.svg" in lower
+                        ):
+                            design_items.append(it)
+
+                design_items.sort(key=lambda x: (x.y(), x.x()))
+
+                for it in design_items:
+                    script_path = it.parameters.get("SCRIPT", "")
+                    if script_path:
+                        abs_script = DesignScriptDialog.get_absolute_path_for_item(
+                            it, script_path
+                        )
+                        success, err = DesignScriptDialog.execute_notebook_sync(
+                            abs_script
+                        )
+                        if success:
+                            json_res = os.path.splitext(abs_script)[0] + ".json"
+                            DesignScriptDialog.apply_json_to_item_scene(
+                                it, json_res, headless=True
+                            )
+                        else:
+                            print(f"Design script failed for {it.name}: {err}")
+
+            finally:
+                if original_json is not None:
+                    with open(json_path, "w") as f:
+                        f.write(original_json)
+
+        # 3. Generate Netlist for the variant
+        subckt_vars = []
+        if self.variables:
+            subckt_vars.extend(self.variables)
+        for k, v in pcell_params.items():
+            subckt_vars.append({"name": k, "value": v})
+
         gen = NetlistGenerator(
             view.scene(),
             [],
-            variables=self.variables,
+            variables=subckt_vars,
             is_subcircuit=True,
-            subckt_name=subckt_name,
+            subckt_name=variant_name,
             subckt_pins=subckt_pins,
             subcircuits_code=self.subcircuits_code,
         )
-        self.subcircuits_code[subckt_name] = gen.generate()
+        self.subcircuits_code[variant_name] = gen.generate()
+        return variant_name
 
     def generate(self):
         output = []
@@ -361,7 +457,12 @@ class NetlistGenerator:
 
                         for sch_path in sch_paths_to_try:
                             if os.path.exists(sch_path):
-                                self._generate_subcircuit(sch_path, subckt_name)
+                                # Pass instance parameters to subcircuit generation
+                                subckt_name = self._generate_subcircuit(
+                                    sch_path,
+                                    subckt_name,
+                                    instance_params=item.parameters,
+                                )
                                 break
 
             # 1. Programmatic pcells (format_netlist)

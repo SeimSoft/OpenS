@@ -226,22 +226,6 @@ class XycePlugin(OpenSPlugin):
                 "background-color: #2e7d32; color: white; font-weight: bold;"
             )
             self.main_window.status_bar.showMessage("Simulation Complete")
-            if (
-                self.main_window.current_simulation_view
-                and self.main_window.current_raw_path
-            ):
-                self.main_window.current_simulation_view.load_simulation_results(
-                    self.main_window.current_raw_path
-                )
-                self.main_window.current_simulation_view.simulationFinished.emit()
-
-            # Save the log to file as well if needed
-            if hasattr(self.main_window, "current_log_path"):
-                try:
-                    with open(self.main_window.current_log_path, "w") as f:
-                        f.write(self.main_window.simulation_text.toPlainText())
-                except Exception:
-                    pass
         else:
             self.main_window.status_bar.setStyleSheet(
                 "background-color: #c62828; color: white; font-weight: bold;"
@@ -249,6 +233,25 @@ class XycePlugin(OpenSPlugin):
             self.main_window.status_bar.showMessage(
                 f"Simulation Failed (Exit Code {exit_code})"
             )
+
+        # Proactively load results even on failure
+        if (
+            self.main_window.current_simulation_view
+            and self.main_window.current_raw_path
+            and os.path.exists(self.main_window.current_raw_path)
+        ):
+            self.main_window.current_simulation_view.load_simulation_results(
+                self.main_window.current_raw_path
+            )
+            self.main_window.current_simulation_view.simulationFinished.emit()
+
+        # Save the log to file as well if needed
+        if hasattr(self.main_window, "current_log_path"):
+            try:
+                with open(self.main_window.current_log_path, "w") as f:
+                    f.write(self.main_window.simulation_text.toPlainText())
+            except Exception:
+                pass
 
         self.main_window._update_action_states()
         self.main_window.simulation_process = None

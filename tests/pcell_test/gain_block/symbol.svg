@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<svg xmlns:opens="http://opens-schematic.org" xmlns="http://www.w3.org/2000/svg" width="120" height="40" viewBox="0 0 120 40">
+  <defs>
+    <style>
+            .pin { fill: none; stroke: none; }
+            .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+            .label { font-family: Arial; font-size: 8px; fill: blue; }
+            .value { font-family: Arial; font-size: 8px; fill: black; }
+            .pin-label { font-family: Arial; font-size: 8px; fill: black; }
+        </style>
+    <opens:param name="Model" value="gain_block.sch"/>
+    <opens:symbol prefix="X" category="Subcircuits"/>
+    <opens:xyce template="X_{name} {pin_IN} {pin_OUT} {Model}"/>
+  </defs>
+  <rect x="20" y="10" width="80" height="20" rx="2" class="symbol" fill="#fcfcfc" stroke="black" stroke-width="2"/>
+  <line x1="0" y1="20" x2="20" y2="20" class="symbol" stroke="black" stroke-width="2"/>
+  <circle id="IN" cx="0" cy="20" r="2" class="pin" fill="red" stroke="none"/>
+  <text x="23" y="20" class="pin-label" dominant-baseline="central" fill="black">IN</text>
+  <line x1="100" y1="20" x2="120" y2="20" class="symbol" stroke="black" stroke-width="2"/>
+  <circle id="OUT" cx="120" cy="20" r="2" class="pin" fill="red" stroke="none"/>
+  <text x="97" y="20" class="pin-label" text-anchor="end" dominant-baseline="central" fill="black">OUT</text>
+  <text x="60.0" y="8" class="label" style="text-anchor: middle;" fill="blue">{name}</text>
+  <text x="60.0" y="38" class="value" style="text-anchor: middle;" fill="black">{Model}</text>
+</svg>

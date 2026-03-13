@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:opens="http://opens-schematic.org" width="120" height="100" viewBox="0 0 120 100">
+  
+  
+  <defs>
+    
+    
+    <style>
+            .pin { fill: none; stroke: none; }
+            .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+            .label { font-family: Arial; font-size: 8px; fill: blue; }
+            .value { font-family: Arial; font-size: 8px; fill: black; }
+            .pin-label { font-family: Arial; font-size: 8px; fill: black; }
+        </style>
+    
+    
+    <opens:param name="Model" value="h_bridge.sch"/>
+    
+    
+    <opens:symbol prefix="X" category="Subcircuits"/>
+    
+    
+    <opens:xyce template="X_{name} {pin_GND} {pin_P1} {pin_P2} {pin_VIN} {pin_en_1_i} {pin_en_2_i} {Model}"/>
+    
+  
+  </defs>
+  
+  
+  <rect x="20.0" y="10.0" width="80.0" height="80.0" rx="2" class="symbol" fill="#fcfcfc" stroke="black" stroke-width="2"/>
+  
+  
+  <line x1="0.0" y1="60.0" x2="20.0" y2="60.0" class="symbol" stroke="black" stroke-width="2"/>
+  
+  
+  <circle id="GND" cx="0.0" cy="60.0" r="2" class="pin" fill="red" stroke="none"/>
+  
+  
+  <text x="25.0" y="61.75" class="pin-label" dominant-baseline="central" fill="black">GND</text>
+  
+  
+  <line x1="0.0" y1="40.0" x2="20.0" y2="40.0" class="symbol" stroke="black" stroke-width="2"/>
+  
+  
+  <circle id="VIN" cx="0.0" cy="40.0" r="2" class="pin" fill="red" stroke="none"/>
+  
+  
+  <text x="25.0" y="41.75" class="pin-label" dominant-baseline="central" fill="black">VIN</text>
+  
+  
+  <line x1="0.0" y1="20.0" x2="20.0" y2="20.0" class="symbol" stroke="black" stroke-width="2"/>
+  
+  
+  <circle id="en_1_i" cx="0.0" cy="20.0" r="2" class="pin" fill="red" stroke="none"/>
+  
+  
+  <text x="25.0" y="21.75" class="pin-label" dominant-baseline="central" fill="black">en_1_i</text>
+  
+  
+  <line x1="0.0" y1="80.0" x2="20.0" y2="80.0" class="symbol" stroke="black" stroke-width="2"/>
+  
+  
+  <circle id="en_2_i" cx="0.0" cy="80.0" r="2" class="pin" fill="red" stroke="none"/>
+  
+  
+  <text x="25.0" y="81.75" class="pin-label" dominant-baseline="central" fill="black">en_2_i</text>
+  
+  
+  <line x1="100.0" y1="20.0" x2="120.0" y2="20.0" class="symbol" stroke="black" stroke-width="2"/>
+  
+  
+  <circle id="P1" cx="120.0" cy="20.0" r="2" class="pin" fill="red" stroke="none"/>
+  
+  
+  <text x="94.765625" y="21.75" class="pin-label" text-anchor="end" dominant-baseline="central" fill="black">P1</text>
+  
+  
+  <line x1="100.0" y1="80.0" x2="120.0" y2="80.0" class="symbol" stroke="black" stroke-width="2"/>
+  
+  
+  <circle id="P2" cx="120.0" cy="80.0" r="2" class="pin" fill="red" stroke="none"/>
+  
+  
+  <text x="94.765625" y="81.75" class="pin-label" text-anchor="end" dominant-baseline="central" fill="black">P2</text>
+  
+  
+  <text x="57.65625" y="6.75" class="label" style="text-anchor: middle;" fill="blue">{name}</text>
+  
+  
+  <text x="58.5390625" y="96.75" class="value" style="text-anchor: middle;" fill="black">{Model}</text>
+  
+
+  <line x1="50.0" y1="40.0" x2="50.0" y2="40.0" stroke="black" stroke-width="2"/>
+  <line x1="110.0" y1="40.0" x2="110.0" y2="40.0" stroke="black" stroke-width="2"/>
+  <line x1="50.0" y1="40.0" x2="50.0" y2="60.0" stroke="black" stroke-width="2"/>
+  <line x1="50.0" y1="50.0" x2="60.0" y2="50.0" stroke="black" stroke-width="2"/>
+  <line x1="60.0" y1="40.0" x2="60.0" y2="60.0" stroke="black" stroke-width="2"/>
+</svg>

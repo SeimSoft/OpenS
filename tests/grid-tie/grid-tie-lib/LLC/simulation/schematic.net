@@ -1,0 +1,45 @@
+* OpenS Generated Netlist
+
+* Subcircuits
+.subckt h_bridge GND P1 P2 VIN en_1_i en_2_i
+.model DRIVER npy MODULE=controller_hbridge CLASS=Controller PYTHONPATH=/Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/h_bridge
+.model BOOT_DIODE D (IS=1e-14 N=1 RS=0)
+.model POWER_MOS NMOS (LEVEL=1 VTO=2.5 KP=0.5 LAMBDA=0.02 CGSO=100p CGDO=10p CBD=50p)
+C1 BOOT1 N_1 1u
+C2 BOOT2 P2 1u
+C3 en_1_i GND 10p
+C4 en_2_i GND 10p
+D1 VIN BOOT1 BOOT_DIODE
+D2 VIN BOOT2 BOOT_DIODE
+M1 VIN H1 N_1 N_1 POWER_MOS L=1u W=10u m=1
+M2 N_1 L1 GND GND POWER_MOS L=1u W=10u m=1
+M3 VIN H2 P2 P2 POWER_MOS L=1u W=10u m=1
+M4 P2 L2 GND GND POWER_MOS L=1u W=10u m=1
+N1 VIN N_2 N_3 en_1_i en_2_i N_4 N_5 GND L1 L2 BOOT1 P2 N_1 BOOT2 H2 H1 DRIVER
+V1 N_1 P1 dc 0 ac 0
+.ends
+
+* Main Circuit
+
+.preprocess addresistors nodcpath 1G
+.model CONTROLLER npy MODULE=controller_llc CLASS=Controller PYTHONPATH=/Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/LLC
+.model BOOTDIODE D (IS=1e-14 N=1 RS=0 CJO=1p M=0.5 TT=1n)
+C1 P1 N_1 1.364u
+C3 0 T2 100n
+C4 VZW T2 100n
+D2 T1 VZW BOOTDIODE
+D3 0 T1 BOOTDIODE
+L1 N_1 int_1 1.858u
+R1_ser int_1 N_2 0.1
+N1 VIN N_4 N_5 N_6 N_7 N_8 N_9 N_10 0 N_11 N_12 en2 en1 N_13 N_14 N_15 CONTROLLER
+R3 VIN N_3 0.001
+R4 VZW 0 160
+* Skipping SCRIPT1: No template
+LP1 N_2 P2 5.573u
+LS1 T1 T2 247.7u
+K1 LP1 LS1 0.99
+V1 N_3 0 dc 30 ac 0
+X_1 0 P1 P2 VIN en1 en2 h_bridge
+.tran 1n 300u
+.print tran v(*) i(R4)
+.end

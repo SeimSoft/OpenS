@@ -37,12 +37,43 @@ class PropertiesWidget(QDockWidget):
 
             # Check for SchematicItem (has parameters and name)
             if hasattr(item, "parameters") and hasattr(item, "name"):
+                # PCell Logic: Check for parameters.json in the subcircuit directory
+                import os
+                import json
+
+                model_param = item.parameters.get("MODEL")
+                if model_param and (
+                    model_param.endswith(".sch") or model_param.endswith(".sch.svg")
+                ):
+                    dir_name = (
+                        os.path.dirname(item.svg_path)
+                        if hasattr(item, "svg_path") and item.svg_path
+                        else ""
+                    )
+                    if dir_name:
+                        json_path = os.path.join(dir_name, "parameters.json")
+                        if os.path.exists(json_path):
+                            try:
+                                with open(json_path, "r") as f:
+                                    pcell_params = json.load(f)
+                                for k, v in pcell_params.items():
+                                    if k not in item.parameters:
+                                        item.parameters[k] = v
+                            except Exception as e:
+                                print(f"Error loading PCell parameters: {e}")
+
                 # Name
                 self.add_row("Name", item.name, editable=True)
 
                 # Parameters
-                for name, value in item.parameters.items():
-                    self.add_row(name, value, editable=True)
+                # Sort parameters for consistent display: MODEL first, then others
+                sorted_keys = sorted(item.parameters.keys())
+                if "MODEL" in item.parameters:
+                    sorted_keys.remove("MODEL")
+                    sorted_keys.insert(0, "MODEL")
+
+                for name in sorted_keys:
+                    self.add_row(name, item.parameters[name], editable=True)
 
             elif isinstance(item, Wire):
                 # Net Name

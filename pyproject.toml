@@ -17,6 +17,9 @@ dependencies = [
     "numpy",
     "matplotlib",
     "pyqtgraph>=0.13.3",
+    "jupyter",
+    "nbconvert",
+    "nbformat",
 ]
 
 [project.scripts]

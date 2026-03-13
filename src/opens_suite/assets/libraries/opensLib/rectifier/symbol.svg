@@ -8,10 +8,7 @@
     </style>
     <opens:param xmlns:opens="http://opens-schematic.org" name="MODEL" value="D" />
     <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="BR" bindkey="b" category="Misc" />
-    <opens:xyce xmlns:opens="http://opens-schematic.org" template="D{name}1 {pin_ac1} {pin_plus} {MODEL}&#10;
-D{name}2 {pin_ac2} {pin_plus} {MODEL}&#10;
-D{name}3 {pin_minus} {pin_ac1} {MODEL}&#10;
-D{name}4 {pin_minus} {pin_ac2} {MODEL}" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="D{name}1 {pin_ac1} {pin_plus} {MODEL}&#10;D{name}2 {pin_ac2} {pin_plus} {MODEL}&#10;D{name}3 {pin_minus} {pin_ac1} {MODEL}&#10;D{name}4 {pin_minus} {pin_ac2} {MODEL}" />
   </defs>
   <!-- Diamond boundary -->
   <path class="symbol" d="M 50 10 L 90 50 L 50 90 L 10 50 Z" stroke-dasharray="4,4" stroke-opacity="0.3" />

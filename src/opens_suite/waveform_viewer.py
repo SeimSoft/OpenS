@@ -37,6 +37,7 @@ class SignalItem:
 class WaveformViewer(QMainWindow):
     openCalculatorRequested = pyqtSignal()
     refreshRequested = pyqtSignal()
+    runSimulationRequested = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -138,6 +139,8 @@ class WaveformViewer(QMainWindow):
                 dx = (sig.x - mx) / rx
                 dy = (sig.y - my) / ry
                 dist = dx**2 + dy**2
+                if len(dist) == 0:
+                    continue
                 idx = np.argmin(dist)
                 d = dist[idx]
                 if d < 0.005 and d < min_dist:
@@ -225,6 +228,8 @@ class WaveformViewer(QMainWindow):
                     dx = (sig.x - mx) / rx
                     dy = (sig.y - my) / ry
                     dist = dx**2 + dy**2
+                    if len(dist) == 0:
+                        continue
                     idx = np.argmin(dist)
                     d = dist[idx]
                     if d < min_dist:
@@ -365,6 +370,17 @@ class WaveformViewer(QMainWindow):
         self.calc_action = QAction(calc_icon, "Calculator", self)
         self.calc_action.triggered.connect(self.openCalculatorRequested.emit)
         toolbar.addAction(self.calc_action)
+
+        # Run Simulation
+        self.sim_action = QAction(
+            self.style().standardIcon(
+                pg.Qt.QtWidgets.QStyle.StandardPixmap.SP_MediaPlay
+            ),
+            "Run Simulation",
+            self,
+        )
+        self.sim_action.triggered.connect(self.runSimulationRequested.emit)
+        toolbar.addAction(self.sim_action)
 
         toolbar.addSeparator()
 

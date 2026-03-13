@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<svg xmlns:opens="http://opens-schematic.org" width="1081.0" height="622.0" viewBox="-621.0 -241.0 1081.0 622.0" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns:opens="http://opens-schematic.org" width="1081.0" height="631.0" viewBox="-621.0 -250.0 1081.0 631.0" xmlns="http://www.w3.org/2000/svg">
   <g transform="translate(-170.0,40.0) rotate(0.0)" symbol_name="symbol" name="M1" save_v="True" save_i="False" param_MODEL="POWER_NMOS" param_L="1u" param_W="10u" param_M="1" library_path="opensLib/nmos/symbol.svg">
     <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
     <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">M1</text>
@@ -107,28 +107,15 @@
   <line x1="-460.0" y1="-30.0" x2="-130.0" y2="-30.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VIN" />
   <line x1="-110.0" y1="20.0" x2="-110.0" y2="50.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VL_D" />
   <line x1="40.0" y1="50.0" x2="0.0" y2="50.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VR_D" />
+  <g transform="translate(-160.0,-150.0) rotate(0.0)" symbol_name="symbol" name="SCRIPT1" save_v="True" save_i="False" param_SCRIPT="design_script.ipynb" library_path="opensLib/design_script/symbol.svg">
+    <rect width="40" height="40" rx="5" fill="none" stroke="blue" stroke-width="0.5" style="stroke-dasharray: 2,2;" />
+    <text y="35" fill="blue" style="font-size: 6px; font-family: sans-serif;">SCRIPT1</text>
+  </g>
   <circle cx="-370.0" cy="40.0" r="3" fill="black" />
   <circle cx="180.0" cy="70.0" r="3" fill="black" />
   <circle cx="-110.0" cy="140.0" r="3" fill="black" />
   <circle cx="-410.0" cy="-30.0" r="3" fill="black" />
   <circle cx="40.0" cy="140.0" r="3" fill="black" />
   <circle cx="-160.0" cy="-30.0" r="3" fill="black" />
-  <opens:analysis enabled="True" save_all="True" start="" step="0.01n" stop="50u" type="Tran" />
-  <opens:output name="inverter_switching">subaxis(2,1)
-plot(st('LP11#branch'), label="st('LP11#branch')")
-plot(st('LP21#branch'), label="st('LP21#branch')")
-subaxis(2,2)
-plot(st('VR'), label="st('VR')")
-plot(st('VL'), label="st('VL')")</opens:output>
-  <opens:output>subaxis(2,1)
-plot(st('LP11#branch'), label="st('LP11#branch')")
-plot(st('LP21#branch'), label="st('LP21#branch')")
-plot(st('V3#branch'), label="st('V3#branch')")
-plot(st('V2#branch'), label="st('V2#branch')")
-
-plot(st('C1#branch'), label="st('C1#branch')")
-
-subaxis(2,2)
-plot(st('VR'), label="st('VR')")
-plot(st('VL'), label="st('VL')")</opens:output>
+  <opens:analysis enabled="True" save_all="True" start="" step="1n" stop="5u" type="Tran" />
 </svg>

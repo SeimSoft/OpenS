@@ -52,9 +52,14 @@ class SpiceRawParser:
                                 v_line = ""
                                 while True:
                                     v_char = f.read(1)
-                                    if not v_char or v_char == b"\n":
+                                    if not v_char:
+                                        header_finished = True
+                                        break
+                                    if v_char == b"\n":
                                         break
                                     v_line += v_char.decode("ascii", errors="ignore")
+                                if header_finished:
+                                    break
                                 parts = v_line.strip().split()
                                 if len(parts) >= 3:
                                     self.variables.append(
@@ -64,6 +69,8 @@ class SpiceRawParser:
                                     self.variables.append(
                                         (int(parts[0]), parts[1], "voltage")
                                     )
+                            if header_finished:
+                                break
                         line = ""
                     else:
                         line += char.decode("ascii", errors="ignore")
@@ -90,10 +97,12 @@ class SpiceRawParser:
                 field_size = 16 if is_complex else 8
                 fmt = "dd" if is_complex else "d"
 
+                data_truncated = False
                 for p in range(no_points):
                     for i in range(no_vars):
                         chunk = f.read(field_size)
-                        if not chunk:
+                        if not chunk or len(chunk) < field_size:
+                            data_truncated = True
                             break
                         val = struct.unpack(fmt, chunk)
                         v_name = self.variables[i][1]
@@ -101,6 +110,8 @@ class SpiceRawParser:
                             results[v_name].append(complex(val[0], val[1]))
                         else:
                             results[v_name].append(val[0])
+                    if data_truncated:
+                        break
 
                 self.plots[plotname] = results
 

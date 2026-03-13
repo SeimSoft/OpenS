@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000">
+    <!-- Pins -->
+    <g symbol_name="pin_in" library_path="opensLib/pin_in/symbol.svg" name="IN" transform="translate(100,100)"/>
+    <g symbol_name="pin_out" library_path="opensLib/pin_out/symbol.svg" name="OUT" transform="translate(300,100)"/>
+    
+    <!-- Resistor R1 -->
+    <g symbol_name="resistor" library_path="opensLib/resistor/symbol.svg" name="R1" transform="translate(200,100)" param_R="{gain*1k}"/>
+    
+    <!-- Design Script -->
+    <g symbol_name="design_script" library_path="opensLib/design_script/symbol.svg" name="DS1" transform="translate(50,50)" param_SCRIPT="script.ipynb"/>
+</svg>

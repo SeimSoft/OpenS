@@ -1,0 +1,48 @@
+XYCE-generated Netlist file copy:  TIME='09:26:34 PM' DATE='Mar 12, 2026' 
+*Original Netlist Title:  
+
+** OpenS Generated Netlist
+
+*.preprocess addresistors nodcpath 1G
+*Xyce:  ".PREPROCESS ADDRESISTORS" statement automatically commented out in netlist copy.
+.model DRIVER npy MODULE=controller_hbridge CLASS=Controller PYTHONPATH=/Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/h_bridge
+.model BOOT_DIODE D (IS=1e-14 N=1 RS=0)
+.model POWER_MOS NMOS (LEVEL=1 VTO=2.5 KP=0.5 LAMBDA=0.02 CGSO=100p CGDO=10p CBD=50p)
+C1 BOOT1 N_1 1u
+C2 BOOT2 P2 1u
+D1 VIN BOOT1 BOOT_DIODE
+D2 VIN BOOT2 BOOT_DIODE
+M1 VIN H1 N_1 N_1 POWER_MOS L=1u W=10u m=1
+M2 N_1 L1 GND GND POWER_MOS L=1u W=10u m=1
+M3 VIN H2 P2 P2 POWER_MOS L=1u W=10u m=1
+M4 P2 L2 GND GND POWER_MOS L=1u W=10u m=1
+N1 VIN N_2 N_3 en_1_i en_2_i N_4 N_5 GND L1 L2 BOOT1 P2 N_1 BOOT2 H2 H1 DRIVER
+V1 N_1 P1 dc 0 ac 0
+* --- Stimuli from stimuli.json ---
+V_STIM_1_VIN VIN 0 30
+V_STIM_2_GND GND 0 0
+V_STIM_3_en_1_i en_1_i 0 PWL(0.0 0.0 1e-07 0.0 2e-07 0.0 2.0099999999999999e-07 3.3 3.0099999999999996e-07 3.3 3.02e-07 0.0 4.0199999999999997e-07 0.0 5.02e-07 0.0)
+V_STIM_4_en_2_i en_2_i 0 PWL(0.0 3.3 1e-07 3.3 1.0099999999999999e-07 0.0 2.0099999999999999e-07 0.0 3.0099999999999996e-07 0.0 4.0099999999999995e-07 0.0 4.0199999999999997e-07 3.3 5.02e-07 3.3)
+* --- Network between P1 and P2 ---
+R_STIM_6 P1 P2 100
+* ----------------------------------------
+.tran 1n 600n
+.print tran v(*) 
+
+
+*XYCE-GENERATED OUTPUT:  Adding resistors between ground and nodes connected to only 1 device terminal:
+
+RONETERM1 N_2 0 
+RONETERM2 N_3 0 
+RONETERM3 N_4 0 
+RONETERM4 N_5 0 
+
+
+*XYCE-GENERATED OUTPUT:  Adding resistors between ground and nodes with no DC path to ground:
+
+RNODCPATH1 H2 0 1G
+RNODCPATH2 L2 0 1G
+RNODCPATH3 L1 0 1G
+RNODCPATH4 H1 0 1G
+
+.END
