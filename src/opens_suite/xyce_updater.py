@@ -60,6 +60,84 @@ class XyceUpdateWorker(QThread):
             self.finished.emit(False, str(e))
 
 
+class XyceCheckWorker(QThread):
+    updateAvailable = pyqtSignal(dict)
+    noUpdateAvailable = pyqtSignal()
+    errorOccurred = pyqtSignal(str)
+
+    def __init__(self, api_url, asset_keyword, local_info_func, force=False):
+        super().__init__()
+        self.api_url = api_url
+        self.asset_keyword = asset_keyword
+        self.local_info_func = local_info_func
+        self.force = force
+
+    def run(self):
+        try:
+            import urllib.request
+            import urllib.error
+
+            req = urllib.request.Request(
+                self.api_url, headers={"User-Agent": "OpenS-Updater"}
+            )
+            with urllib.request.urlopen(req, timeout=5) as response:
+                data = json.loads(response.read().decode("utf-8"))
+
+            latest_version = data.get("tag_name", "")
+
+            # Find the right asset
+            download_url = None
+            asset_size = 0
+            for asset in data.get("assets", []):
+                # Pick the first asset matching our platform
+                name = asset.get("name", "").lower()
+                if self.asset_keyword in name and (
+                    name.endswith(".zip") or name.endswith(".tar.gz")
+                ):
+                    # If there are multiple macos, prefer intel specifically if we asked for it
+                    if self.asset_keyword == "macos":
+                        # General macos - if it's the intel one, skip it unless we are intel
+                        if "intel" in name and platform.machine() != "x86_64":
+                            continue
+                    download_url = asset.get("browser_download_url")
+                    asset_size = asset.get("size", 0)
+                    break
+
+            if not download_url:
+                self.errorOccurred.emit(
+                    "No compatible Xyce release found for your platform."
+                )
+                return
+
+            # Calculate a pseudo-hash using the tag and asset size
+            latest_hash = f"{latest_version}_{asset_size}"
+            local_info = self.local_info_func()
+
+            needs_update = False
+            if self.force or not local_info:
+                needs_update = True
+            else:
+                if (
+                    local_info.get("version") != latest_version
+                    or local_info.get("hash") != latest_hash
+                ):
+                    needs_update = True
+
+            if needs_update:
+                self.updateAvailable.emit(
+                    {
+                        "version": latest_version,
+                        "hash": latest_hash,
+                        "download_url": download_url,
+                    }
+                )
+            else:
+                self.noUpdateAvailable.emit()
+
+        except Exception as e:
+            self.errorOccurred.emit(f"Failed to check for updates: {e}")
+
+
 class XyceUpdater(QObject):
     updateAvailable = pyqtSignal(dict)  # Emits release info if update is available
     noUpdateAvailable = pyqtSignal()
@@ -86,6 +164,8 @@ class XyceUpdater(QObject):
         else:
             self.asset_keyword = "ubuntu"
 
+        self._check_worker = None
+
     def get_local_info(self):
         """Returns the local version info dict or None if not found."""
         if os.path.exists(self.version_file):
@@ -106,77 +186,23 @@ class XyceUpdater(QObject):
             print(f"Failed to save version info: {e}")
 
     def check_for_updates(self, force=False):
-        """Asynchronously (or quickly) checks for updates via GitHub API."""
-        import threading
+        """Asynchronously checks for updates via GitHub API."""
+        # Skip update check in pytest environment
+        if "PYTEST_CURRENT_TEST" in os.environ:
+            return
 
-        def _check():
-            try:
-                import urllib.request
-                import urllib.error
+        # Ensure only one check runs at a time
+        if self._check_worker and self._check_worker.isRunning():
+            return
 
-                req = urllib.request.Request(
-                    self.API_URL, headers={"User-Agent": "OpenS-Updater"}
-                )
-                with urllib.request.urlopen(req, timeout=5) as response:
-                    data = json.loads(response.read().decode("utf-8"))
+        self._check_worker = XyceCheckWorker(
+            self.API_URL, self.asset_keyword, self.get_local_info, force=force
+        )
 
-                latest_version = data.get("tag_name", "")
+        # Connect signals
+        self._check_worker.updateAvailable.connect(self.updateAvailable.emit)
+        self._check_worker.noUpdateAvailable.connect(self.noUpdateAvailable.emit)
+        self._check_worker.errorOccurred.connect(self.errorOccurred.emit)
 
-                # Find the right asset
-                download_url = None
-                asset_size = 0
-                for asset in data.get("assets", []):
-                    # Pick the first asset matching our platform
-                    name = asset.get("name", "").lower()
-                    if self.asset_keyword in name and (
-                        name.endswith(".zip") or name.endswith(".tar.gz")
-                    ):
-                        # If there are multiple macos, prefer intel specifically if we asked for it
-                        if self.asset_keyword == "macos":
-                            # General macos - if it's the intel one, skip it unless we are intel
-                            if "intel" in name and platform.machine() != "x86_64":
-                                continue
-                        download_url = asset.get("browser_download_url")
-                        asset_size = asset.get("size", 0)
-                        break
-
-                if not download_url:
-                    self.errorOccurred.emit(
-                        "No compatible Xyce release found for your platform."
-                    )
-                    return
-
-                # Calculate a pseudo-hash using the tag and asset size
-                # (since GitHub releases API doesn't provide commit hashes directly for assets without extra queries)
-                latest_hash = f"{latest_version}_{asset_size}"
-
-                local_info = self.get_local_info()
-
-                needs_update = False
-                if force or not local_info:
-                    needs_update = True
-                else:
-                    if (
-                        local_info.get("version") != latest_version
-                        or local_info.get("hash") != latest_hash
-                    ):
-                        needs_update = True
-
-                if needs_update:
-                    self.updateAvailable.emit(
-                        {
-                            "version": latest_version,
-                            "hash": latest_hash,
-                            "download_url": download_url,
-                        }
-                    )
-                else:
-                    self.noUpdateAvailable.emit()
-
-            except Exception as e:
-                self.errorOccurred.emit(f"Failed to check for updates: {e}")
-
-        # Run check in background thread so it doesn't freeze the GUI
-        t = threading.Thread(target=_check)
-        t.daemon = True
-        t.start()
+        # Start worker
+        self._check_worker.start()

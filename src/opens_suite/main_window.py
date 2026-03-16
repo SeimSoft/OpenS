@@ -469,6 +469,7 @@ class MainWindow(QMainWindow):
         view.modeChanged.connect(self.update_status_mode)
         view.statusMessage.connect(self.update_status)
         view.openSubcircuitRequested.connect(self.open_file)
+        view.modificationChanged.connect(lambda: self._update_tab_title_for_view(view))
 
         # Connect Selection signals
         view.scene().selectionChanged.connect(self._on_selection_changed)
@@ -538,6 +539,9 @@ class MainWindow(QMainWindow):
                 view.modeChanged.connect(self.update_status_mode)
                 view.statusMessage.connect(self.update_status)
                 view.openSubcircuitRequested.connect(self.open_file)
+                view.modificationChanged.connect(
+                    lambda m, v=view: self._update_tab_title_for_view(v)
+                )
 
                 # Connect Selection signals
                 view.scene().selectionChanged.connect(self._on_selection_changed)
@@ -604,6 +608,14 @@ class MainWindow(QMainWindow):
                 import traceback
 
                 traceback.print_exc()
+
+    def _update_tab_title_for_view(self, view):
+        index = self.tabs.indexOf(view)
+        if index != -1:
+            title = self._get_tab_title(getattr(view, "filename", None))
+            if hasattr(view, "is_modified") and view.is_modified():
+                title += "*"
+            self.tabs.setTabText(index, title)
 
     def save_file(self):
         current_widget = self.tabs.currentWidget()
@@ -831,6 +843,12 @@ class SettingsDialog(QDialog):
         self.nodcpath_edit.setText(self.settings.value("nodcpath_resistance", "1G"))
         form.addRow(".preprocess nodcpath R:", self.nodcpath_edit)
 
+        # MCP Port
+        self.mcp_port_edit = QLineEdit()
+        self.mcp_port_edit.setPlaceholderText("8000")
+        self.mcp_port_edit.setText(self.settings.value("mcp_port", "8000"))
+        form.addRow("MCP Server Port:", self.mcp_port_edit)
+
         # Library Search Paths
         self.lib_paths_list = QListWidget()
         self.lib_paths_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -872,6 +890,15 @@ class SettingsDialog(QDialog):
         update_layout.addWidget(update_btn)
         update_layout.addStretch()
         layout.addLayout(update_layout)
+
+        # MCP export button
+        mcp_layout = QHBoxLayout()
+        mcp_export_btn = QPushButton("Export To Copilot Config")
+        mcp_export_btn.clicked.connect(self._export_mcp_config)
+        mcp_layout.addWidget(QLabel("MCP Server Integration:"))
+        mcp_layout.addWidget(mcp_export_btn)
+        mcp_layout.addStretch()
+        layout.addLayout(mcp_layout)
 
         # Separator Line
         line = QFrame()
@@ -926,6 +953,27 @@ class SettingsDialog(QDialog):
             self.parent()._check_for_xyce_updates(force=True)
             self.accept()
 
+    def _export_mcp_config(self):
+        # Find MCP plugin
+        plugin = None
+        if self.parent() and hasattr(self.parent(), "plugin_manager"):
+            for p in self.parent().plugin_manager.plugins:
+                from opens_suite.plugins.mcp_plugin import McpPlugin
+                if isinstance(p, McpPlugin):
+                    plugin = p
+                    break
+        
+        if plugin:
+            try:
+                # Save first to ensure current port is used
+                self.settings.setValue("mcp_port", self.mcp_port_edit.text().strip())
+                path = plugin.export_config()
+                QMessageBox.information(self, "Export Successful", f"MCP configuration exported to:\n{path}")
+            except Exception as e:
+                QMessageBox.critical(self, "Export Failed", f"Failed to export configuration: {e}")
+        else:
+            QMessageBox.warning(self, "Plugin Missing", "McpPlugin not found. Configuration cannot be exported.")
+
     def _show_lib_paths_menu(self, pos):
         menu = QMenu(self)
         add_action = menu.addAction("Add Path...")
@@ -969,6 +1017,7 @@ class SettingsDialog(QDialog):
     def save(self):
         self.settings.setValue("editor_command", self.editor_edit.text())
         self.settings.setValue("nodcpath_resistance", self.nodcpath_edit.text().strip())
+        self.settings.setValue("mcp_port", self.mcp_port_edit.text().strip())
 
         custom_paths = []
         for i in range(self.lib_paths_list.count()):

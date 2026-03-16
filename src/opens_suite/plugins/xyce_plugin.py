@@ -110,6 +110,9 @@ class XycePlugin(OpenSPlugin):
                     return
             else:
                 return
+        elif view.is_modified():
+            # Automatically save if modified before simulation
+            self.main_window.save_file()
 
         # 2. Create simulation directory
         sim_dir = os.path.join(os.path.dirname(filename), "simulation")

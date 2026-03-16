@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg width="300.0" height="290.0" viewBox="-250.0 -100.0 300.0 290.0" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(-70.0,20.0) rotate(0.0)" symbol_name="symbol" name="PLUS" save_v="True" save_i="False" library_path="opensLib/pin_in/symbol.svg">
+    <svg width="100" height="40" viewBox="-80 -20 100 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: red; stroke: red; stroke-width: 1; }
+    </style>
+        <symbol prefix="PIN" category="IO" bindkey="i" />
+        <pin id="pin_1" net="{name}" />
+      </defs>
+      <polygon class="symbol" points="-20,-5 -8,-5 0,0 -8,5 -20,5" />
+      <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
+      <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">PLUS</text>
+    </svg>
+  </g>
+  <g transform="translate(-70.0,70.0) rotate(0.0)" symbol_name="symbol" name="MINUS" save_v="True" save_i="False" library_path="opensLib/pin_in/symbol.svg">
+    <svg width="100" height="40" viewBox="-80 -20 100 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: red; stroke: red; stroke-width: 1; }
+    </style>
+        <symbol prefix="PIN" category="IO" bindkey="i" />
+        <pin id="pin_1" net="{name}" />
+      </defs>
+      <polygon class="symbol" points="-20,-5 -8,-5 0,0 -8,5 -20,5" />
+      <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
+      <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">MINUS</text>
+    </svg>
+  </g>
+</svg>

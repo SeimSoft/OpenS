@@ -13,6 +13,8 @@ def main_window(qapp, tmp_path):
     project_dir = tmp_path / "project"
     project_dir.mkdir()
     win = MainWindow(str(project_dir))
+    # Load all plugins to ensure simulate_action and others are present
+    win.plugin_manager.load_plugins()
     return win
 
 
@@ -41,20 +43,20 @@ def test_waveform_viewer_simulation_trigger(main_window, tmp_path):
 
     # Mock evaluate to avoid real data parsing but let it create viewer
     # We'll mock the internal _create_scope instead
-    calc._create_scope = MagicMock(return_value={"t": [1], "vt": lambda x: [1]})
+    calc._create_scope = MagicMock(return_value={"t": [1], "vt": lambda x: [1], "plot": MagicMock()})
     calc.evaluate()
 
     viewer = calc.viewer
     assert isinstance(viewer, WaveformViewer)
     assert viewer.sim_action is not None
 
-    # Mock the simulate action trigger
-    win.simulate_action = MagicMock()
-
-    # 3. Trigger simulation from viewer
+    # Trigger simulation from viewer
+    # Since XycePlugin is loaded, viewer.sim_action IS win.simulate_action
+    assert viewer.sim_action == win.simulate_action
+    
+    # Mock the trigger call to verify
+    win.simulate_action.trigger = MagicMock()
     viewer.sim_action.trigger()
-
-    # CHECK: MainWindow's simulate action should be triggered
     win.simulate_action.trigger.assert_called_once()
 
 

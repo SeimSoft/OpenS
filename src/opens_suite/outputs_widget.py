@@ -126,6 +126,31 @@ class OutputsWidget(QDockWidget):
 
         self.expressionsChanged.emit()
 
+    def update_expression(self, row, **kwargs):
+        """Update fields of an existing expression row."""
+        if not (0 <= row < self.model.rowCount()):
+            return False
+
+        field_map = {
+            "name": self.COL_NAME,
+            "expression": self.COL_EXPR,
+            "unit": self.COL_UNIT,
+            "min": self.COL_MIN,
+            "max": self.COL_MAX,
+            "description": self.COL_DESC,
+        }
+
+        any_changed = False
+        for key, val in kwargs.items():
+            if key in field_map:
+                col = field_map[key]
+                item = self.model.item(row, col)
+                if item.text() != str(val):
+                    item.setText(str(val))
+                    any_changed = True
+        
+        return any_changed
+
     def update_or_add_expression(self, expression, origin_row=None):
         if origin_row is not None and 0 <= origin_row < self.model.rowCount():
             item_expr = self.model.item(origin_row, self.COL_EXPR)

@@ -81,10 +81,14 @@ class LibraryWidget(QDockWidget):
         self.preview_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         preview_layout.addWidget(self.preview_label)
 
-        layout.addWidget(QLabel("Preview:"))
+        self.preview_header = QLabel("Preview:")
+        layout.addWidget(self.preview_header)
         layout.addWidget(preview_container)
+        self.preview_container = preview_container
 
         self.setWidget(container)
+        self.preview_header.hide()
+        self.preview_container.hide()
         self._populate_library()
 
     def filter_items(self, text):
@@ -149,6 +153,8 @@ class LibraryWidget(QDockWidget):
         ):
             self.preview_label.setText(item.text(0))
             self.preview_label.setPixmap(QPixmap())
+            self.preview_header.hide()
+            self.preview_container.hide()
             return
 
         renderer = QSvgRenderer(path)
@@ -160,8 +166,12 @@ class LibraryWidget(QDockWidget):
             painter.end()
             self.preview_label.setPixmap(pixmap)
             self.preview_label.setText("")
+            self.preview_header.show()
+            self.preview_container.show()
         else:
             self.preview_label.setText("Invalid preview")
+            self.preview_header.hide()
+            self.preview_container.hide()
 
     def _get_or_create_node(
         self,
@@ -455,6 +465,9 @@ class LibraryWidget(QDockWidget):
                 menu.addSeparator()
                 rename_action = menu.addAction("Rename Cell...")
                 rename_action.triggered.connect(lambda: self._rename_cell(node_path))
+            elif node_type == "VIEW":
+                copy_action = menu.addAction("Copy View...")
+                copy_action.triggered.connect(lambda: self._copy_view(item))
 
         if node_path or item.data(0, Qt.ItemDataRole.UserRole):
             p = node_path or item.data(0, Qt.ItemDataRole.UserRole)
@@ -589,3 +602,52 @@ class LibraryWidget(QDockWidget):
 
     def get_symbol_by_bindkey(self, key):
         return self.bindkey_map.get(key.lower())
+
+    def _copy_view(self, item):
+        path = item.data(0, Qt.ItemDataRole.UserRole)
+        if not path or not os.path.exists(path):
+            return
+
+        # Simple parse for lib/cell/view
+        parts = path.split(os.sep)
+        if len(parts) < 3:
+            return
+        
+        src_view = parts[-1]
+        src_cell = parts[-2]
+        src_lib = parts[-3]
+
+        # UseInputDialog for destination
+        text, ok = QInputDialog.getText(self, "Copy View", "Enter destination (lib/cell/view):", 
+                                        text=f"{src_lib}/{src_cell}/{src_view}")
+        
+        if ok and text:
+            try:
+                dest_parts = text.split("/")
+                if len(dest_parts) != 3:
+                    raise ValueError("Destination must be in lib/cell/view format")
+                
+                dest_lib, dest_cell, dest_view = dest_parts
+                
+                # We can reuse the MCP plugin's logic if we want, but let's keep it self-contained or use a helper
+                # For now, let's just do it directly here
+                base_dir = os.path.dirname(os.path.dirname(os.path.dirname(path)))
+                dest_cell_path = os.path.join(base_dir, dest_lib, dest_cell)
+                if not os.path.exists(dest_cell_path):
+                    os.makedirs(dest_cell_path)
+                
+                dest_path = os.path.join(dest_cell_path, dest_view)
+                if not dest_path.lower().endswith(".svg") and path.lower().endswith(".svg"):
+                    dest_path += ".svg"
+                
+                if os.path.exists(dest_path):
+                    res = QMessageBox.question(self, "Overwrite?", f"File {dest_path} already exists. Overwrite?",
+                                               QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+                    if res == QMessageBox.StandardButton.No:
+                        return
+
+                shutil.copy2(path, dest_path)
+                self._populate_library()
+                QMessageBox.information(self, "Success", f"View copied to {dest_lib}/{dest_cell}/{dest_view}")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to copy view: {e}")

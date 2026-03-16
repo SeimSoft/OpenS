@@ -91,6 +91,10 @@ class IOMixin:
         return abs_path
 
     def save_schematic(self, filename, analyses=None, outputs=None, variables=None):
+        # Ensure connectivity is up to date before saving
+        if hasattr(self, "recalculate_connectivity"):
+            self.recalculate_connectivity()
+
         # Register namespace for extra data
         ET.register_namespace("opens", "http://opens-schematic.org")
 
@@ -418,6 +422,10 @@ class IOMixin:
         tree = ET.ElementTree(root)
         tree.write(filename, encoding="utf-8", xml_declaration=True)
         self.statusMessage.emit(f"Saved to {filename}")
+        
+        # Reset modified flag if it's a SchematicView
+        if hasattr(self, "set_modified"):
+            self.set_modified(False)
 
     def load_schematic(self, filename):
         self.scene().clear()
@@ -703,6 +711,10 @@ class IOMixin:
                 self.scene().itemsBoundingRect(), Qt.AspectRatioMode.KeepAspectRatio
             )
             self.scale(0.9, 0.9)
+
+            # Reset modified flag after loading
+            if hasattr(self, "set_modified"):
+                self.set_modified(False)
 
         except Exception as e:
             self.statusMessage.emit(f"Error loading: {e}")

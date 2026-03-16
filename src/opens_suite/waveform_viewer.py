@@ -136,6 +136,12 @@ class WaveformViewer(QMainWindow):
 
         for sig in self.signals.values():
             if len(self.plots) > sig.axis_idx and self.plots[sig.axis_idx] == plot_item:
+                try:
+                    if len(sig.x) != len(sig.y) or len(sig.x) == 0:
+                        continue
+                except TypeError:
+                    continue
+                
                 dx = (sig.x - mx) / rx
                 dy = (sig.y - my) / ry
                 dist = dx**2 + dy**2

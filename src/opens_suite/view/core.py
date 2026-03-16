@@ -75,6 +75,7 @@ class SchematicView(
     netProbed = pyqtSignal(str)
     simulationFinished = pyqtSignal()
     openSubcircuitRequested = pyqtSignal(str)
+    modificationChanged = pyqtSignal(bool)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -93,7 +94,7 @@ class SchematicView(
 
         # Undo Stack
         self.undo_stack = QUndoStack(self)
-        self.undo_stack.indexChanged.connect(self.recalculate_connectivity)
+        self.undo_stack.indexChanged.connect(self._on_undo_stack_changed)
 
         # Navigation
         self.setDragMode(
@@ -145,6 +146,7 @@ class SchematicView(
         self.outputs = []
         self.filename = None
         self.last_item_to_node = {}  # item -> node_name from last simulation
+        self._modified = False
 
         from opens_suite.theme import theme_manager
 
@@ -174,7 +176,7 @@ class SchematicView(
         self.current_mode = mode
         self.modeChanged.emit(mode)
 
-        self.recalculate_connectivity()
+        self.set_modified(True)
 
         if mode == self.MODE_SELECT:
             self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
@@ -232,3 +234,14 @@ class SchematicView(
             self.setCursor(Qt.CursorShape.CrossCursor)
             self.statusMessage.emit("Mode: Line")
             self.line_start = None
+
+    def set_modified(self, modified: bool):
+        if self._modified != modified:
+            self._modified = modified
+            self.modificationChanged.emit(modified)
+
+    def _on_undo_stack_changed(self, index):
+        self.set_modified(True)
+
+    def is_modified(self):
+        return self._modified

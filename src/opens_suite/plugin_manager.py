@@ -1,3 +1,4 @@
+import os
 from opens_suite.plugins.library_plugin import LibraryPlugin
 from opens_suite.plugins.properties_plugin import PropertiesPlugin
 from opens_suite.plugins.analysis_plugin import AnalysisPlugin
@@ -8,13 +9,12 @@ from opens_suite.plugins.xyce_plugin import XycePlugin
 from opens_suite.plugins.variables_plugin import VariablesPlugin
 from opens_suite.plugins.results_selection_plugin import ResultsSelectionPlugin
 
-
 class PluginManager:
     def __init__(self, main_window):
         self.main_window = main_window
         self.plugins = []
 
-    def load_plugins(self):
+    def load_plugins(self, force_load=None):
         # Instantiate plugins
         self.plugins = [
             LibraryPlugin(self.main_window),
@@ -27,6 +27,10 @@ class PluginManager:
             VariablesPlugin(self.main_window),
             ResultsSelectionPlugin(self.main_window),
         ]
+
+        if "PYTEST_CURRENT_TEST" not in os.environ or (force_load and "McpPlugin" in force_load):
+            from opens_suite.plugins.mcp_plugin import McpPlugin
+            self.plugins.append(McpPlugin(self.main_window))
 
         # Initialize
         for plugin in self.plugins:

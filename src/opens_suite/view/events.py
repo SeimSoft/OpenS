@@ -74,7 +74,6 @@ class EventsMixin:
         if items:
             cmd = RemoveItemsCommand(self.scene(), items)
             self.undo_stack.push(cmd)
-            self.recalculate_connectivity()
 
     def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key.Key_Delete or event.key() == Qt.Key.Key_Backspace:
@@ -203,7 +202,6 @@ class EventsMixin:
 
                         cmd = InsertItemsCommand(self.scene(), [item])
                         self.undo_stack.push(cmd)
-                        self.recalculate_connectivity()
 
                         import os
 
@@ -369,8 +367,6 @@ class EventsMixin:
                         self.current_wire = Wire(pos, pos)
                         self.scene().addItem(self.current_wire)
                         self.wire_mode_locked = False  # Reset for next segment
-
-                    self.recalculate_connectivity()
 
             elif event.button() == Qt.MouseButton.MiddleButton:
                 # Force switch manually if needed, though user relies on auto
@@ -672,8 +668,6 @@ class EventsMixin:
             self._move_start_positions = {}
 
         super().mouseReleaseEvent(event)
-        # Always recalculate after any release to be sure
-        self.recalculate_connectivity()
 
     def mouseMoveEvent(self, event: QMouseEvent):
         scene_pos = self.mapToScene(event.position().toPoint())
@@ -813,7 +807,6 @@ class EventsMixin:
                     self.undo_stack.push(cmd)
 
                     event.acceptProposedAction()
-                    self.recalculate_connectivity()
                     return
             except Exception:
                 pass
@@ -833,7 +826,6 @@ class EventsMixin:
             self.undo_stack.push(cmd)
 
             event.acceptProposedAction()
-            self.recalculate_connectivity()
 
     def _assign_name(self, item):
         prefix = item.prefix
@@ -987,4 +979,3 @@ class EventsMixin:
 
         cmd = TransformItemsCommand(items, old_state, new_state)
         self.undo_stack.push(cmd)
-        self.recalculate_connectivity()
