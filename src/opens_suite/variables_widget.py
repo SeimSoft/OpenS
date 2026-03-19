@@ -5,8 +5,6 @@ from PyQt6.QtWidgets import (
     QHeaderView,
     QVBoxLayout,
     QWidget,
-    QPushButton,
-    QHBoxLayout,
     QMenu,
 )
 from PyQt6.QtCore import Qt, pyqtSignal
@@ -38,15 +36,23 @@ class VariablesWidget(QDockWidget):
 
         layout.addWidget(self.table)
 
-        btn_layout = QHBoxLayout()
-        self.add_btn = QPushButton("Add Variable")
-        self.add_btn.clicked.connect(self.add_variable)
-        btn_layout.addWidget(self.add_btn)
-
-        layout.addLayout(btn_layout)
+        # Placeholder row for adding new variables by editing directly.
+        self._ensure_placeholder_row()
 
         self.setWidget(container)
         self.block_signals = False
+
+    def _ensure_placeholder_row(self):
+        """Ensure there's always an empty row at the end for adding a new variable."""
+        row_count = self.table.rowCount()
+        if row_count == 0:
+            self.table.insertRow(0)
+            return
+
+        # If last row already has a name, append an empty row
+        last_name_item = self.table.item(row_count - 1, 0)
+        if last_name_item and last_name_item.text().strip():
+            self.table.insertRow(row_count)
 
     def get_variables(self):
         variables = []
@@ -68,20 +74,26 @@ class VariablesWidget(QDockWidget):
             self.table.insertRow(row)
             self.table.setItem(row, 0, QTableWidgetItem(var.get("name", "")))
             self.table.setItem(row, 1, QTableWidgetItem(var.get("value", "")))
+        self._ensure_placeholder_row()
         self.block_signals = False
-
-    def add_variable(self):
-        self.block_signals = True
-        row = self.table.rowCount()
-        self.table.insertRow(row)
-        self.table.setItem(row, 0, QTableWidgetItem(f"VAR{row+1}"))
-        self.table.setItem(row, 1, QTableWidgetItem("0"))
-        self.block_signals = False
-        self.variablesChanged.emit()
 
     def _on_item_changed(self, item):
         if self.block_signals:
             return
+
+        row = item.row()
+        name_item = self.table.item(row, 0)
+        if name_item and not name_item.text().strip():
+            # If user cleared the name, remove the row unless it's the last placeholder row
+            if row != self.table.rowCount() - 1:
+                self.table.removeRow(row)
+                self.variablesChanged.emit()
+                return
+
+        # If user filled in the placeholder row, add a new placeholder
+        if row == self.table.rowCount() - 1 and name_item and name_item.text().strip():
+            self._ensure_placeholder_row()
+
         self.variablesChanged.emit()
 
     def _show_context_menu(self, position):

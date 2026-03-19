@@ -1,0 +1,285 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns:opens="http://opens-schematic.org" width="980.0" height="591.0" viewBox="-80.0 -121.0 980.0 591.0" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(100.0,140.0) rotate(0.0)" symbol_name="symbol" name="PIN1" save_v="True" save_i="False" param_NET_NAME="vin_ai" library_path="opensLib/pin_in/symbol.svg">
+    <svg width="100" height="40" viewBox="-80 -20 100 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: red; stroke: red; stroke-width: 1; }
+    </style>
+        <symbol prefix="PIN" category="IO" bindkey="i" />
+        <pin id="pin_1" net="{net_name}" />
+      </defs>
+      <parameter name="net_name" default="in" />
+      <polygon class="symbol" points="-20,-5 -8,-5 0,0 -8,5 -20,5" />
+      <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
+      <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">vin_ai</text>
+    </svg>
+  </g>
+  <g transform="translate(710.0,100.0) rotate(0.0)" symbol_name="symbol" name="PIN4" save_v="True" save_i="False" param_NET_NAME="vout_ao" library_path="opensLib/pin_out/symbol.svg">
+    <svg width="100" height="40" viewBox="-10 -20 100 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: red; stroke: red; stroke-width: 1; }
+    </style>
+        <symbol prefix="PIN" category="IO" bindkey="o" />
+        <pin id="pin_1" net="{net_name}" />
+      </defs>
+      <parameter name="net_name" default="out" />
+      <polygon class="symbol" points="0,-5 8,-5 20,0 8,5 0,5" />
+      <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
+      <text x="25" y="4" font-size="12px" fill="red" text-anchor="start">vout_ao</text>
+    </svg>
+  </g>
+  <g transform="translate(100.0,30.0) rotate(0.0)" symbol_name="symbol" name="PIN2" save_v="True" save_i="False" param_NET_NAME="VDD" library_path="opensLib/pin_in/symbol.svg">
+    <svg width="100" height="40" viewBox="-80 -20 100 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: red; stroke: red; stroke-width: 1; }
+    </style>
+        <symbol prefix="PIN" category="IO" bindkey="i" />
+        <pin id="pin_1" net="{net_name}" />
+      </defs>
+      <parameter name="net_name" default="in" />
+      <polygon class="symbol" points="-20,-5 -8,-5 0,0 -8,5 -20,5" />
+      <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
+      <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">VDD</text>
+    </svg>
+  </g>
+  <g transform="translate(100.0,280.0) rotate(0.0)" symbol_name="symbol" name="PIN3" save_v="True" save_i="False" param_NET_NAME="VSS" library_path="opensLib/pin_in/symbol.svg">
+    <svg width="100" height="40" viewBox="-80 -20 100 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: red; stroke: red; stroke-width: 1; }
+    </style>
+        <symbol prefix="PIN" category="IO" bindkey="i" />
+        <pin id="pin_1" net="{net_name}" />
+      </defs>
+      <parameter name="net_name" default="in" />
+      <polygon class="symbol" points="-20,-5 -8,-5 0,0 -8,5 -20,5" />
+      <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
+      <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">VSS</text>
+    </svg>
+  </g>
+  <g transform="translate(520.0,100.0) rotate(0.0)" symbol_name="symbol" name="B1" save_v="True" save_i="False" param_GAIN="1" param_V_MIN="-15" param_V_MAX="15" library_path="opensLib/vcvs/symbol.svg">
+    <svg width="100" height="80" viewBox="0 0 100 80">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .plus { stroke: black; stroke-width: 1; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+        <param name="GAIN" value="1" />
+        <param name="V_MIN" value="-15" />
+        <param name="V_MAX" value="15" />
+        <symbol prefix="B" category="Sources" />
+        <xyce template="B{name} {pin_plus} {pin_minus} V={{LIMIT(V({pin_ctrl_plus},{pin_ctrl_minus})*{GAIN},{V_MIN},{V_MAX})}}" />
+      </defs>
+      <polygon class="symbol" points="60,20 80,40 60,60 40,40" />
+      <path class="symbol" d="M 60 0 L 60 20" stroke-linecap="round" />
+      <path class="symbol" d="M 60 60 L 60 80" stroke-linecap="round" />
+      <text x="56" y="32" class="value" style="font-size:10px">+</text>
+      <text x="56" y="55" class="value" style="font-size:10px">-</text>
+      <path class="symbol" d="M 0 20 L 20 20" stroke-linecap="round" />
+      <circle class="symbol" cx="22" cy="20" r="2" />
+      <text x="25" y="24" class="value" style="font-size:10px">+</text>
+      <path class="symbol" d="M 0 60 L 20 60" stroke-linecap="round" />
+      <circle class="symbol" cx="22" cy="60" r="2" />
+      <text x="26" y="63" class="value" style="font-size:10px">-</text>
+      <circle class="pin" id="pin_plus" cx="60" cy="0" r="2" />
+      <circle class="pin" id="pin_minus" cx="60" cy="80" r="2" />
+      <circle class="pin" id="pin_ctrl_plus" cx="0" cy="20" r="2" />
+      <circle class="pin" id="pin_ctrl_minus" cx="0" cy="60" r="2" />
+      <text x="80" y="25" class="label">B1</text>
+      <text x="80" y="40" class="value">G=1</text>
+      <text x="80" y="50" class="value">min=-15</text>
+      <text x="80" y="60" class="value">max=15</text>
+    </svg>
+  </g>
+  <g transform="translate(520.0,10.0) rotate(0.0)" symbol_name="symbol" name="C1" save_v="True" save_i="False" param_C="100n" param_IC="" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
+    <svg width="60" height="40" viewBox="0 0 60 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+        <param name="C" value="1u" />
+        <param name="IC" value="" />
+        <param name="SUPPORTS_CURRENT" value="True" />
+        <symbol prefix="C" bindkey="c" category="Passives" />
+        <xyce template="C{name} {pin_1} {pin_2} {C}{% if IC %} IC={{IC}}{% endif %}" />
+      </defs>
+      <path class="symbol" d="M 0 20 L 26 20 M 34 20 L 60 20" />
+      <path class="symbol" d="M 26 10 V 30 M 34 10 V 30" />
+      <circle class="pin" id="pin_1" cx="0" cy="20" r="2" />
+      <circle class="pin" id="pin_2" cx="60" cy="20" r="2" />
+      <text x="0" y="0" class="label">C1</text>
+      <text x="0" y="38" class="value">100n</text>
+    </svg>
+  </g>
+  <line x1="520.0" y1="160.0" x2="500.0" y2="160.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="500.0" y1="160.0" x2="500.0" y2="220.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="500.0" y1="220.0" x2="670.0" y2="220.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="670.0" y1="220.0" x2="670.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="670.0" y1="100.0" x2="580.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="710.0" y1="100.0" x2="670.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="580.0" y1="30.0" x2="670.0" y2="30.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="670.0" y1="30.0" x2="670.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(280.0,100.0) rotate(0.0)" symbol_name="symbol" name="R2" save_v="True" save_i="False" param_R="31.83k" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
+    <svg width="60" height="40" viewBox="0 0 60 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+        <param name="R" value="10k" />
+        <param name="SUPPORTS_CURRENT" value="True" />
+        <symbol prefix="R" bindkey="r" category="Passives" />
+        <xyce template="R{name} {pin_1} {pin_2} {R}" />
+      </defs>
+      <path class="symbol" d="M 0 20 L 10 20 M 10 13 H 50 V 27 H 10 Z M 50 20 L 60 20" stroke-linecap="round" />
+      <circle class="pin" id="pin_1" cx="0" cy="20" r="2" />
+      <circle class="pin" id="pin_2" cx="60" cy="20" r="2" />
+      <text x="0" y="0" class="label">R2</text>
+      <text x="0" y="38" class="value">31.83k</text>
+      <text x="35" y="40" class="value" style="fill: green;">{RR2:i}</text>
+    </svg>
+  </g>
+  <line x1="340.0" y1="120.0" x2="410.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="470.0" y1="120.0" x2="520.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="520.0" y1="30.0" x2="370.0" y2="30.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="370.0" y1="30.0" x2="370.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(160.0,120.0) rotate(0.0)" symbol_name="symbol" name="B2" save_v="True" save_i="False" param_GAIN="1" param_V_MIN="-15" param_V_MAX="15" library_path="opensLib/vcvs/symbol.svg">
+    <svg width="100" height="80" viewBox="0 0 100 80">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .plus { stroke: black; stroke-width: 1; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+        <param name="GAIN" value="1" />
+        <param name="V_MIN" value="-15" />
+        <param name="V_MAX" value="15" />
+        <symbol prefix="B" category="Sources" />
+        <xyce template="B{name} {pin_plus} {pin_minus} V={{LIMIT(V({pin_ctrl_plus},{pin_ctrl_minus})*{GAIN},{V_MIN},{V_MAX})}}" />
+      </defs>
+      <polygon class="symbol" points="60,20 80,40 60,60 40,40" />
+      <path class="symbol" d="M 60 0 L 60 20" stroke-linecap="round" />
+      <path class="symbol" d="M 60 60 L 60 80" stroke-linecap="round" />
+      <text x="56" y="32" class="value" style="font-size:10px">+</text>
+      <text x="56" y="55" class="value" style="font-size:10px">-</text>
+      <path class="symbol" d="M 0 20 L 20 20" stroke-linecap="round" />
+      <circle class="symbol" cx="22" cy="20" r="2" />
+      <text x="25" y="24" class="value" style="font-size:10px">+</text>
+      <path class="symbol" d="M 0 60 L 20 60" stroke-linecap="round" />
+      <circle class="symbol" cx="22" cy="60" r="2" />
+      <text x="26" y="63" class="value" style="font-size:10px">-</text>
+      <circle class="pin" id="pin_plus" cx="60" cy="0" r="2" />
+      <circle class="pin" id="pin_minus" cx="60" cy="80" r="2" />
+      <circle class="pin" id="pin_ctrl_plus" cx="0" cy="20" r="2" />
+      <circle class="pin" id="pin_ctrl_minus" cx="0" cy="60" r="2" />
+      <text x="80" y="25" class="label">B2</text>
+      <text x="80" y="40" class="value">G=1</text>
+      <text x="80" y="50" class="value">min=-15</text>
+      <text x="80" y="60" class="value">max=15</text>
+    </svg>
+  </g>
+  <line x1="160.0" y1="180.0" x2="160.0" y2="220.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="160.0" y1="220.0" x2="260.0" y2="220.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="260.0" y1="220.0" x2="260.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="260.0" y1="120.0" x2="220.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="280.0" y1="120.0" x2="260.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="160.0" y1="140.0" x2="100.0" y2="140.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="100.0" y1="280.0" x2="580.0" y2="280.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="580.0" y1="280.0" x2="580.0" y2="180.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="220.0" y1="200.0" x2="220.0" y2="280.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(410.0,100.0) rotate(0.0)" symbol_name="symbol" name="R3" save_v="True" save_i="False" param_R="31.83k" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
+    <svg width="60" height="40" viewBox="0 0 60 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+        <param name="R" value="10k" />
+        <param name="SUPPORTS_CURRENT" value="True" />
+        <symbol prefix="R" bindkey="r" category="Passives" />
+        <xyce template="R{name} {pin_1} {pin_2} {R}" />
+      </defs>
+      <path class="symbol" d="M 0 20 L 10 20 M 10 13 H 50 V 27 H 10 Z M 50 20 L 60 20" stroke-linecap="round" />
+      <circle class="pin" id="pin_1" cx="0" cy="20" r="2" />
+      <circle class="pin" id="pin_2" cx="60" cy="20" r="2" />
+      <text x="0" y="0" class="label">R3</text>
+      <text x="0" y="38" class="value">31.83k</text>
+      <text x="35" y="40" class="value" style="fill: green;">{RR3:i}</text>
+    </svg>
+  </g>
+  <g transform="translate(710.0,260.0) rotate(0.0)" symbol_name="symbol" name="SCRIPT1" save_v="True" save_i="False" param_SCRIPT="design_script.ipynb" library_path="opensLib/design_script/symbol.svg">
+    <svg width="60" height="60">
+      <rect x="0" y="0" width="60" height="60" fill="none" stroke="black" stroke-width="2" />
+      <rect x="10" y="10" width="40" height="40" fill="#f0f0f0" stroke="black" stroke-width="1" />
+      <text x="30" y="30" font-family="Arial" font-size="12" text-anchor="middle" dominant-baseline="middle">Jupyter</text>
+      <text x="30" y="45" font-family="Arial" font-size="10" text-anchor="middle" dominant-baseline="middle">design_script.ipynb</text>
+      <rect class="script-run-button" id="run-btn" x="42" y="3" width="15" height="15" fill="#4caf50" stroke="black" stroke-width="1" rx="2" ry="2" opens:action="run" />
+      <path d="M46,6 L53,10.5 L46,15 Z" fill="white" pointer-events="none" />
+      <param name="SCRIPT" value="design_script.ipynb" />
+      <symbol prefix="SCRIPT" category="Python" />
+    </svg>
+  </g>
+  <g transform="translate(390.0,160.0) rotate(90.0)" symbol_name="symbol" name="C2" save_v="True" save_i="False" param_C="100n" param_IC="" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
+    <svg width="60" height="40" viewBox="0 0 60 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+        <param name="C" value="1u" />
+        <param name="IC" value="" />
+        <param name="SUPPORTS_CURRENT" value="True" />
+        <symbol prefix="C" bindkey="c" category="Passives" />
+        <xyce template="C{name} {pin_1} {pin_2} {C}{% if IC %} IC={{IC}}{% endif %}" />
+      </defs>
+      <path class="symbol" d="M 0 20 L 26 20 M 34 20 L 60 20" />
+      <path class="symbol" d="M 26 10 V 30 M 34 10 V 30" />
+      <circle class="pin" id="pin_1" cx="0" cy="20" r="2" />
+      <circle class="pin" id="pin_2" cx="60" cy="20" r="2" />
+      <text x="0" y="0" class="label">C2</text>
+      <text x="0" y="38" class="value">100n</text>
+    </svg>
+  </g>
+  <line x1="370.0" y1="160.0" x2="370.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="370.0" y1="220.0" x2="370.0" y2="280.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(520.0,310.0) rotate(0.0)" symbol_name="symbol" name="STIM1" save_v="True" save_i="False" param_SCRIPT="stimuli.ipynb" library_path="opensLib/stimuli_generator/symbol.svg">
+    <svg width="60" height="60">
+      <rect x="0" y="0" width="60" height="60" fill="none" stroke="black" stroke-width="2" />
+      <rect x="10" y="10" width="40" height="40" fill="#e3f2fd" stroke="#1976d2" stroke-width="1" />
+      <path d="M15,35 L20,35 L25,20 L30,40 L35,25 L40,35 L45,35" fill="none" stroke="#1976d2" stroke-width="2" />
+      <text x="30" y="24" font-family="Arial" font-size="8" text-anchor="middle" dominant-baseline="middle" fill="#1976d2">Stimuli</text>
+      <text x="30" y="48" font-family="Arial" font-size="7" text-anchor="middle" dominant-baseline="middle" fill="#333">stimuli.ipynb</text>
+      <rect class="script-run-button" id="run-btn" x="42" y="3" width="15" height="15" fill="#4caf50" stroke="black" stroke-width="1" rx="2" ry="2" opens:action="run" />
+      <path d="M46,6 L53,10.5 L46,15 Z" fill="white" pointer-events="none" />
+      <param name="SCRIPT" value="stimuli.ipynb" />
+      <symbol prefix="STIM" category="Stimuli" />
+    </svg>
+  </g>
+  <circle cx="370.0" cy="120.0" r="3" fill="black" />
+  <circle cx="220.0" cy="280.0" r="3" fill="black" />
+  <circle cx="670.0" cy="100.0" r="3" fill="black" />
+  <circle cx="370.0" cy="280.0" r="3" fill="black" />
+  <circle cx="260.0" cy="120.0" r="3" fill="black" />
+  <opens:analysis ac_type="DEC" enabled="True" points="1000" start="1" stop="10Meg" type="AC" />
+</svg>

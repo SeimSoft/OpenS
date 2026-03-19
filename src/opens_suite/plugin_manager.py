@@ -8,6 +8,7 @@ from opens_suite.plugins.calculator_plugin import CalculatorPlugin
 from opens_suite.plugins.xyce_plugin import XycePlugin
 from opens_suite.plugins.variables_plugin import VariablesPlugin
 from opens_suite.plugins.results_selection_plugin import ResultsSelectionPlugin
+from opens_suite.plugins.copilot_plugin import CopilotPlugin
 
 class PluginManager:
     def __init__(self, main_window):
@@ -26,6 +27,7 @@ class PluginManager:
             XycePlugin(self.main_window),
             VariablesPlugin(self.main_window),
             ResultsSelectionPlugin(self.main_window),
+            CopilotPlugin(self.main_window),
         ]
 
         if "PYTEST_CURRENT_TEST" not in os.environ or (force_load and "McpPlugin" in force_load):

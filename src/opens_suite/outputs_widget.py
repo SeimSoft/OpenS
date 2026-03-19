@@ -75,6 +75,15 @@ class OutputsWidget(QDockWidget):
         self.table_view.customContextMenuRequested.connect(self._show_context_menu)
         self.table_view.doubleClicked.connect(self._on_item_double_clicked)
 
+        # Ensure text remains readable on a light background
+        palette = self.table_view.palette()
+        palette.setColor(palette.ColorRole.Base, QColor("#ffffff"))
+        palette.setColor(palette.ColorRole.AlternateBase, QColor("#f0f3ff"))
+        palette.setColor(palette.ColorRole.Text, QColor("#1f1f1f"))
+        palette.setColor(palette.ColorRole.Highlight, QColor("#a6c8ff"))
+        palette.setColor(palette.ColorRole.HighlightedText, QColor("#000000"))
+        self.table_view.setPalette(palette)
+
         # Apply delegate to Value column
         self.value_delegate = ValueColumnDelegate()
         self.table_view.setItemDelegateForColumn(self.COL_VALUE, self.value_delegate)
@@ -148,7 +157,7 @@ class OutputsWidget(QDockWidget):
                 if item.text() != str(val):
                     item.setText(str(val))
                     any_changed = True
-        
+
         return any_changed
 
     def update_or_add_expression(self, expression, origin_row=None):
@@ -345,6 +354,7 @@ class OutputsWidget(QDockWidget):
         item_value = self.model.item(row, self.COL_VALUE)
         if val_float is None:
             item_value.setBackground(QBrush())  # No color if not numeric
+            item_value.setForeground(QBrush())
             return
 
         min_str = self.model.item(row, self.COL_MIN).text()
@@ -362,9 +372,11 @@ class OutputsWidget(QDockWidget):
             high = float(high_str) if high_str else float("inf")
 
             if low <= val_float <= high:
-                item_value.setBackground(QColor("#ccffcc"))  # Light green
+                item_value.setBackground(QColor("#dff0d8"))
+                item_value.setForeground(QColor("#0a0a0a"))
             else:
-                item_value.setBackground(QColor("#ffcccc"))  # Light red
+                item_value.setBackground(QColor("#f8d7da"))
+                item_value.setForeground(QColor("#0a0a0a"))
         except Exception:
             item_value.setBackground(QBrush())
 

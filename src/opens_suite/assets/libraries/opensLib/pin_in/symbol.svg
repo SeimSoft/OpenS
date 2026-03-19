@@ -5,12 +5,13 @@
       .symbol { fill: red; stroke: red; stroke-width: 1; }
     </style>
     <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="PIN" category="IO" bindkey="i" />
-    <opens:pin xmlns:opens="http://opens-schematic.org" id="pin_1" net="{name}" />
+    <opens:pin xmlns:opens="http://opens-schematic.org" id="pin_1" net="{net_name}" />
   </defs>
+  <opens:parameter xmlns:opens="http://opens-schematic.org" name="net_name" default="in" />
   <!-- Input Pin Symbol: Connection tip at 0,0. Body extends to the left. -->
   <polygon class="symbol" points="-20,-5 -8,-5 0,0 -8,5 -20,5" />
   <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
   
   <!-- Label: Anchor at -25, right-aligned. Vertically centered on baseline. -->
-  <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">{name}</text>
+  <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">{net_name}</text>
 </svg>

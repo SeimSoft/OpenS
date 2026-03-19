@@ -19,6 +19,24 @@ from PyQt6.QtCore import Qt, QPointF, QRectF, QByteArray, QThread, pyqtSignal
 from PyQt6.QtWidgets import QTextEdit, QDialogButtonBox, QApplication
 
 
+def _maybe_show_message(func, *args, **kwargs):
+    """Show a message box only when not running under pytest."""
+
+    if "PYTEST_CURRENT_TEST" in os.environ:
+        import logging
+
+        # Try to get an informative message text if available
+        text = ""
+        if len(args) >= 3:
+            text = args[2]
+        elif "text" in kwargs:
+            text = kwargs["text"]
+
+        logging.warning(f"[Suppressed message box] {text}")
+    else:
+        func(*args, **kwargs)
+
+
 class ScriptExecutionWorker(QThread):
     finished = pyqtSignal(bool, str)  # success, error_message
 
@@ -98,7 +116,12 @@ class ErrorDialog(QDialog):
 
     def copy_to_clipboard(self):
         QApplication.clipboard().setText(self.text_edit.toPlainText())
-        QMessageBox.information(self, "Copied", "Error message copied to clipboard.")
+        _maybe_show_message(
+            QMessageBox.information,
+            self,
+            "Copied",
+            "Error message copied to clipboard.",
+        )
 
 
 class DesignScriptDialog(QDialog):
@@ -250,27 +273,79 @@ class DesignScriptDialog(QDialog):
                     # Search for dps.save(...) and update it
                     import re
 
-                    for cell in nb_data.get("cells", []):
-                        if cell.get("cell_type") == "code":
-                            source = cell.get("source", [])
-                            # Source can be a list of strings or a single string
-                            if isinstance(source, list):
-                                new_source = []
-                                for line in source:
-                                    # Regex to replace filename in dps.save("...", ...)
-                                    new_line = re.sub(
+                    if is_stimuli:
+                        # User wants a specific stimuli template
+                        nb_data = {
+                            "cells": [
+                                {
+                                    "cell_type": "markdown",
+                                    "id": "1",
+                                    "metadata": {},
+                                    "source": [
+                                        "# Stimuli Generator\n",
+                                        "\n",
+                                        "Use the `Stimuli()` class to come up with the stimuli and finally save it in a file that is called the same as this notebook but with `*.json` extension."
+                                    ]
+                                },
+                                {
+                                    "cell_type": "code",
+                                    "execution_count": None,
+                                    "id": "2",
+                                    "metadata": {},
+                                    "outputs": [],
+                                    "source": [
+                                        "from opens_suite import Stimuli\n",
+                                        "\n",
+                                        "stimuli = Stimuli()\n",
+                                        "\n",
+                                        "# stimuli[\"V1.V\"] = 3.3  # Example\n",
+                                        "stimuli[\"VDD\"] = 3.3\n",
+                                        "stimuli[\"VSS\"] = 0"
+                                    ]
+                                },
+                                {
+                                    "cell_type": "code",
+                                    "execution_count": None,
+                                    "id": "3",
+                                    "metadata": {},
+                                    "outputs": [],
+                                    "source": [
+                                        "# This will be picked up automatically by opens when running the design script\n",
+                                        f"stimuli.save(\"{target_json}\")"
+                                    ]
+                                }
+                            ],
+                            "metadata": {
+                                "kernelspec": {"display_name": "python3", "language": "python", "name": "python3"},
+                                "language_info": {"name": "python", "version": "3.11.0"}
+                            },
+                            "nbformat": 4,
+                            "nbformat_minor": 5
+                        }
+                    else:
+                        for cell in nb_data.get("cells", []):
+                            if cell.get("cell_type") == "code":
+                                source = cell.get("source", [])
+                                if isinstance(source, list):
+                                    new_source = []
+                                    for line in source:
+                                        # Fix import
+                                        line = line.replace("from opens import", "from opens_suite import")
+                                        # Regex to replace filename in dps.save("...", ...)
+                                        new_line = re.sub(
+                                            r'(dps\.save\(")([^"]*)(")',
+                                            rf"\1{target_json}\3",
+                                            line,
+                                        )
+                                        new_source.append(new_line)
+                                    cell["source"] = new_source
+                                elif isinstance(source, str):
+                                    source = source.replace("from opens import", "from opens_suite import")
+                                    cell["source"] = re.sub(
                                         r'(dps\.save\(")([^"]*)(")',
                                         rf"\1{target_json}\3",
-                                        line,
+                                        source,
                                     )
-                                    new_source.append(new_line)
-                                cell["source"] = new_source
-                            elif isinstance(source, str):
-                                cell["source"] = re.sub(
-                                    r'(dps\.save\(")([^"]*)(")',
-                                    rf"\1{target_json}\3",
-                                    source,
-                                )
 
                     with open(abs_script_path, "w") as f:
                         json.dump(nb_data, f, indent=1)
@@ -285,9 +360,17 @@ class DesignScriptDialog(QDialog):
                     with open(abs_script_path, "w") as f:
                         json.dump(empty_nb, f)
             except Exception as e:
-                QMessageBox.critical(
-                    None, "Error", f"Failed to create notebook from template: {e}"
-                )
+                # Don't show message box during testing
+                if "PYTEST_CURRENT_TEST" not in os.environ:
+                    _maybe_show_message(
+                        QMessageBox.critical,
+                        None,
+                        "Error",
+                        f"Failed to create notebook from template: {e}",
+                    )
+                else:
+                    import logging
+                    logging.warning(f"Failed to create notebook from template: {e}")
                 return
 
         # Use editor_command from settings
@@ -307,11 +390,20 @@ class DesignScriptDialog(QDialog):
             args = shlex.split(cmd_str)
             subprocess.Popen(args)
         except Exception as e:
-            QMessageBox.critical(
-                None,
-                "Error",
-                f"Failed to open notebook:\nCommand: {editor_cmd}\nError: {e}",
-            )
+            # Don't show message box during testing (CI environments)
+            if "PYTEST_CURRENT_TEST" not in os.environ:
+                _maybe_show_message(
+                    QMessageBox.critical,
+                    None,
+                    "Error",
+                    f"Failed to open notebook:\nCommand: {editor_cmd}\nError: {e}",
+                )
+            else:
+                # Log the error during testing
+                import logging
+                logging.warning(
+                    f"Failed to open notebook during test: {editor_cmd}\nError: {e}"
+                )
 
     @staticmethod
     def execute_notebook_sync(abs_script_path):
@@ -371,8 +463,11 @@ class DesignScriptDialog(QDialog):
     def execute_and_apply(item):
         script_path = item.parameters.get("SCRIPT", "")
         if not script_path:
-            QMessageBox.warning(
-                None, "Missing Path", "No script path defined for this item."
+            _maybe_show_message(
+                QMessageBox.warning,
+                None,
+                "Missing Path",
+                "No script path defined for this item.",
             )
             return
 
@@ -382,8 +477,11 @@ class DesignScriptDialog(QDialog):
         )
 
         if not abs_script_path or not os.path.exists(abs_script_path):
-            QMessageBox.warning(
-                None, "Not Found", f"Notebook file not found at:\n{abs_script_path}"
+            _maybe_show_message(
+                QMessageBox.warning,
+                None,
+                "Not Found",
+                f"Notebook file not found at:\n{abs_script_path}",
             )
             return
 
@@ -434,11 +532,15 @@ class DesignScriptDialog(QDialog):
                 if os.path.exists(json_path):
                     DesignScriptDialog.apply_json_to_item_scene(item, json_path)
                 else:
-                    QMessageBox.warning(
-                        None,
-                        "Missing Results",
-                        f"Execution finished but no result file found at:\n{json_path}",
-                    )
+                    if "PYTEST_CURRENT_TEST" not in os.environ:
+                        QMessageBox.warning(
+                            None,
+                            "Missing Results",
+                            f"Execution finished but no result file found at:\n{json_path}",
+                        )
+                    else:
+                        import logging
+                        logging.warning(f"No result file found at: {json_path}")
             else:
                 cwd_display = notebook_dir if notebook_dir else "<None>"
                 debug_info = f"\n\nDebug Info:\n- Interpreter: {sys.executable}\n- PYTHONPATH: {env.get('PYTHONPATH')}\n- CWD: {cwd_display}"
@@ -464,7 +566,12 @@ class DesignScriptDialog(QDialog):
                 data = json.load(f)
         except Exception as e:
             if not headless:
-                QMessageBox.critical(None, "Error", f"Failed to parse JSON: {e}")
+                _maybe_show_message(
+                    QMessageBox.critical,
+                    None,
+                    "Error",
+                    f"Failed to parse JSON: {e}",
+                )
             else:
                 print(f"Error parsing JSON: {e}")
             return 0
@@ -565,7 +672,12 @@ class DesignScriptDialog(QDialog):
                 msg += f"\n\nUpdates:\n{detail_msg}"
             if not msg:
                 msg = "No stimuli or parameters found in JSON."
-            QMessageBox.information(None, "Stimuli Generator", msg)
+            _maybe_show_message(
+                QMessageBox.information,
+                None,
+                "Stimuli Generator",
+                msg,
+            )
         else:
             if applied_count > 0:
                 QMessageBox.information(

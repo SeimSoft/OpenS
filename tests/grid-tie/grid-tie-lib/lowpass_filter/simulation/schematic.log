@@ -1,0 +1,68 @@
+
+*****
+***** Welcome to the Xyce(TM) Parallel Electronic Simulator
+*****
+***** This is version Xyce Release 7.10-opensource
+***** Date: Wed Mar 18 21:04:31 CET 2026
+
+
+***** Executing netlist /Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/lowpass_filter/simulation/schematic.net
+
+***** Reading and parsing netlist...
+***** Setting up topology...
+
+Netlist warning: Voltage Node (VIN_AI) connected to only 1 device Terminal
+Netlist warning: Voltage Node (VDD) connected to only 1 device Terminal
+Netlist warning: Voltage Node (N_2) connected to only 1 device Terminal
+***** Device Count Summary ...
+       B level 1 (Expression Based Voltage or Current Source) 2
+       C level 1 (Capacitor)                                  2
+       R level 1 (Resistor)                                   2
+       V level 1 (Independent Voltage Source)                 3
+       --------------------------------------------------------
+       Total Devices                                          9
+***** Setting up matrix structure...
+***** Number of Unknowns = 12
+***** Initializing...
+
+
+***** Solution Summary *****
+	Number Successful Steps Taken:		7001
+	Number Failed Steps Attempted:		0
+	Number Jacobians Evaluated:		2
+	Number Linear Solves:			2
+	Number Failed Linear Solves:		0
+	Number Residual Evaluations:		4
+	Number Nonlinear Convergence Failures:	0
+	Total Residual Load Time:		0.000121117 seconds
+	Total Jacobian Load Time:		0.000144243 seconds
+	Total Linear Solution Time:		0.00187588 seconds
+
+
+***** Total Simulation Solvers Run Time: 0.137317 seconds
+***** Total Elapsed Run Time:            0.194999 seconds
+*****
+***** End of Xyce(TM) Simulation
+*****
+
+Timing summary of 1 processor
+                 Stats                   Count       CPU Time              Wall Time
+---------------------------------------- ----- --------------------- ---------------------
+Xyce                                         1        0.105 (100.0%)        0.213 (100.0%)
+  Analysis                                   1        0.098 (94.21%)        0.137 (64.44%)
+    AC                                       1        0.098 (94.20%)        0.137 (64.43%)
+      DC Nonlinear Solve                     1        0.001 ( 0.64%)        0.009 ( 4.23%)
+        Residual                             4        0.000 ( 0.09%)        0.000 ( 0.06%)
+        Jacobian                             2        0.000 ( 0.02%)        0.000 ( 0.07%)
+        Linear Solve                         2        0.000 ( 0.15%)        0.002 ( 0.88%)
+      AC Linear Solve                     7001        0.056 (53.64%)        0.066 (31.09%)
+        Linear Solve                      7001        0.049 (46.78%)        0.054 (25.30%)
+  Netlist Import                             1        0.002 ( 1.64%)        0.028 (13.35%)
+    Parse Context                            1        0.000 ( 0.16%)        0.001 ( 0.70%)
+    Distribute Devices                       1        0.000 ( 0.47%)        0.002 ( 1.08%)
+    Verify Devices                           1        0.000 (<0.01%)        0.000 ( 0.05%)
+    Instantiate                              1        0.000 ( 0.20%)        0.001 ( 0.33%)
+  Late Initialization                        1        0.001 ( 0.98%)        0.012 ( 5.48%)
+    Global Indices                           1        0.000 ( 0.13%)        0.001 ( 0.33%)
+  Setup Matrix Structure                     1        0.000 ( 0.20%)        0.005 ( 2.36%)
+

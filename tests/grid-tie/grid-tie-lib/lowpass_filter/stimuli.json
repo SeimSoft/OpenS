@@ -1,0 +1,3 @@
+{
+  "runset": "V_STIM_1_VDD VDD 0 3.3\nV_STIM_2_VSS VSS 0 0\nV_STIM_3_vin_ai vin_ai 0 DC 1.65 AC 1"
+}

@@ -344,6 +344,7 @@ class NetlistGenerator:
                             for k, v in getattr(sch_item, "parameters", {}).items():
                                 net = net.replace(f"{{{k}}}", str(v))
                                 net = net.replace(f"{{{k.lower()}}}", str(v))
+                                net = net.replace(f"{{{k.upper()}}}", str(v))
                                 net = net.replace(f"{{{k.title()}}}", str(v))
 
                             return net
@@ -530,14 +531,102 @@ class NetlistGenerator:
                     import re
 
                     # Backward compatibility for str.format() style placeholders
-                    # Convert {var} to {{var}} if it's not already Jinja's {{var}} or {%...%}
-                    jinja_template_str = re.sub(
-                        r"(?<!\{)(?<!%)\{([a-zA-Z0-9_]+)\}(?!\})(?!%)",
-                        r"{{\1}}",
-                        template,
-                    )
+                    # Convert {var} to {{var}} by default, but avoid producing nested
+                    # Jinja tags when placeholders appear inside existing {{ ... }} or
+                    # {% ... %} blocks (common in complex templates such as VCVS).
+                    def _convert_placeholders_to_jinja(s: str) -> str:
+                        # Split into segments that are inside Jinja tags and outside.
+                        tag_pattern = re.compile(r"(\{\{.*?\}\}|\{%.*?%\})", re.DOTALL)
+                        parts = tag_pattern.split(s)
+                        out_parts = []
+                        for part in parts:
+                            if not part:
+                                continue
+
+                            # If this segment is a Jinja tag, keep it but replace any
+                            # {var} placeholders inside with plain variable names
+                            # (they are already in expression context).
+                            if part.startswith("{{") and part.endswith("}}"):
+                                inner = part[2:-2]
+                                inner = re.sub(r"\{([a-zA-Z0-9_]+)\}", r"\1", inner)
+                                out_parts.append("{{" + inner + "}}")
+                            elif part.startswith("{%") and part.endswith("%}"):
+                                inner = part[2:-2]
+                                inner = re.sub(r"\{([a-zA-Z0-9_]+)\}", r"\1", inner)
+                                out_parts.append("{%" + inner + "%}")
+                            else:
+                                # Outside of tags, convert {var} -> {{var}} so Jinja will
+                                # substitute it.
+                                out_parts.append(
+                                    re.sub(
+                                        r"\{([a-zA-Z0-9_]+)\}",
+                                        r"{{\1}}",
+                                        part,
+                                    )
+                                )
+                        return "".join(out_parts)
+
+                    jinja_template_str = _convert_placeholders_to_jinja(template)
+
+                    class _Expr(str):
+                        """A lightweight string wrapper that supports basic arithmetic.
+
+                        This allows templates to contain expressions like
+                        `V(node1,node2)*GAIN`, which should be treated as a
+                        literal SPICE expression rather than evaluated as Python.
+                        """
+
+                        def __new__(cls, value):
+                            return str.__new__(cls, value)
+
+                        def _op(self, other, op):
+                            return _Expr(f"{self}{op}{other}")
+
+                        def __add__(self, other):
+                            return self._op(other, "+")
+
+                        def __radd__(self, other):
+                            return self._op(other, "+")
+
+                        def __sub__(self, other):
+                            return self._op(other, "-")
+
+                        def __rsub__(self, other):
+                            return _Expr(f"{other}{self}")
+
+                        def __mul__(self, other):
+                            return self._op(other, "*")
+
+                        def __rmul__(self, other):
+                            return self._op(other, "*")
+
+                        def __truediv__(self, other):
+                            return self._op(other, "/")
+
+                        def __rtruediv__(self, other):
+                            return _Expr(f"{other}{self}")
+
+                        def __pow__(self, other):
+                            return self._op(other, "**")
+
+                        def __rpow__(self, other):
+                            return _Expr(f"{other}{self}")
+
+                    # Wrap values in _Expr so Jinja arithmetic results in string concatenation
+                    # rather than Python numerical ops.
+                    fmt_args = {k: _Expr(str(v)) for k, v in fmt_args.items()}
 
                     env = jinja2.Environment()
+                    env.globals.update(
+                        {
+                            "V": lambda n1, n2: _Expr(f"V({n1},{n2})"),
+                            # Limit should be a single token (no spaces) to avoid Xyce
+                            # treating commas as parameter separators.
+                            "LIMIT": lambda expr, lo, hi: _Expr(
+                                f"LIMIT({expr},{lo},{hi})"
+                            ),
+                        }
+                    )
                     t = env.from_string(jinja_template_str)
                     line = t.render(**fmt_args)
 
@@ -647,11 +736,8 @@ class NetlistGenerator:
         # If user wants any voltages, we'll keep v(*) for convenience or list them
         # Xyce .print tran v(*) i(*) is standard.
         # But if we want to be selective:
-        voltages_str = (
-            "v(*)"
-            if any(getattr(item, "save_voltage", True) for item in schematic_items)
-            else ""
-        )
+        # Voltages are saved by default (v(*) is convenient and low-overhead).
+        voltages_str = "v(*)"
 
         # 3. Stimuli Generators (Custom Netlist Snippets)
         for item in schematic_items:
@@ -713,16 +799,20 @@ class NetlistGenerator:
                 output.append(
                     f".dc {config.get('source')} {config.get('start')} {config.get('stop')} {config.get('step')}"
                 )
-                if save_all:
-                    output.append(f".print dc {voltages_str} {currents_str}")
+                print_tokens = [voltages_str]
+                if currents_str:
+                    print_tokens.append(currents_str)
+                output.append(f".print dc {' '.join(print_tokens)}")
                 # DC sweeps shouldn't generally be mixed with AC/TRAN because Xyce can complain about
                 # the time/freq scale vs stepped parameters depending on how it's defined, but we'll leave it up to the user.
             elif an_type == "AC":
                 output.append(
                     f".ac {config.get('ac_type')} {config.get('points')} {config.get('start')} {config.get('stop')}"
                 )
-                if save_all:
-                    output.append(f".print ac {voltages_str} {currents_str}")
+                print_tokens = [voltages_str]
+                if currents_str:
+                    print_tokens.append(currents_str)
+                output.append(f".print ac {' '.join(print_tokens)}")
             elif an_type == "TRAN":
                 step = config.get("step") or "1u"
                 stop = config.get("stop") or "100u"
@@ -730,13 +820,11 @@ class NetlistGenerator:
                 if config.get("start"):
                     line += f" {config.get('start')}"
                 output.append(line)
-                if save_all:
-                    output.append(f".print tran {voltages_str} {currents_str}")
+                output.append(f".print tran {voltages_str} {currents_str}")
             elif an_type == "OP":
                 output.append(".op")
-                if save_all:
-                    # In Xyce, for .op analysis, specify .print dc to get results in the raw file
-                    output.append(f".print dc {voltages_str} {currents_str}")
+                # In Xyce, for .op analysis, specify .print dc to get results in the raw file
+                output.append(f".print dc {voltages_str} {currents_str}")
 
         if not self.is_subcircuit:
             subckts_str = "\n".join(self.subcircuits_code.values())

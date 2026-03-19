@@ -36,10 +36,10 @@ class ResultsSelectionWidget(QDockWidget):
 
         layout.addLayout(btn_layout)
 
-        # Table
+        # Table: only show current-saving selection (voltages are saved by default)
         self.table = QTableWidget()
-        self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(["Instance", "Voltage", "Current"])
+        self.table.setColumnCount(2)
+        self.table.setHorizontalHeaderLabels(["Instance", "Current"])
         self.table.itemChanged.connect(self.on_item_changed)
         layout.addWidget(self.table)
 
@@ -58,50 +58,41 @@ class ResultsSelectionWidget(QDockWidget):
 
         self._updating = True
         items = [i for i in self.current_scene.items() if isinstance(i, SchematicItem)]
-        # Filter out GND
-        items = [i for i in items if i.prefix != "GND"]
-        items.sort(key=lambda x: x.name)
+        # Filter to only include items that can actually produce current outputs.
+        filtered = []
+        for i in items:
+            # Skip GND and any non-component items
+            if i.prefix == "GND":
+                continue
+            # Xyce does not support current measurement for resistors via i(Rname)
+            if str(i.prefix).upper() == "R":
+                continue
+            supports_current = (
+                str(i.parameters.get("SUPPORTS_CURRENT", "False")).lower() == "true"
+            )
+            if supports_current or getattr(i, "save_current", False):
+                filtered.append(i)
 
-        self.table.setRowCount(len(items))
+        filtered.sort(key=lambda x: x.name)
 
-        for row, item in enumerate(items):
+        self.table.setRowCount(len(filtered))
+
+        for row, item in enumerate(filtered):
             # Instance Name
             name_item = QTableWidgetItem(item.name)
             name_item.setFlags(name_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             name_item.setData(Qt.ItemDataRole.UserRole, item)
             self.table.setItem(row, 0, name_item)
 
-            # Voltage Checkbox
-            v_check = QTableWidgetItem()
-            v_check.setCheckState(
-                Qt.CheckState.Checked if item.save_voltage else Qt.CheckState.Unchecked
-            )
-            v_check.setFlags(
-                Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled
-            )
-            self.table.setItem(row, 1, v_check)
-
             # Current Checkbox
             c_check = QTableWidgetItem()
-            supports_current = (
-                str(item.parameters.get("SUPPORTS_CURRENT", "False")).lower() == "true"
+            c_check.setCheckState(
+                Qt.CheckState.Checked if item.save_current else Qt.CheckState.Unchecked
             )
-
-            if supports_current:
-                c_check.setCheckState(
-                    Qt.CheckState.Checked
-                    if item.save_current
-                    else Qt.CheckState.Unchecked
-                )
-                c_check.setFlags(
-                    Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled
-                )
-            else:
-                c_check.setCheckState(Qt.CheckState.Unchecked)
-                c_check.setFlags(Qt.ItemFlag.NoItemFlags)  # Grayed out/Disabled
-                item.save_current = False
-
-            self.table.setItem(row, 2, c_check)
+            c_check.setFlags(
+                Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled
+            )
+            self.table.setItem(row, 1, c_check)
 
         self.table.resizeColumnsToContents()
         self._updating = False
@@ -115,9 +106,7 @@ class ResultsSelectionWidget(QDockWidget):
         name_item = self.table.item(row, 0)
         sch_item = name_item.data(Qt.ItemDataRole.UserRole)
 
-        if col == 1:  # Voltage
-            sch_item.save_voltage = table_item.checkState() == Qt.CheckState.Checked
-        elif col == 2:  # Current
+        if col == 1:  # Current
             sch_item.save_current = table_item.checkState() == Qt.CheckState.Checked
 
         self.settingsChanged.emit()

@@ -11,14 +11,14 @@
     <opens:param xmlns:opens="http://opens-schematic.org" name="V_MIN" value="-15" />
     <opens:param xmlns:opens="http://opens-schematic.org" name="V_MAX" value="15" />
     <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="B" category="Sources" />
-    <opens:xyce xmlns:opens="http://opens-schematic.org" template="B{name} {pin_plus} {pin_minus} V={{LIMIT(V({pin_ctrl_plus},{pin_ctrl_minus})*{GAIN}, {V_MIN}, {V_MAX})}}" />
+    <opens:xyce xmlns:opens="http://opens-schematic.org" template="B{name} {pin_plus} {pin_minus} V={{LIMIT(V({pin_ctrl_plus},{pin_ctrl_minus})*{GAIN},{V_MIN},{V_MAX})}}" />
   </defs>
-  
+
   <!-- VCVS Output Diamond -->
   <polygon class="symbol" points="60,20 80,40 60,60 40,40" />
   <path class="symbol" d="M 60 0 L 60 20" stroke-linecap="round"/>
   <path class="symbol" d="M 60 60 L 60 80" stroke-linecap="round"/>
-  
+
   <!-- Diamond + and - -->
   <text x="56" y="32" class="value" style="font-size:10px">+</text>
   <text x="56" y="55" class="value" style="font-size:10px">-</text>

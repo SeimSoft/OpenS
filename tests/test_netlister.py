@@ -151,3 +151,72 @@ def test_jinja2_optional_template_blocks(qapp, tmp_path):
     assert "L1 0 0 1m" in netlist
     assert "IC=5V" in netlist
     assert "L2 0 0 2m IC=5V" in netlist
+
+
+def test_vcvs_netlisting_does_not_break_on_nested_jinja(qapp, tmp_path):
+    import opens_suite
+    from opens_suite.schematic_item import SchematicItem
+    from opens_suite.netlister import NetlistGenerator
+    from opens_suite.xyce_runner import XyceRunner
+
+    # Use the built-in VCVS symbol which contains an expression with braces
+    svg_path = os.path.join(
+        os.path.dirname(opens_suite.__file__),
+        "assets",
+        "libraries",
+        "opensLib",
+        "vcvs",
+        "symbol.svg",
+    )
+    assert os.path.exists(svg_path), f"VCVS symbol not found at {svg_path}"
+
+    view = SchematicView()
+    scene = view.scene()
+
+    item = SchematicItem(svg_path)
+    item.name = "B2"
+    # Ensure the prefix matches the symbol's declared prefix
+    item.prefix = "B"
+    scene.addItem(item)
+
+    gen = NetlistGenerator(scene, [])
+    netlist = gen.generate()
+
+    # Ensure netlist generation succeeded and no template parsing errors occurred
+    assert "Error formatting B2" not in netlist
+    # Netlist line should contain the correct prefix and value expression
+    assert "B2" in netlist
+    assert "V=" in netlist
+    # Ensure no unrendered braces remain in output
+    assert "{{" not in netlist and "}}" not in netlist
+
+    # Write netlist to a file and attempt a minimal Xyce simulation (if Xyce is available).
+    # Add a minimal analysis so Xyce has something to run.
+    # Xyce requires at least one .op/.tran/.ac/.dc/etc statement.
+    # Ensure the netlist is solvable by adding basic DC paths for all generated nodes.
+    if netlist.strip().endswith(".end"):
+        netlist = netlist.strip()
+
+        # Add dummy resistors to give each node a DC path to ground.
+        # The netlist generator assigns nodes like N_1..N_4 for the VCVS pins.
+        netlist_lines = netlist.splitlines()
+        # Insert before the final .end
+        if netlist_lines[-1] == ".end":
+            netlist_lines.insert(-1, "R_N1 N_1 0 1k")
+            netlist_lines.insert(-1, "R_N2 N_2 0 1k")
+            netlist_lines.insert(-1, "R_N3 N_3 0 1k")
+            netlist_lines.insert(-1, "R_N4 N_4 0 1k")
+            netlist_lines.insert(-1, ".op")
+        netlist = "\n".join(netlist_lines) + "\n"
+
+    netlist_path = tmp_path / "vcvs_test.net"
+    netlist_path.write_text(netlist)
+    raw_path = tmp_path / "vcvs_test.raw"
+
+    xyce_path = XyceRunner.get_executable_path()
+    if not os.path.exists(xyce_path):
+        pytest.skip("Xyce is not available; skipping actual simulation")
+
+    runner = XyceRunner()
+    returncode = runner.run_cli(str(netlist_path), str(raw_path))
+    assert returncode == 0, "Xyce simulation failed for generated VCVS netlist"

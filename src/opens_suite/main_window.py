@@ -346,20 +346,20 @@ class MainWindow(QMainWindow):
 
     def _create_toolbars(self):
         toolbar = QToolBar("File Toolbar")
-        toolbar.setIconSize(QSize(16, 16))
+        toolbar.setIconSize(QSize(24, 24))
         toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
         self.addToolBar(toolbar)
         toolbar.addAction(self.save_action)
 
         edit_toolbar = QToolBar("Edit Toolbar")
-        edit_toolbar.setIconSize(QSize(16, 16))
+        edit_toolbar.setIconSize(QSize(24, 24))
         edit_toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
         self.addToolBar(edit_toolbar)
         edit_toolbar.addAction(self.undo_action)
         edit_toolbar.addAction(self.redo_action)
 
         sim_toolbar = QToolBar("Simulation Toolbar")
-        sim_toolbar.setIconSize(QSize(16, 16))
+        sim_toolbar.setIconSize(QSize(24, 24))
         sim_toolbar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
         self.addToolBar(sim_toolbar)
         sim_toolbar.addAction(self.create_symbol_action)
@@ -439,6 +439,7 @@ class MainWindow(QMainWindow):
         if index < 0:
             return
         view = self.tabs.widget(index)
+
         if isinstance(view, SchematicView):
             # Reload all symbols in case they were modified in the symbol editor
             view.reload_symbols()
@@ -446,10 +447,27 @@ class MainWindow(QMainWindow):
             # Sync Properties (if plugin loaded)
             self._on_selection_changed()
             self._update_action_states()
+
+            # Ensure Analysis/Variables/Outputs dock widgets reflect the active schematic
+            if hasattr(self, "analysis_dock"):
+                self.analysis_dock.blockSignals(True)
+                self.analysis_dock.restore_analyses(getattr(view, "analyses", []))
+                self.analysis_dock.blockSignals(False)
+
+            if hasattr(self, "variables_dock"):
+                self.variables_dock.blockSignals(True)
+                self.variables_dock.set_variables(getattr(view, "variables", []))
+                self.variables_dock.blockSignals(False)
+
+            if hasattr(self, "outputs_dock"):
+                self.outputs_dock.blockSignals(True)
+                self.outputs_dock.restore_expressions(getattr(view, "outputs", []))
+                self.outputs_dock.blockSignals(False)
+
             if hasattr(self, "results_selection_dock"):
                 self.results_selection_dock.set_scene(view.scene())
 
-        pass
+        # Existing behavior around showing recent simulation results can remain
         view = self.tabs.currentWidget()
         has_results = False
         if isinstance(view, SchematicView):
@@ -962,7 +980,7 @@ class SettingsDialog(QDialog):
                 if isinstance(p, McpPlugin):
                     plugin = p
                     break
-        
+
         if plugin:
             try:
                 # Save first to ensure current port is used

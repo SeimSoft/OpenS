@@ -288,16 +288,19 @@ class LibraryWidget(QDockWidget):
                 for cell_name in sorted(cells):
                     cell_path = os.path.join(lib_path, cell_name)
 
-                    # 1. Determine Category and Bindkey from symbol.svg
                     category = "Uncategorized"
                     symbol_path = os.path.join(cell_path, "symbol.svg")
-                    if os.path.exists(symbol_path):
+                    # If symbol.svg doesn't exist, try schematic.svg for metadata
+                    meta_path = symbol_path if os.path.exists(symbol_path) else os.path.join(cell_path, "schematic.svg")
+                    
+                    if os.path.exists(meta_path):
                         try:
-                            tree = ET.parse(symbol_path)
+                            tree = ET.parse(meta_path)
                             for elem in tree.getroot().iter():
                                 if (
                                     elem.tag.endswith("}symbol")
                                     or elem.tag == "opens:symbol"
+                                    or elem.tag.endswith("}category_meta") # Allow a dedicated tag too
                                 ):
                                     cat = elem.get("category")
                                     if cat:
@@ -305,7 +308,7 @@ class LibraryWidget(QDockWidget):
 
                                     bk = elem.get("bindkey")
                                     if bk:
-                                        self.bindkey_map[bk.lower()] = symbol_path
+                                        self.bindkey_map[bk.lower()] = meta_path
                                     break
                         except Exception:
                             pass

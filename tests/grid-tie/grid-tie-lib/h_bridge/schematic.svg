@@ -231,7 +231,7 @@
   <line x1="-400.0" y1="-170.0" x2="-370.0" y2="-170.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="-400.0" y1="160.0" x2="-400.0" y2="360.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="-400.0" y1="360.0" x2="-360.0" y2="360.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(-480.0,-170.0) rotate(0.0)" symbol_name="symbol" name="VIN" save_v="True" save_i="False" library_path="opensLib/pin_in/symbol.svg">
+  <g transform="translate(-480.0,-170.0) rotate(0.0)" symbol_name="symbol" name="VIN" save_v="True" save_i="False" param_NET_NAME="VIN" library_path="opensLib/pin_in/symbol.svg">
     <svg width="100" height="40" viewBox="-80 -20 100 40">
       <defs>
         <style>
@@ -239,15 +239,16 @@
       .symbol { fill: red; stroke: red; stroke-width: 1; }
     </style>
         <symbol prefix="PIN" category="IO" bindkey="i" />
-        <pin id="pin_1" net="{name}" />
+        <pin id="pin_1" net="{net_name}" />
       </defs>
+      <parameter name="net_name" default="in" />
       <polygon class="symbol" points="-20,-5 -8,-5 0,0 -8,5 -20,5" />
       <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
       <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">VIN</text>
     </svg>
   </g>
   <line x1="-480.0" y1="-170.0" x2="-400.0" y2="-170.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(-480.0,360.0) rotate(0.0)" symbol_name="symbol" name="GND" save_v="True" save_i="False" library_path="opensLib/pin_in/symbol.svg">
+  <g transform="translate(-480.0,360.0) rotate(0.0)" symbol_name="symbol" name="GND" save_v="True" save_i="False" param_NET_NAME="GND" library_path="opensLib/pin_in/symbol.svg">
     <svg width="100" height="40" viewBox="-80 -20 100 40">
       <defs>
         <style>
@@ -255,15 +256,16 @@
       .symbol { fill: red; stroke: red; stroke-width: 1; }
     </style>
         <symbol prefix="PIN" category="IO" bindkey="i" />
-        <pin id="pin_1" net="{name}" />
+        <pin id="pin_1" net="{net_name}" />
       </defs>
+      <parameter name="net_name" default="in" />
       <polygon class="symbol" points="-20,-5 -8,-5 0,0 -8,5 -20,5" />
       <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
       <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">GND</text>
     </svg>
   </g>
   <line x1="-400.0" y1="360.0" x2="-480.0" y2="360.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(570.0,80.0) rotate(0.0)" symbol_name="symbol" name="P1" save_v="True" save_i="False" library_path="opensLib/pin_out/symbol.svg">
+  <g transform="translate(570.0,80.0) rotate(0.0)" symbol_name="symbol" name="P1" save_v="True" save_i="False" param_NET_NAME="P1" library_path="opensLib/pin_out/symbol.svg">
     <svg width="100" height="40" viewBox="-10 -20 100 40">
       <defs>
         <style>
@@ -271,14 +273,15 @@
       .symbol { fill: red; stroke: red; stroke-width: 1; }
     </style>
         <symbol prefix="PIN" category="IO" bindkey="o" />
-        <pin id="pin_1" net="{name}" />
+        <pin id="pin_1" net="{net_name}" />
       </defs>
+      <parameter name="net_name" default="out" />
       <polygon class="symbol" points="0,-5 8,-5 20,0 8,5 0,5" />
       <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
       <text x="25" y="4" font-size="12px" fill="red" text-anchor="start">P1</text>
     </svg>
   </g>
-  <g transform="translate(380.0,100.0) rotate(0.0)" symbol_name="symbol" name="P2" save_v="True" save_i="False" library_path="opensLib/pin_out/symbol.svg">
+  <g transform="translate(380.0,100.0) rotate(0.0)" symbol_name="symbol" name="P2" save_v="True" save_i="False" param_NET_NAME="P2" library_path="opensLib/pin_out/symbol.svg">
     <svg width="100" height="40" viewBox="-10 -20 100 40">
       <defs>
         <style>
@@ -286,8 +289,9 @@
       .symbol { fill: red; stroke: red; stroke-width: 1; }
     </style>
         <symbol prefix="PIN" category="IO" bindkey="o" />
-        <pin id="pin_1" net="{name}" />
+        <pin id="pin_1" net="{net_name}" />
       </defs>
+      <parameter name="net_name" default="out" />
       <polygon class="symbol" points="0,-5 8,-5 20,0 8,5 0,5" />
       <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
       <text x="25" y="4" font-size="12px" fill="red" text-anchor="start">P2</text>
@@ -295,7 +299,7 @@
   </g>
   <line x1="380.0" y1="100.0" x2="310.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="380.0" y1="80.0" x2="-60.0" y2="80.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(-460.0,80.0) rotate(0.0)" symbol_name="symbol" name="en_1_i" save_v="True" save_i="False" library_path="opensLib/pin_in/symbol.svg">
+  <g transform="translate(-460.0,80.0) rotate(0.0)" symbol_name="symbol" name="en_1_i" save_v="True" save_i="False" param_NET_NAME="en_1_i" library_path="opensLib/pin_in/symbol.svg">
     <svg width="100" height="40" viewBox="-80 -20 100 40">
       <defs>
         <style>
@@ -303,14 +307,15 @@
       .symbol { fill: red; stroke: red; stroke-width: 1; }
     </style>
         <symbol prefix="PIN" category="IO" bindkey="i" />
-        <pin id="pin_1" net="{name}" />
+        <pin id="pin_1" net="{net_name}" />
       </defs>
+      <parameter name="net_name" default="in" />
       <polygon class="symbol" points="-20,-5 -8,-5 0,0 -8,5 -20,5" />
       <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
       <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">en_1_i</text>
     </svg>
   </g>
-  <g transform="translate(-460.0,100.0) rotate(0.0)" symbol_name="symbol" name="en_2_i" save_v="True" save_i="False" library_path="opensLib/pin_in/symbol.svg">
+  <g transform="translate(-460.0,100.0) rotate(0.0)" symbol_name="symbol" name="en_2_i" save_v="True" save_i="False" param_NET_NAME="en_2_i" library_path="opensLib/pin_in/symbol.svg">
     <svg width="100" height="40" viewBox="-80 -20 100 40">
       <defs>
         <style>
@@ -318,8 +323,9 @@
       .symbol { fill: red; stroke: red; stroke-width: 1; }
     </style>
         <symbol prefix="PIN" category="IO" bindkey="i" />
-        <pin id="pin_1" net="{name}" />
+        <pin id="pin_1" net="{net_name}" />
       </defs>
+      <parameter name="net_name" default="in" />
       <polygon class="symbol" points="-20,-5 -8,-5 0,0 -8,5 -20,5" />
       <circle id="pin_1" cx="0" cy="0" r="2" class="pin" />
       <text x="-25" y="4" font-size="12px" fill="red" text-anchor="end">en_2_i</text>
@@ -617,5 +623,4 @@
   <circle cx="-60.0" cy="80.0" r="3" fill="black" />
   <circle cx="-450.0" cy="80.0" r="3" fill="black" />
   <circle cx="-60.0" cy="-140.0" r="3" fill="black" />
-  <opens:analysis enabled="True" save_all="True" start="" step="1n" stop="100u" type="Tran" />
 </svg>

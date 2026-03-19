@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<svg xmlns:opens="http://opens-schematic.org" width="2656.7483771502766" height="942.0" viewBox="-530.0 -331.0 2656.7483771502766 942.0" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(-240.0,0.0) rotate(0.0)" symbol_name="symbol" name="V1" save_v="True" save_i="False" param_V="30" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
+<svg xmlns:opens="http://opens-schematic.org" width="3322.0" height="1172.0" viewBox="-631.0 -331.0 3322.0 1172.0" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(-240.0,0.0) rotate(0.0)" symbol_name="symbol" name="V1" save_v="True" save_i="True" param_V="30" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
     <svg width="40" height="60" viewBox="0 0 40 60">
       <defs>
         <style>
@@ -47,7 +47,7 @@
     </svg>
   </g>
   <line x1="-220.0" y1="190.0" x2="-220.0" y2="60.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(260.0,10.0) rotate(0.0)" symbol_name="symbol" name="C1" save_v="True" save_i="False" param_C="1.818u" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
+  <g transform="translate(260.0,10.0) rotate(0.0)" symbol_name="symbol" name="C1" save_v="True" save_i="True" param_C="1.818u" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -242,7 +242,7 @@
       <text x="10" y="46" class="value">Args: (IS=1e-14 N=1 RS=0 CJO=1p M=0.5 TT=1n)</text>
     </svg>
   </g>
-  <g transform="translate(-200.0,-140.0) rotate(90.0)" symbol_name="symbol" name="R3" save_v="True" save_i="False" param_R="0.1" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
+  <g transform="translate(-200.0,-140.0) rotate(90.0)" symbol_name="symbol" name="R3" save_v="True" save_i="True" param_R="0.1" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -280,7 +280,7 @@
   </g>
   <line x1="680.0" y1="210.0" x2="880.0" y2="210.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="680.0" y1="210.0" x2="680.0" y2="170.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(660.0,170.0) rotate(270.0)" symbol_name="symbol" name="C3" save_v="True" save_i="False" param_C="100n" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
+  <g transform="translate(660.0,170.0) rotate(270.0)" symbol_name="symbol" name="C3" save_v="True" save_i="True" param_C="100n" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -328,7 +328,7 @@
   <line x1="880.0" y1="210.0" x2="970.0" y2="210.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="1620.0" y1="240.0" x2="1620.0" y2="190.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="N2_2" />
   <line x1="970.0" y1="-10.0" x2="880.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VZW" />
-  <g transform="translate(330.0,10.0) rotate(0.0)" symbol_name="symbol" name="L1" save_v="True" save_i="False" param_L="1.393u" param_RSER="0.1" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/inductor/symbol.svg">
+  <g transform="translate(330.0,10.0) rotate(0.0)" symbol_name="symbol" name="L1" save_v="True" save_i="True" param_L="1.393u" param_RSER="0.1" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/inductor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -358,7 +358,7 @@
     </svg>
   </g>
   <line x1="420.0" y1="90.0" x2="420.0" y2="110.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="P2" />
-  <g transform="translate(700.0,20.0) rotate(90.0)" symbol_name="symbol" name="C4" save_v="True" save_i="False" param_C="100n" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
+  <g transform="translate(700.0,20.0) rotate(90.0)" symbol_name="symbol" name="C4" save_v="True" save_i="True" param_C="100n" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -383,7 +383,7 @@
   </g>
   <line x1="680.0" y1="80.0" x2="680.0" y2="110.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="T2" />
   <line x1="680.0" y1="20.0" x2="680.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VZW" />
-  <g transform="translate(580.0,-30.0) rotate(0.0)" symbol_name="symbol" name="D2" save_v="True" save_i="False" param_MODEL="BOOTDIODE" param_SUPPORTS_CURRENT="True" library_path="opensLib/diode/symbol.svg">
+  <g transform="translate(580.0,-30.0) rotate(0.0)" symbol_name="symbol" name="D2" save_v="True" save_i="True" param_MODEL="BOOTDIODE" param_SUPPORTS_CURRENT="True" library_path="opensLib/diode/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -408,7 +408,7 @@
       <text x="30" y="6" class="value" style="fill: green;">{DD2:i}</text>
     </svg>
   </g>
-  <g transform="translate(640.0,230.0) rotate(180.0)" symbol_name="symbol" name="D3" save_v="True" save_i="False" param_MODEL="BOOTDIODE" param_SUPPORTS_CURRENT="True" library_path="opensLib/diode/symbol.svg">
+  <g transform="translate(640.0,230.0) rotate(180.0)" symbol_name="symbol" name="D3" save_v="True" save_i="True" param_MODEL="BOOTDIODE" param_SUPPORTS_CURRENT="True" library_path="opensLib/diode/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -502,7 +502,7 @@
   <line x1="420.0" y1="30.0" x2="420.0" y2="50.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="420.0" y1="110.0" x2="420.0" y2="170.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="P2" />
   <line x1="880.0" y1="-10.0" x2="680.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VZW" />
-  <g transform="translate(1600.0,40.0) rotate(0.0)" symbol_name="symbol" name="V2" save_v="True" save_i="False" param_V="300" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
+  <g transform="translate(1600.0,40.0) rotate(0.0)" symbol_name="symbol" name="V2" save_v="True" save_i="True" param_V="300" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
     <svg width="40" height="60" viewBox="0 0 40 60">
       <defs>
         <style>
@@ -598,7 +598,7 @@
   <line x1="1120.0" y1="290.0" x2="10.0" y2="290.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="10.0" y1="290.0" x2="10.0" y2="70.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="10.0" y1="70.0" x2="-40.0" y2="70.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(1410.0,-30.0) rotate(0.0)" symbol_name="symbol" name="L2" save_v="True" save_i="False" param_L="1m" param_RSER="1" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/inductor/symbol.svg">
+  <g transform="translate(1410.0,-30.0) rotate(0.0)" symbol_name="symbol" name="L2" save_v="True" save_i="True" param_L="1m" param_RSER="1" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/inductor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -629,7 +629,7 @@
   </g>
   <line x1="1620.0" y1="-10.0" x2="1580.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VOUT" />
   <line x1="1580.0" y1="-10.0" x2="1470.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VOUT" />
-  <g transform="translate(790.0,20.0) rotate(90.0)" symbol_name="symbol" name="R5" save_v="True" save_i="False" param_R="1.596Meg" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
+  <g transform="translate(790.0,20.0) rotate(90.0)" symbol_name="symbol" name="R5" save_v="True" save_i="True" param_R="1.596Meg" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -653,7 +653,7 @@
   </g>
   <line x1="770.0" y1="20.0" x2="770.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VZW" />
   <line x1="770.0" y1="80.0" x2="770.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Vmeas" />
-  <g transform="translate(790.0,120.0) rotate(90.0)" symbol_name="symbol" name="R6" save_v="True" save_i="False" param_R="4.4k" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
+  <g transform="translate(790.0,120.0) rotate(90.0)" symbol_name="symbol" name="R6" save_v="True" save_i="True" param_R="4.4k" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -681,7 +681,7 @@
   <line x1="840.0" y1="400.0" x2="-140.0" y2="400.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Vmeas" />
   <line x1="-140.0" y1="400.0" x2="-140.0" y2="110.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Vmeas" />
   <line x1="-140.0" y1="110.0" x2="-120.0" y2="110.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Vmeas" />
-  <g transform="translate(-290.0,100.0) rotate(0.0)" symbol_name="symbol" name="V3" save_v="True" save_i="False" param_V1="0" param_V2="3.3" param_TD="0" param_TR="1n" param_TF="1n" param_PW="{1/100k/2}" param_PER="{1/100k}" param_SUPPORTS_CURRENT="True" library_path="opensLib/pulse/symbol.svg">
+  <g transform="translate(-290.0,100.0) rotate(0.0)" symbol_name="symbol" name="V3" save_v="True" save_i="True" param_V1="0" param_V2="3.3" param_TD="0" param_TR="1n" param_TF="1n" param_PW="{1/100k/2}" param_PER="{1/100k}" param_SUPPORTS_CURRENT="True" library_path="opensLib/pulse/symbol.svg">
     <svg width="40" height="60" viewBox="0 0 40 60">
       <defs>
         <style>
@@ -760,7 +760,7 @@
   </g>
   <line x1="1620.0" y1="240.0" x2="1580.0" y2="240.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="N2_2" />
   <line x1="1540.0" y1="240.0" x2="1410.0" y2="240.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="N2" />
-  <g transform="translate(1600.0,360.0) rotate(90.0)" symbol_name="symbol" name="R7" save_v="True" save_i="False" param_R="200" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
+  <g transform="translate(1600.0,360.0) rotate(90.0)" symbol_name="symbol" name="R7" save_v="True" save_i="True" param_R="200" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -804,7 +804,7 @@
       <circle class="pin" id="pin_1" cx="20" cy="0" r="2" />
     </svg>
   </g>
-  <g transform="translate(1700.0,360.0) rotate(90.0)" symbol_name="symbol" name="C5" save_v="True" save_i="False" param_C="10p" param_IC="" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
+  <g transform="translate(1700.0,360.0) rotate(90.0)" symbol_name="symbol" name="C5" save_v="True" save_i="True" param_C="10p" param_IC="" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -831,7 +831,7 @@
   <line x1="1680.0" y1="330.0" x2="1580.0" y2="330.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="I_out_meas" />
   <line x1="1680.0" y1="420.0" x2="1680.0" y2="460.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="1680.0" y1="460.0" x2="1580.0" y2="460.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(1880.0,60.0) rotate(90.0)" symbol_name="symbol" name="R8" save_v="True" save_i="False" param_R="1.6Meg" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
+  <g transform="translate(1880.0,60.0) rotate(90.0)" symbol_name="symbol" name="R8" save_v="True" save_i="True" param_R="1.6Meg" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -853,7 +853,7 @@
       <text x="35" y="40" class="value" style="fill: green;">{RR8:i}</text>
     </svg>
   </g>
-  <g transform="translate(1880.0,150.0) rotate(90.0)" symbol_name="symbol" name="R9" save_v="True" save_i="False" param_R="4.4k" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
+  <g transform="translate(1880.0,150.0) rotate(90.0)" symbol_name="symbol" name="R9" save_v="True" save_i="True" param_R="4.4k" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -879,7 +879,7 @@
   <line x1="1860.0" y1="-10.0" x2="1620.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VOUT" />
   <line x1="1860.0" y1="240.0" x2="1860.0" y2="210.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="REF_R_OUT" />
   <line x1="1860.0" y1="150.0" x2="1860.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(1940.0,160.0) rotate(90.0)" symbol_name="symbol" name="C6" save_v="True" save_i="False" param_C="10n" param_IC="" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
+  <g transform="translate(1940.0,160.0) rotate(90.0)" symbol_name="symbol" name="C6" save_v="True" save_i="True" param_C="10n" param_IC="" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -909,39 +909,232 @@
   <line x1="1860.0" y1="240.0" x2="1740.0" y2="240.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="REF_R_OUT" />
   <line x1="1740.0" y1="240.0" x2="1740.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="REF_R_OUT" />
   <line x1="1740.0" y1="120.0" x2="1620.0" y2="120.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="REF_R_OUT" />
+  <g transform="translate(2010.0,140.0) rotate(0.0)" symbol_name="symbol" name="B1" save_v="True" save_i="False" param_GAIN="1" param_V_MIN="-15" param_V_MAX="15" library_path="opensLib/vcvs/symbol.svg">
+    <svg width="100" height="80" viewBox="0 0 100 80">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .plus { stroke: black; stroke-width: 1; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+        <param name="GAIN" value="1" />
+        <param name="V_MIN" value="-15" />
+        <param name="V_MAX" value="15" />
+        <symbol prefix="B" category="Sources" />
+        <xyce template="B{name} {pin_plus} {pin_minus} V={{LIMIT(V({pin_ctrl_plus},{pin_ctrl_minus})*{GAIN},{V_MIN},{V_MAX})}}" />
+      </defs>
+      <polygon class="symbol" points="60,20 80,40 60,60 40,40" />
+      <path class="symbol" d="M 60 0 L 60 20" stroke-linecap="round" />
+      <path class="symbol" d="M 60 60 L 60 80" stroke-linecap="round" />
+      <text x="56" y="32" class="value" style="font-size:10px">+</text>
+      <text x="56" y="55" class="value" style="font-size:10px">-</text>
+      <path class="symbol" d="M 0 20 L 20 20" stroke-linecap="round" />
+      <circle class="symbol" cx="22" cy="20" r="2" />
+      <text x="25" y="24" class="value" style="font-size:10px">+</text>
+      <path class="symbol" d="M 0 60 L 20 60" stroke-linecap="round" />
+      <circle class="symbol" cx="22" cy="60" r="2" />
+      <text x="26" y="63" class="value" style="font-size:10px">-</text>
+      <circle class="pin" id="pin_plus" cx="60" cy="0" r="2" />
+      <circle class="pin" id="pin_minus" cx="60" cy="80" r="2" />
+      <circle class="pin" id="pin_ctrl_plus" cx="0" cy="20" r="2" />
+      <circle class="pin" id="pin_ctrl_minus" cx="0" cy="60" r="2" />
+      <text x="80" y="25" class="label">B1</text>
+      <text x="80" y="40" class="value">G=1</text>
+      <text x="80" y="50" class="value">min=-15</text>
+      <text x="80" y="60" class="value">max=15</text>
+    </svg>
+  </g>
+  <g transform="translate(2010.0,350.0) rotate(0.0)" symbol_name="symbol" name="B2" save_v="True" save_i="False" param_GAIN="1" param_V_MIN="-15" param_V_MAX="15" library_path="opensLib/vcvs/symbol.svg">
+    <svg width="100" height="80" viewBox="0 0 100 80">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .plus { stroke: black; stroke-width: 1; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+        <param name="GAIN" value="1" />
+        <param name="V_MIN" value="-15" />
+        <param name="V_MAX" value="15" />
+        <symbol prefix="B" category="Sources" />
+        <xyce template="B{name} {pin_plus} {pin_minus} V={{LIMIT(V({pin_ctrl_plus},{pin_ctrl_minus})*{GAIN},{V_MIN},{V_MAX})}}" />
+      </defs>
+      <polygon class="symbol" points="60,20 80,40 60,60 40,40" />
+      <path class="symbol" d="M 60 0 L 60 20" stroke-linecap="round" />
+      <path class="symbol" d="M 60 60 L 60 80" stroke-linecap="round" />
+      <text x="56" y="32" class="value" style="font-size:10px">+</text>
+      <text x="56" y="55" class="value" style="font-size:10px">-</text>
+      <path class="symbol" d="M 0 20 L 20 20" stroke-linecap="round" />
+      <circle class="symbol" cx="22" cy="20" r="2" />
+      <text x="25" y="24" class="value" style="font-size:10px">+</text>
+      <path class="symbol" d="M 0 60 L 20 60" stroke-linecap="round" />
+      <circle class="symbol" cx="22" cy="60" r="2" />
+      <text x="26" y="63" class="value" style="font-size:10px">-</text>
+      <circle class="pin" id="pin_plus" cx="60" cy="0" r="2" />
+      <circle class="pin" id="pin_minus" cx="60" cy="80" r="2" />
+      <circle class="pin" id="pin_ctrl_plus" cx="0" cy="20" r="2" />
+      <circle class="pin" id="pin_ctrl_minus" cx="0" cy="60" r="2" />
+      <text x="80" y="25" class="label">B2</text>
+      <text x="80" y="40" class="value">G=1</text>
+      <text x="80" y="50" class="value">min=-15</text>
+      <text x="80" y="60" class="value">max=15</text>
+    </svg>
+  </g>
+  <line x1="2010.0" y1="200.0" x2="2010.0" y2="240.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="REF_R_OUT" />
+  <line x1="2010.0" y1="240.0" x2="1920.0" y2="240.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="REF_R_OUT" />
+  <line x1="2010.0" y1="160.0" x2="2010.0" y2="140.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2010.0" y1="140.0" x2="1920.0" y2="140.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2010.0" y1="370.0" x2="2010.0" y2="330.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="I_out_meas" />
+  <line x1="2010.0" y1="330.0" x2="1680.0" y2="330.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="I_out_meas" />
+  <line x1="2010.0" y1="410.0" x2="2010.0" y2="460.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2010.0" y1="460.0" x2="1680.0" y2="460.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(2520.0,340.0) rotate(0.0)" symbol_name="symbol" name="V4" save_v="True" save_i="False" param_V="1.65" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
+    <svg width="40" height="60" viewBox="0 0 40 60">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .plus { stroke: black; stroke-width: 1; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+        <param name="V" value="1" />
+        <param name="VAC" value="0" />
+        <param name="SUPPORTS_CURRENT" value="True" />
+        <symbol prefix="V" bindkey="v" category="Sources" />
+        <xyce template="V{name} {pin_plus} {pin_minus} dc {V} ac {VAC}" />
+      </defs>
+      <circle class="symbol" cx="20" cy="30" r="15" />
+      <path class="symbol" d="M 20 0 L 20 15" stroke-linecap="round" />
+      <path class="symbol" d="M 20 45 L 20 60" stroke-linecap="round" />
+      <path class="plus" d="M 15 22 L 25 22 M 20 17 L 20 27" stroke-linecap="round" />
+      <path class="plus" d="M 15 38 L 25 38" stroke-linecap="round" />
+      <circle class="pin" id="pin_plus" cx="20" cy="0" r="2" />
+      <circle class="pin" id="pin_minus" cx="20" cy="60" r="2" />
+      <text x="35" y="25" class="label">V4</text>
+      <text x="35" y="45" class="value">1.65</text>
+      <text x="35" y="55" class="value">0</text>
+      <text x="35" y="60" class="value" style="fill: green;">{VV4:i}</text>
+    </svg>
+  </g>
+  <g transform="translate(2520.0,230.0) rotate(0.0)" symbol_name="symbol" name="V5" save_v="True" save_i="False" param_V="1.65" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
+    <svg width="40" height="60" viewBox="0 0 40 60">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .plus { stroke: black; stroke-width: 1; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .value { font-family: Arial; font-size: 8px; fill: black; }
+    </style>
+        <param name="V" value="1" />
+        <param name="VAC" value="0" />
+        <param name="SUPPORTS_CURRENT" value="True" />
+        <symbol prefix="V" bindkey="v" category="Sources" />
+        <xyce template="V{name} {pin_plus} {pin_minus} dc {V} ac {VAC}" />
+      </defs>
+      <circle class="symbol" cx="20" cy="30" r="15" />
+      <path class="symbol" d="M 20 0 L 20 15" stroke-linecap="round" />
+      <path class="symbol" d="M 20 45 L 20 60" stroke-linecap="round" />
+      <path class="plus" d="M 15 22 L 25 22 M 20 17 L 20 27" stroke-linecap="round" />
+      <path class="plus" d="M 15 38 L 25 38" stroke-linecap="round" />
+      <circle class="pin" id="pin_plus" cx="20" cy="0" r="2" />
+      <circle class="pin" id="pin_minus" cx="20" cy="60" r="2" />
+      <text x="35" y="25" class="label">V5</text>
+      <text x="35" y="45" class="value">1.65</text>
+      <text x="35" y="55" class="value">0</text>
+      <text x="35" y="60" class="value" style="fill: green;">{VV5:i}</text>
+    </svg>
+  </g>
+  <line x1="2540.0" y1="290.0" x2="2540.0" y2="340.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2540.0" y1="230.0" x2="2540.0" y2="180.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <g transform="translate(2520.0,140.0) rotate(0.0)" symbol_name="symbol" name="VDD1" save_v="True" save_i="False" param_NET_NAME="VDD3V3" library_path="opensLib/named_vdd/symbol.svg">
+    <svg width="40" height="40" viewBox="0 0 40 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+      .net_label { font-family: Arial; font-size: 8px; fill: red; }
+    </style>
+        <symbol prefix="VDD" bindkey="" category="Misc" />
+        <xyce template="" />
+        <pin id="pin_1" net_override="{NET_NAME}" />
+      </defs>
+      <parameter name="NET_NAME" default="VCC" />
+      <path class="symbol" d="M 20 40 L 20 15" />
+      <path class="symbol" d="M 5 15 L 35 15" />
+      <circle class="pin" id="pin_1" cx="20" cy="40" r="2" />
+      <text x="25" y="10" class="net_label">VDD3V3</text>
+    </svg>
+  </g>
+  <line x1="2540.0" y1="310.0" x2="2240.0" y2="310.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2240.0" y1="310.0" x2="2240.0" y2="460.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2240.0" y1="460.0" x2="2070.0" y2="460.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2070.0" y1="460.0" x2="2070.0" y2="430.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2070.0" y1="220.0" x2="2070.0" y2="310.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2070.0" y1="310.0" x2="2240.0" y2="310.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2070.0" y1="350.0" x2="2070.0" y2="330.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Iist" />
+  <line x1="2070.0" y1="330.0" x2="2160.0" y2="330.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Iist" />
+  <line x1="2070.0" y1="140.0" x2="2070.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Isoll" />
+  <line x1="2070.0" y1="100.0" x2="2210.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Isoll" />
+  <g transform="translate(2520.0,440.0) rotate(0.0)" symbol_name="symbol" name="GND5" save_v="True" save_i="False" library_path="opensLib/gnd/symbol.svg">
+    <svg width="40" height="40" viewBox="0 0 40 40">
+      <defs>
+        <style>
+      .pin { fill: none; stroke: none; }
+      .symbol { fill: none; stroke: black; stroke-width: 2; stroke-linecap: round; }
+      .label { font-family: Arial; font-size: 8px; fill: blue; }
+    </style>
+        <symbol prefix="GND" bindkey="g" category="Misc" />
+        <xyce template="" />
+        <pin id="pin_1" net="0" />
+      </defs>
+      <path class="symbol" d="M 20 0 L 20 10" />
+      <path class="symbol" d="M 5 10 L 35 10 L 20 25 Z" />
+      <circle class="pin" id="pin_1" cx="20" cy="0" r="2" />
+    </svg>
+  </g>
+  <line x1="2540.0" y1="440.0" x2="2540.0" y2="400.0" stroke="black" stroke-width="2" stroke-linecap="round" />
+  <line x1="2160.0" y1="330.0" x2="2160.0" y2="690.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Iist" />
+  <line x1="2160.0" y1="690.0" x2="-480.0" y2="690.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Iist" />
+  <line x1="-480.0" y1="690.0" x2="-480.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Iist" />
+  <line x1="-480.0" y1="-10.0" x2="-120.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Iist" />
+  <line x1="-120.0" y1="10.0" x2="-140.0" y2="10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Isoll" />
+  <line x1="-140.0" y1="10.0" x2="-450.0" y2="10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Isoll" />
+  <line x1="-450.0" y1="10.0" x2="-450.0" y2="500.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Isoll" />
+  <line x1="-450.0" y1="500.0" x2="-450.0" y2="660.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Isoll" />
+  <line x1="-450.0" y1="660.0" x2="2330.0" y2="660.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Isoll" />
+  <line x1="2330.0" y1="660.0" x2="2330.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Isoll" />
+  <line x1="2330.0" y1="100.0" x2="2210.0" y2="100.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Isoll" />
   <circle cx="1580.0" cy="460.0" r="3" fill="black" />
   <circle cx="770.0" cy="210.0" r="3" fill="black" />
   <circle cx="1620.0" cy="-10.0" r="3" fill="black" />
   <circle cx="-150.0" cy="-180.0" r="3" fill="black" />
   <circle cx="770.0" cy="100.0" r="3" fill="black" />
-  <circle cx="680.0" cy="90.0" r="3" fill="black" />
-  <circle cx="-20.0" cy="180.0" r="3" fill="black" />
   <circle cx="680.0" cy="-10.0" r="3" fill="black" />
+  <circle cx="770.0" cy="-10.0" r="3" fill="black" />
+  <circle cx="1680.0" cy="330.0" r="3" fill="black" />
+  <circle cx="680.0" cy="90.0" r="3" fill="black" />
+  <circle cx="2240.0" cy="310.0" r="3" fill="black" />
+  <circle cx="1620.0" cy="120.0" r="3" fill="black" />
+  <circle cx="1920.0" cy="140.0" r="3" fill="black" />
+  <circle cx="1680.0" cy="460.0" r="3" fill="black" />
   <circle cx="1580.0" cy="330.0" r="3" fill="black" />
-  <circle cx="1860.0" cy="240.0" r="3" fill="black" />
   <circle cx="-220.0" cy="180.0" r="3" fill="black" />
   <circle cx="1860.0" cy="140.0" r="3" fill="black" />
-  <circle cx="1620.0" cy="120.0" r="3" fill="black" />
-  <circle cx="770.0" cy="-10.0" r="3" fill="black" />
+  <circle cx="1920.0" cy="240.0" r="3" fill="black" />
+  <circle cx="-20.0" cy="180.0" r="3" fill="black" />
+  <circle cx="1860.0" cy="240.0" r="3" fill="black" />
+  <circle cx="2540.0" cy="310.0" r="3" fill="black" />
   <circle cx="540.0" cy="50.0" r="3" fill="black" />
   <circle cx="680.0" cy="210.0" r="3" fill="black" />
-  <opens:analysis enabled="True" save_all="True" start="" step="1u" stop="500u" type="Tran" />
-  <opens:output>subaxis(3,1)
-
-plot(st('VOUT')-st("N2"), label="st('VOUT')")
-plot(st('N1')-st("N2"), label="st('N1-N2')")
-plot(st('VZW'), label="st('VZW')")
-
-subaxis(3,2)
-plot(st('VCLK'), label="st('VCLK')")
-plot(st('VMEAS'), label="st('VMEAS')")
-plot(st('EN1'), label="st('EN1')")
-plot(st('EN2'), label="st('EN2')")
-
-subaxis(3,3)
-plot(st('L1#branch'), label="st('L1#branch')")
-plot(st('L2#branch'), label="st('L2#branch')")
-plot(st('I_OUT_MEAS'), label="st('I_OUT_MEAS')")
-
-plot(st('LP2#branch'), label="st('LP2#branch')")</opens:output>
+  <opens:analysis enabled="True" save_all="True" start="" step="1u" stop="100u" type="Tran" />
+  <opens:output>plot(vt('N_4'), label="vt('N_4')")
+plot(vt('VOUT'), label="vt('VOUT')")</opens:output>
+  <opens:output>plot(vt('N_4'), label="vt('N_4')")
+plot(vt('VOUT'), label="vt('VOUT')")</opens:output>
 </svg>

@@ -86,7 +86,7 @@ class XycePlugin(OpenSPlugin):
             self.main_window.simulation_process.kill()
             self.main_window.status_bar.showMessage("Simulation Aborted")
             self.main_window.status_bar.setStyleSheet(
-                "background-color: #fbc02d; color: black; font-weight: bold;"
+                "background-color: #fff3cd; color: #856404; font-weight: bold;"
             )
             return
 
@@ -226,12 +226,12 @@ class XycePlugin(OpenSPlugin):
 
         if exit_code == 0:
             self.main_window.status_bar.setStyleSheet(
-                "background-color: #2e7d32; color: white; font-weight: bold;"
+                "background-color: #d4edda; color: #155724; font-weight: bold;"
             )
             self.main_window.status_bar.showMessage("Simulation Complete")
         else:
             self.main_window.status_bar.setStyleSheet(
-                "background-color: #c62828; color: white; font-weight: bold;"
+                "background-color: #f8d7da; color: #721c24; font-weight: bold;"
             )
             self.main_window.status_bar.showMessage(
                 f"Simulation Failed (Exit Code {exit_code})"

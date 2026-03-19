@@ -1,0 +1,193 @@
+/*
+OpenS Global Qt Stylesheet (Light Theme)
+This stylesheet provides a bright, high-contrast look-and-feel.
+*/
+
+/* Base window background */
+QWidget {
+  background: #f5f6fa;
+  color: #1f1f1f;
+  font-family: .AppleSystemUIFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 11pt;
+}
+
+/* Dock panels */
+QDockWidget {
+  background: #f5f6fa;
+}
+QDockWidget::title {
+  background: #e2e6f0;
+  color: #1f1f1f;
+  padding: 4px;
+}
+
+/* Toolbars */
+QToolBar {
+  background: #e2e6f0;
+  border: 0px;
+  spacing: 4px;
+}
+
+/* Menus */
+QMenuBar {
+  background: #e2e6f0;
+}
+QMenuBar::item {
+  background: transparent;
+  color: #1f1f1f;
+  padding: 4px 8px;
+}
+QMenuBar::item:selected {
+  background: #cfd8ef;
+}
+
+QMenu {
+  background: #ffffff;
+  border: 1px solid #b0b8d0;
+}
+QMenu::item:selected {
+  background: #cfd8ef;
+}
+
+/* Buttons */
+QPushButton {
+  background: #ffffff;
+  border: 1px solid #b0b8d0;
+  border-radius: 4px;
+  padding: 5px 10px;
+  color: #1f1f1f;
+}
+QPushButton:hover {
+  background: #f0f4ff;
+}
+QPushButton:pressed {
+  background: #d4dffb;
+}
+
+/* Tool buttons */
+QToolButton {
+  color: #1f1f1f;
+}
+QToolButton:hover {
+  color: #0a0a0a;
+}
+
+QToolBar QToolButton {
+  background: transparent;
+  border: none;
+}
+QToolBar QToolButton:hover {
+  background: #cfd8ef;
+  border-radius: 4px;
+}
+QToolBar QToolButton:pressed {
+  background: #b0b8d0;
+  border-radius: 4px;
+}
+
+/* Table and list views */
+QTableView, QTableWidget, QListView, QListWidget, QTreeView, QTreeWidget {
+  background: #ffffff;
+  alternate-background-color: #f0f3ff;
+  color: #1f1f1f;
+  selection-background-color: #a6c8ff;
+  selection-color: #000000;
+}
+
+/* Explicit item selection styling for improved contrast */
+QTableView::item:selected, QTreeView::item:selected, QListView::item:selected {
+  background: #a6c8ff;
+  color: #000000;
+}
+
+QHeaderView::section {
+  background: #e2e6f0;
+  color: #1f1f1f;
+  padding: 0px 4px;
+  border: 1px solid #b0b8d0;
+  min-height: 18px;
+  font-size: 10pt;
+}
+
+QTableView::item {
+  padding: 0px 4px;
+  min-height: 18px;
+  font-size: 10pt;
+}
+
+/* Scrollbars */
+QScrollBar:horizontal {
+  background: #f5f6fa;
+  height: 12px;
+  margin: 0 16px 0 16px;
+}
+QScrollBar::handle:horizontal {
+  background: #b0b8d0;
+  min-width: 20px;
+  border-radius: 6px;
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+  background: none;
+}
+
+QScrollBar:vertical {
+  background: #f5f6fa;
+  width: 12px;
+  margin: 16px 0 16px 0;
+}
+QScrollBar::handle:vertical {
+  background: #b0b8d0;
+  min-height: 20px;
+  border-radius: 6px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+  background: none;
+}
+
+/* Inputs */
+QLineEdit, QTextEdit, QPlainTextEdit, QComboBox {
+  background: #ffffff;
+  border: 1px solid #b0b8d0;
+  border-radius: 4px;
+  padding: 4px;
+  color: #1f1f1f;
+}
+
+/* Tabs */
+QTabWidget::pane {
+  border: 1px solid #b0b8d0;
+  background: #ffffff;
+  border-radius: 4px;
+}
+QTabBar {
+  background: transparent;
+}
+QTabBar::tab {
+  background: transparent;
+  padding: 6px 16px;
+  border-bottom: 2px solid transparent;
+  color: #555555;
+  margin-right: 2px;
+}
+QTabBar::tab:selected {
+  background: #ffffff;
+  border-bottom: 2px solid #005A9C;
+  color: #005A9C;
+  font-weight: bold;
+}
+QTabBar::tab:hover:!selected {
+  background: #e2e6f0;
+}
+
+/* Status bar */
+QStatusBar {
+  background: #f5f6fa;
+  border-top: 1px solid #b0b8d0;
+}
+
+/* Tooltip */
+QToolTip {
+  background: #ffffff;
+  color: #1f1f1f;
+  border: 1px solid #b0b8d0;
+}

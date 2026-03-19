@@ -11,6 +11,9 @@ class Controller:
         self.Vmeas = Input(7)
         self.Vclk = Input(5)
 
+        self.Iist = Input(1)
+        self.Isoll = Input(2)
+
         self.V1 = ResistorOutput(12, 1000.0, self.VDD, self.VSS)
         self.V2 = ResistorOutput(11, 1000.0, self.VDD, self.VSS)
 

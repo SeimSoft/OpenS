@@ -1,0 +1,17 @@
+* OpenS Generated Netlist
+.preprocess addresistors nodcpath 1G
+B1 vout_ao VSS V=LIMIT(V(N_2,vout_ao)*1,-15,15)
+B2 N_3 VSS V=LIMIT(V(vin_ai,N_3)*1,-15,15)
+C1 N_1 vout_ao 100n
+C2 N_1 VSS 100n
+R2 N_3 N_1 31.83k
+R3 N_1 N_2 31.83k
+* Skipping SCRIPT1: No template
+* --- Stimuli from stimuli.json ---
+V_STIM_1_VDD VDD 0 3.3
+V_STIM_2_VSS VSS 0 0
+V_STIM_3_vin_ai vin_ai 0 DC 1.65 AC 1
+* ----------------------------------------
+.ac DEC 1000 1 10Meg
+.print ac v(*) 
+.end
