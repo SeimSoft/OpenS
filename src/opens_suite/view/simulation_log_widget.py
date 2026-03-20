@@ -5,12 +5,29 @@ from PyQt6.QtGui import QFont
 
 class SimulationLogWidget(QWidget):
     sendInputRequested = pyqtSignal(str)
+    copilotAnalysisRequested = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
+
+        # Toolbar for analysis
+        import qtawesome as qta
+        from PyQt6.QtWidgets import QToolBar, QToolButton
+        from PyQt6.QtCore import QSize
+        self.toolbar = QToolBar()
+        self.toolbar.setIconSize(QSize(16, 16))
+        
+        self.copilot_btn = QToolButton()
+        self.copilot_btn.setIcon(qta.icon("mdi6.auto-fix", color="#1f1f1f"))
+        self.copilot_btn.setText("Ask Copilot for Error Analysis")
+        self.copilot_btn.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
+        self.copilot_btn.clicked.connect(self.copilotAnalysisRequested.emit)
+        self.toolbar.addWidget(self.copilot_btn)
+        
+        layout.addWidget(self.toolbar)
 
         self.text_edit = QTextEdit()
         self.text_edit.setReadOnly(True)

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<svg xmlns:opens="http://opens-schematic.org" width="1500.0" height="832.0" viewBox="-740.0 -321.0 1500.0 832.0" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns:opens="http://opens-schematic.org" width="1537.7396925227113" height="832.0" viewBox="-740.0 -321.0 1537.7396925227113 832.0" xmlns="http://www.w3.org/2000/svg">
   <g transform="translate(-120.0,-110.0) rotate(0.0)" symbol_name="symbol" name="M1" save_v="True" save_i="False" param_MODEL="POWER_MOS" param_L="1u" param_W="10u" param_M="1" library_path="opensLib/nmos/symbol.svg">
     <svg width="80" height="80" viewBox="0 0 100 100">
       <defs>
@@ -623,4 +623,5 @@
   <circle cx="-60.0" cy="80.0" r="3" fill="black" />
   <circle cx="-450.0" cy="80.0" r="3" fill="black" />
   <circle cx="-60.0" cy="-140.0" r="3" fill="black" />
+  <opens:analysis save_all="True" start="" step="1n" stop="400n" type="Tran" enabled="True" />
 </svg>

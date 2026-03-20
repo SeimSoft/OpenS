@@ -53,7 +53,10 @@ def test_connectivity_deferral(view):
     view.recalculate_connectivity.assert_not_called()
     
     # Save SHOULD trigger recalculate_connectivity
-    with patch('xml.etree.ElementTree.ElementTree.write'):
+    with patch('xml.etree.ElementTree.ElementTree.write'), \
+         patch('opens_suite.design_points.DesignPoints') as mock_dps:
+        mock_dps.return_value._length = 0
+        mock_dps.return_value._data = {}
         view.save_schematic("dummy.svg")
         view.recalculate_connectivity.assert_called()
     

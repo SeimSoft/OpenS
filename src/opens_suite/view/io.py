@@ -91,6 +91,121 @@ class IOMixin:
         return abs_path
 
     def save_schematic(self, filename, analyses=None, outputs=None, variables=None):
+        from opens_suite.design_points import DesignPoints
+        import os
+        import numpy as np
+
+        json_files = []
+        free_text_items = []
+        schematic_dir = ""
+        if filename:
+            schematic_dir = os.path.dirname(os.path.abspath(filename))
+
+        # Logger helper
+        main_win = self.window()
+        def log_msg(msg):
+            if hasattr(main_win, "simulation_text"):
+                main_win.simulation_text.append(msg)
+            print(msg)
+
+        # 1. Extract JSON design scripts and evaluatable texts
+        for item in self.scene().items():
+            if not isinstance(item, SchematicItem):
+                continue
+
+            script_name = item.parameters.get("SCRIPT", "")
+            if script_name.endswith(".ipynb") and schematic_dir:
+                json_name = script_name.replace(".ipynb", ".json")
+                json_path = os.path.join(schematic_dir, json_name)
+                if os.path.exists(json_path) and json_path not in json_files:
+                    json_files.append(json_path)
+
+            svg_path = getattr(item, "svg_path", "")
+            if svg_path and "free_text" in svg_path.lower():
+                evaluate_val = str(item.parameters.get("EVALUATE", "False")).strip().lower()
+                if evaluate_val == "true":
+                    free_text_items.append(item)
+
+        # 2. Merge existing mapped design points
+        dps = DesignPoints(json_files)
+        
+        # Inject GUI variables into dps so that evaluated scripts can access them
+        gui_variables = []
+        if hasattr(main_win, "variables_dock"):
+            gui_variables = main_win.variables_dock.get_variables()
+        elif hasattr(self, "variables"):
+            gui_variables = getattr(self, "variables", [])
+            
+        for var in gui_variables:
+            name = var.get("name", "").strip()
+            val = var.get("value", "").strip()
+            unit = var.get("unit", "").strip()
+            if name and val:
+                key = f"{name} [{unit}]" if unit else name
+                try:
+                    dps[key] = val
+                except Exception as e:
+                    log_msg(f"Could not parse variable '{name}'='{val}': {e}")
+
+        # 3. Dynamic payload execution
+        errors_encountered = False
+        if free_text_items:
+            local_context = {"dps": dps, "DesignPoints": DesignPoints, "np": np}
+            for fti in free_text_items:
+                code = fti.parameters.get("TEXT", "")
+                if code and not code.startswith("* Enter code here"):
+                    try:
+                        exec(code, globals(), local_context)
+                    except Exception as e:
+                        errors_encountered = True
+                        log_msg(f"Error evaluating free text '{getattr(fti, 'name', '')}': {e}")
+                        import traceback
+                        for line in traceback.format_exc().split("\n")[-4:]:
+                            if line.strip(): log_msg(line)
+
+        # 4. Map resulting points to active UI SchematicItem targets
+        updated_params = []
+        if dps._length > 0:
+            first_row = dps.to_dict(0)
+            items_by_name = {
+                item.name: item
+                for item in self.scene().items()
+                if isinstance(item, SchematicItem) and getattr(item, "name", "")
+            }
+            
+            changed_params = []
+            unchanged_count = 0
+            for key, val in first_row.items():
+                parsed_name, _ = dps._parse_key(key)
+                if "." in parsed_name:
+                    comp_name, param_name = parsed_name.split(".", 1)
+                    if comp_name in items_by_name:
+                        comp = items_by_name[comp_name]
+                        if param_name in comp.parameters:
+                            old_val = comp.parameters[param_name]
+                            val_fmt = DesignPoints._format_si(val)
+                            if str(old_val) != str(val) and str(old_val) != val_fmt:
+                                comp.set_parameter(param_name, val)
+                                changed_params.append(f"{parsed_name} = {val_fmt} (was {old_val})")
+                            else:
+                                unchanged_count += 1
+                                
+            updated_params = changed_params  # for the dock-show check below
+            if changed_params:
+                log_msg(f"DesignPoints: Updated {len(changed_params)} parameter(s) ({unchanged_count} unchanged):")
+                for u in changed_params:
+                    log_msg("  + " + u)
+            elif unchanged_count > 0:
+                log_msg(f"DesignPoints: {unchanged_count} parameter(s) all unchanged.")
+                    
+        # Force log dock open if updates occurred OR if execution errors were encountered
+        if (updated_params or errors_encountered) and hasattr(main_win, "simulation_dock"):
+            if not main_win.simulation_dock.isVisible():
+                main_win.simulation_dock.show()
+                    
+        if hasattr(main_win, "variables_dock"):
+            main_win.variables_dock.set_design_points(dps)
+
         # Ensure connectivity is up to date before saving
         if hasattr(self, "recalculate_connectivity"):
             self.recalculate_connectivity()

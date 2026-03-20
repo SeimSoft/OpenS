@@ -1,5 +1,6 @@
 import os
 import subprocess
+import qtawesome as qta
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QToolBar
@@ -9,15 +10,14 @@ from opens_suite.plugins.base import OpenSPlugin
 class CopilotPlugin(OpenSPlugin):
     def setup(self):
         # Load icon
-        icon_path = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)), "assets", "icons", "copilot.svg"
-        )
-        self.copilot_icon = QIcon(icon_path)
+        self.copilot_icon = qta.icon("mdi6.auto-fix", color="#1f1f1f")
 
         # Create action
-        self.action = QAction(self.copilot_icon, "GitHub Copilot", self.main_window)
-        self.action.setStatusTip("Launch GitHub Copilot in system terminal")
-        self.action.triggered.connect(self.launch_copilot)
+        from PyQt6.QtCore import QSettings
+        settings = QSettings("OpenS", "OpenS")
+        self.action = QAction(self.copilot_icon, "AI Terminal", self.main_window)
+        self.action.setStatusTip("Launch AI in system terminal")
+        self.action.triggered.connect(self.launch_ai)
 
         # Add to Simulation Toolbar
         toolbars = self.main_window.findChildren(QToolBar)
@@ -32,10 +32,15 @@ class CopilotPlugin(OpenSPlugin):
             self.main_window.addToolBar(self.toolbar)
             self.toolbar.addAction(self.action)
 
-    def launch_copilot(self):
-        # Use AppleScript to open a new terminal window and run copilot
+    def launch_ai(self):
+        # Use AppleScript to open a new terminal window and run the configured AI command
+        from PyQt6.QtCore import QSettings
+        settings = QSettings("OpenS", "OpenS")
+        ai_cmd = settings.value("ai_terminal_command", "copilot")
+        
+        # Use AppleScript to open a new terminal window and run the command
         # This is specific to macOS.
-        script = 'tell application "Terminal" to do script "copilot"'
+        script = f'tell application "Terminal" to do script "{ai_cmd}"'
         cmd = f"osascript -e '{script}' -e 'tell application \"Terminal\" to activate'"
         try:
             subprocess.Popen(cmd, shell=True)

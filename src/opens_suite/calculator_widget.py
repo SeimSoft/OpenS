@@ -1,6 +1,7 @@
 import os
 import traceback
 import numpy as np
+import qtawesome as qta
 from PyQt6.QtWidgets import (
     QMainWindow,
     QVBoxLayout,
@@ -32,9 +33,7 @@ class CalculatorDialog(QMainWindow):
         self._load_data()
         self.viewer = None  # Waveform viewer window
 
-        self.probe_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "probe.svg")
-        )
+        self.probe_icon = qta.icon("mdi6.crosshairs-gps", color="#1f1f1f")
         self._setup_ui()
         self._populate_signals()
 
@@ -78,37 +77,38 @@ class CalculatorDialog(QMainWindow):
         self.resize(900, 600)
 
         # Toolbar
-        toolbar = QToolBar()
-        toolbar.setMovable(False)
+        self.toolbar = QToolBar()
+        self.toolbar.setMovable(False)
 
-        self.send_to_outputs_action = QAction("📤 Send to Outputs", self)
+        import qtawesome as qta
+        self.send_to_outputs_action = QAction(qta.icon("mdi6.export", color="#1f1f1f"), "Send to Outputs", self)
         self.send_to_outputs_action.setToolTip(
             "Add this expression to the Output Expressions dock"
         )
         self.send_to_outputs_action.triggered.connect(self._send_to_outputs)
-        toolbar.addAction(self.send_to_outputs_action)
+        self.toolbar.addAction(self.send_to_outputs_action)
 
-        self.eval_action = QAction("▶️ Evaluate", self)
+        self.eval_action = QAction(qta.icon("mdi6.play", color="#1f1f1f"), "Evaluate", self)
         self.eval_action.setToolTip("Execute the Python script")
         self.eval_action.triggered.connect(self.evaluate)
-        toolbar.addAction(self.eval_action)
+        self.toolbar.addAction(self.eval_action)
 
         self.probe_action = QAction(self.probe_icon, "Probe Schematic", self)
         self.probe_action.setToolTip("Click a net in the schematic to insert it here")
         self.probe_action.triggered.connect(self.probeRequested.emit)
-        toolbar.addAction(self.probe_action)
+        self.toolbar.addAction(self.probe_action)
 
-        self.clear_action = QAction("🧹 Clear", self)
+        self.clear_action = QAction(qta.icon("mdi6.broom", color="#1f1f1f"), "Clear", self)
         self.clear_action.setToolTip("Clear the python script")
-        toolbar.addAction(self.clear_action)
+        self.toolbar.addAction(self.clear_action)
 
         # Help action to show available functions/variables
-        self.help_action = QAction("❓ Help", self)
+        self.help_action = QAction(qta.icon("mdi6.help-circle-outline", color="#1f1f1f"), "Help", self)
         self.help_action.setToolTip("Show available functions and variables")
         self.help_action.triggered.connect(self._show_help_dialog)
-        toolbar.addAction(self.help_action)
+        self.toolbar.addAction(self.help_action)
 
-        self.addToolBar(toolbar)
+        self.addToolBar(self.toolbar)
 
         # Central widget: script editor
         central = QWidget()
@@ -138,10 +138,17 @@ class CalculatorDialog(QMainWindow):
         self.result_edit.setReadOnly(True)
         self.result_edit.setPlaceholderText("Scalar results will appear here...")
 
-        dock = QDockWidget("Results", self)
-        dock.setWidget(self.result_edit)
-        dock.setAllowedAreas(Qt.DockWidgetArea.BottomDockWidgetArea)
-        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, dock)
+        self.result_dock = QDockWidget("Results", self)
+        self.result_dock.setWidget(self.result_edit)
+        self.result_dock.setAllowedAreas(Qt.DockWidgetArea.BottomDockWidgetArea)
+        self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.result_dock)
+        self.result_dock.hide()
+        
+        import qtawesome as qta
+        self.result_dock_action = self.result_dock.toggleViewAction()
+        self.result_dock_action.setIcon(qta.icon("mdi6.numeric", color="#1f1f1f"))
+        self.result_dock_action.setToolTip("Toggle Scalar Results Dock")
+        self.toolbar.addAction(self.result_dock_action)
 
     def insert_expression(self, expr):
         """Insert a string into the script editor at the current cursor position."""
@@ -256,7 +263,8 @@ class CalculatorDialog(QMainWindow):
             self.viewer.openCalculatorRequested.connect(self._bring_to_front)
             self.viewer.refreshRequested.connect(self._refresh_and_replot)
             self.viewer.runSimulationRequested.connect(self._request_simulation)
-            self.viewer.show()
+            if "PYTEST_CURRENT_TEST" not in os.environ:
+                self.viewer.show()
 
         self.viewer.clear()
         scope = self._create_scope()
@@ -329,6 +337,8 @@ class CalculatorDialog(QMainWindow):
     def _display_result(self, script, result):
         # We only want to show scalars (or small objects) in the dock
         from opens_suite.design_points import DesignPoints
+        if not self.result_dock.isVisible():
+            self.result_dock.show()
 
         if isinstance(result, (int, float, np.number, complex)):
             val_str = ""

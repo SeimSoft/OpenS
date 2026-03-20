@@ -1,0 +1,11 @@
+{
+  "DS1.gain": 20.0,
+  "DS1.MODEL": "gain_block.sch",
+  "R1.R": "{gain*1k}",
+  "R1.gain": 20.0,
+  "R1.MODEL": "gain_block.sch",
+  "OUT.gain": 20.0,
+  "OUT.MODEL": "gain_block.sch",
+  "IN.gain": 20.0,
+  "IN.MODEL": "gain_block.sch"
+}

@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<svg xmlns:opens="http://opens-schematic.org" width="3322.0" height="1172.0" viewBox="-631.0 -331.0 3322.0 1172.0" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(-240.0,0.0) rotate(0.0)" symbol_name="symbol" name="V1" save_v="True" save_i="True" param_V="30" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
+<svg xmlns:opens="http://opens-schematic.org" width="3322.0" height="1208.7571628232006" viewBox="-631.0 -367.75716282320053 3322.0 1208.7571628232006" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(-240.0,0.0) rotate(0.0)" symbol_name="symbol" name="V1" save_v="True" save_i="True" param_V="30.0" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
     <svg width="40" height="60" viewBox="0 0 40 60">
       <defs>
         <style>
@@ -24,7 +24,7 @@
       <circle class="pin" id="pin_plus" cx="20" cy="0" r="2" />
       <circle class="pin" id="pin_minus" cx="20" cy="60" r="2" />
       <text x="35" y="25" class="label">V1</text>
-      <text x="35" y="45" class="value">30</text>
+      <text x="35" y="45" class="value">30.0</text>
       <text x="35" y="55" class="value">0</text>
       <text x="35" y="60" class="value" style="fill: green;">{VV1:i}</text>
     </svg>
@@ -47,7 +47,7 @@
     </svg>
   </g>
   <line x1="-220.0" y1="190.0" x2="-220.0" y2="60.0" stroke="black" stroke-width="2" stroke-linecap="round" />
-  <g transform="translate(260.0,10.0) rotate(0.0)" symbol_name="symbol" name="C1" save_v="True" save_i="True" param_C="1.818u" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
+  <g transform="translate(260.0,10.0) rotate(0.0)" symbol_name="symbol" name="C1" save_v="True" save_i="True" param_C="1.2625356278894167e-06" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/capacitor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -67,10 +67,10 @@
       <circle class="pin" id="pin_1" cx="0" cy="20" r="2" />
       <circle class="pin" id="pin_2" cx="60" cy="20" r="2" />
       <text x="0" y="0" class="label">C1</text>
-      <text x="0" y="38" class="value">1.818u</text>
+      <text x="0" y="38" class="value">1.2625356278894167e-06</text>
     </svg>
   </g>
-  <g transform="translate(420.0,30.0) rotate(0.0)" symbol_name="symbol" name="TX1" save_v="True" save_i="False" param_LP="13.93u" param_LS="619.2u" param_K="0.99" param_IC_P="0" param_IC_S="0" library_path="opensLib/transformer/symbol.svg">
+  <g transform="translate(420.0,30.0) rotate(0.0)" symbol_name="symbol" name="TX1" save_v="True" save_i="False" param_LP="2.0063034540204743e-05" param_LS="619.2u" param_K="990m" param_IC_P="0" param_IC_S="0" library_path="opensLib/transformer/symbol.svg">
     <svg width="80" height="80" viewBox="0 0 80 80">
       <defs>
         <style>
@@ -107,8 +107,8 @@
       <circle class="pin" id="pin_s1" cx="80" cy="20" r="2" />
       <circle class="pin" id="pin_s2" cx="80" cy="60" r="2" />
       <text x="5" y="10" class="label">TX1</text>
-      <text x="5" y="75" class="value">K=0.99</text>
-      <text x="30" y="10" class="value">P:13.93u</text>
+      <text x="5" y="75" class="value">K=990m</text>
+      <text x="30" y="10" class="value">P:2.0063034540204743e-05</text>
       <text x="30" y="75" class="value">S:619.2u</text>
     </svg>
   </g>
@@ -242,7 +242,7 @@
       <text x="10" y="46" class="value">Args: (IS=1e-14 N=1 RS=0 CJO=1p M=0.5 TT=1n)</text>
     </svg>
   </g>
-  <g transform="translate(-200.0,-140.0) rotate(90.0)" symbol_name="symbol" name="R3" save_v="True" save_i="True" param_R="0.1" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
+  <g transform="translate(-200.0,-140.0) rotate(90.0)" symbol_name="symbol" name="R3" save_v="True" save_i="True" param_R="100m" param_SUPPORTS_CURRENT="True" library_path="opensLib/resistor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -260,7 +260,7 @@
       <circle class="pin" id="pin_1" cx="0" cy="20" r="2" />
       <circle class="pin" id="pin_2" cx="60" cy="20" r="2" />
       <text x="0" y="0" class="label">R3</text>
-      <text x="0" y="38" class="value">0.1</text>
+      <text x="0" y="38" class="value">100m</text>
       <text x="35" y="40" class="value" style="fill: green;">{RR3:i}</text>
     </svg>
   </g>
@@ -328,7 +328,7 @@
   <line x1="880.0" y1="210.0" x2="970.0" y2="210.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="1620.0" y1="240.0" x2="1620.0" y2="190.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="N2_2" />
   <line x1="970.0" y1="-10.0" x2="880.0" y2="-10.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="VZW" />
-  <g transform="translate(330.0,10.0) rotate(0.0)" symbol_name="symbol" name="L1" save_v="True" save_i="True" param_L="1.393u" param_RSER="0.1" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/inductor/symbol.svg">
+  <g transform="translate(330.0,10.0) rotate(0.0)" symbol_name="symbol" name="L1" save_v="True" save_i="True" param_L="2.0063034540204743e-06" param_RSER="100m" param_IC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/inductor/symbol.svg">
     <svg width="60" height="40" viewBox="0 0 60 40">
       <defs>
         <style>
@@ -352,8 +352,8 @@
       <circle class="pin" id="pin_1" cx="0" cy="20" r="2" />
       <circle class="pin" id="pin_2" cx="60" cy="20" r="2" />
       <text x="0" y="0" class="label">L1</text>
-      <text x="0" y="38" class="value">L=1.393u</text>
-      <text x="30" y="38" class="value">Rs=0.1</text>
+      <text x="0" y="38" class="value">L=2.0063034540204743e-06</text>
+      <text x="30" y="38" class="value">Rs=100m</text>
       <text x="35" y="0" class="value" style="fill: green;">{LL1:i}</text>
     </svg>
   </g>
@@ -716,7 +716,7 @@
   <line x1="-270.0" y1="180.0" x2="-270.0" y2="160.0" stroke="black" stroke-width="2" stroke-linecap="round" />
   <line x1="-270.0" y1="100.0" x2="-270.0" y2="70.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Vclk" />
   <line x1="-270.0" y1="70.0" x2="-120.0" y2="70.0" stroke="black" stroke-width="2" stroke-linecap="round" net_name="Vclk" />
-  <g transform="translate(1600.0,240.0) rotate(90.0)" symbol_name="symbol" name="TX2" save_v="True" save_i="False" param_LP="2u" param_LS="20m" param_K="0.9" param_IC_P="0" param_IC_S="0" library_path="opensLib/transformer/symbol.svg">
+  <g transform="translate(1600.0,240.0) rotate(90.0)" symbol_name="symbol" name="TX2" save_v="True" save_i="False" param_LP="2u" param_LS="20m" param_K="900m" param_IC_P="0" param_IC_S="0" library_path="opensLib/transformer/symbol.svg">
     <svg width="80" height="80" viewBox="0 0 80 80">
       <defs>
         <style>
@@ -753,7 +753,7 @@
       <circle class="pin" id="pin_s1" cx="80" cy="20" r="2" />
       <circle class="pin" id="pin_s2" cx="80" cy="60" r="2" />
       <text x="5" y="10" class="label">TX2</text>
-      <text x="5" y="75" class="value">K=0.9</text>
+      <text x="5" y="75" class="value">K=900m</text>
       <text x="30" y="10" class="value">P:2u</text>
       <text x="30" y="75" class="value">S:20m</text>
     </svg>
@@ -1137,4 +1137,5 @@
 plot(vt('VOUT'), label="vt('VOUT')")</opens:output>
   <opens:output>plot(vt('N_4'), label="vt('N_4')")
 plot(vt('VOUT'), label="vt('VOUT')")</opens:output>
+  <opens:variable name="VIN" value="36" />
 </svg>

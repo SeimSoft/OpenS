@@ -13,14 +13,36 @@ from opens_suite.plugins.base import OpenSPlugin
 from opens_suite.schematic_view import SchematicView
 from opens_suite.netlister import NetlistGenerator
 from opens_suite.xyce_runner import XyceRunner
+from PyQt6.QtCore import QThread, pyqtSignal
+import traceback
+
+
+class NetlistWorker(QThread):
+    finished = pyqtSignal(str, str)  # netlist content, error
+    
+    def __init__(self, scene, analyses, variables):
+        super().__init__()
+        self.scene = scene
+        self.analyses = analyses
+        self.variables = variables
+        
+    def run(self):
+        try:
+            from opens_suite.netlister import NetlistGenerator
+            generator = NetlistGenerator(self.scene, self.analyses, variables=self.variables)
+            netlist = generator.generate()
+            self.finished.emit(netlist, "")
+        except Exception as e:
+            traceback.print_exc()
+            self.finished.emit("", str(e))
 
 
 class XycePlugin(OpenSPlugin):
     def setup(self):
+        import qtawesome as qta
+        self.netlist_icon = qta.icon("mdi6.text-box-outline", color="#1f1f1f")
         self.netlist_action = QAction(
-            self.main_window.style().standardIcon(
-                QStyle.StandardPixmap.SP_FileDialogDetailedView
-            ),
+            self.netlist_icon,
             "Create Netlist",
             self.main_window,
         )
@@ -55,26 +77,32 @@ class XycePlugin(OpenSPlugin):
         view.recalculate_connectivity()
         analyses = self.main_window.analysis_dock.get_all_analyses()
 
-        try:
-            # Get variables if available
-            variables = []
-            if hasattr(self.main_window, "variables_dock"):
-                variables = self.main_window.variables_dock.get_variables()
+        # Get variables if available
+        variables = []
+        if hasattr(self.main_window, "variables_dock"):
+            variables = self.main_window.variables_dock.get_variables()
 
-            generator = NetlistGenerator(view.scene(), analyses, variables=variables)
-            netlist = generator.generate()
+        self.main_window.simulation_text.clear()
+        self.main_window.simulation_text.append("Generating Netlist in background...")
+        self.main_window.simulation_dock.setWindowTitle("Netlist")
+        self.main_window.simulation_dock.show()
+        
+        self.netlist_action.setEnabled(False)
+        self.simulate_action.setEnabled(False)
 
-            # Show in Simulation Log
-            self.main_window.simulation_text.clear()
-            self.main_window.simulation_text.setPlainText(netlist)
-            self.main_window.simulation_dock.setWindowTitle("Netlist")
-            self.main_window.simulation_dock.show()
+        self.worker = NetlistWorker(view.scene(), analyses, variables)
+        self.worker.finished.connect(self._on_create_netlist_finished)
+        self.worker.start()
 
-        except Exception as e:
-            QMessageBox.critical(self.main_window, "Netlist Error", str(e))
-            import traceback
+    def _on_create_netlist_finished(self, netlist, error):
+        self.netlist_action.setEnabled(True)
+        self.simulate_action.setEnabled(True)
+        if error:
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.critical(self.main_window, "Netlist Error", error)
+            return
 
-            traceback.print_exc()
+        self.main_window.simulation_text.setPlainText(netlist)
 
     def run_simulation(self):
         # If currently simulating, then this button acts as 'Stop'
@@ -132,8 +160,30 @@ class XycePlugin(OpenSPlugin):
         if hasattr(self.main_window, "variables_dock"):
             variables = self.main_window.variables_dock.get_variables()
 
-        generator = NetlistGenerator(view.scene(), analyses, variables=variables)
-        netlist = generator.generate()
+        self.main_window.status_bar.showMessage("Generating netlist in background...")
+        self.main_window.simulation_text.clear()
+        self.main_window.simulation_text.append("Building connectivity graph and generating Xyce netlist...")
+        self.main_window.simulation_dock.setWindowTitle(f"Simulation Log - {base}")
+        self.main_window.simulation_dock.show()
+        
+        # Update action to 'Stop' mode
+        self.simulate_action.setIcon(self.main_window.stop_icon)
+        self.simulate_action.setText("Stop Simulation")
+
+        self.worker = NetlistWorker(view.scene(), analyses, variables)
+        self.worker.finished.connect(lambda netlist, err: self._on_sim_netlist_finished(netlist, err, view, netlist_path, raw_path, log_path, base))
+        self.worker.start()
+
+    def _on_sim_netlist_finished(self, netlist, error, view, netlist_path, raw_path, log_path, base):
+        if self.simulate_action.text() == "Simulate":
+            return # Aborted by user while netlisting
+
+        if error:
+            self.main_window.simulation_text.append(f"\nNetlisting failed:\n{error}")
+            self.main_window.status_bar.showMessage("Netlisting failed.")
+            self.simulate_action.setIcon(self.main_window.play_icon)
+            self.simulate_action.setText("Simulate")
+            return
 
         try:
             with open(netlist_path, "w") as f:
@@ -161,14 +211,6 @@ class XycePlugin(OpenSPlugin):
             self.main_window.current_raw_path = raw_path
             self.main_window.current_log_path = log_path
 
-            self.main_window.simulation_text.clear()
-            self.main_window.simulation_dock.setWindowTitle(f"Simulation Log - {base}")
-            self.main_window.simulation_dock.show()
-
-            # Update action to 'Stop' mode
-            self.simulate_action.setIcon(self.main_window.stop_icon)
-            self.simulate_action.setText("Stop Simulation")
-
             self.main_window.simulation_log.sendInputRequested.connect(
                 self._on_simulation_send_input
             )
@@ -178,11 +220,7 @@ class XycePlugin(OpenSPlugin):
                 self.main_window.simulation_process.state()
                 == QProcess.ProcessState.NotRunning
             ):
-                if not self.main_window.simulation_process.waitForStarted():
-                    self.main_window.status_bar.showMessage("Failed to start Xyce")
-                    self.simulate_action.setIcon(self.main_window.play_icon)
-                    self.simulate_action.setText("Simulate")
-                    self.main_window.simulation_process = None
+                raise Exception("Failed to start Xyce process.")
 
         except FileNotFoundError:
             QMessageBox.critical(

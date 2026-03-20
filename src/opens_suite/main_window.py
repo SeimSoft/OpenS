@@ -1,5 +1,6 @@
 import json
 import xml.etree.ElementTree as ET
+import qtawesome as qta
 from PyQt6.QtWidgets import (
     QMainWindow,
     QTabWidget,
@@ -65,33 +66,15 @@ class MainWindow(QMainWindow):
         self.waveform_viewer = None
 
         # Load Icons
-        self.play_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "play.svg")
-        )
-        self.stop_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "stop.svg")
-        )
-        self.calc_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "calculator.svg")
-        )
-        self.probe_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "probe.svg")
-        )
-        self.undo_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "undo.svg")
-        )
-        self.redo_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "redo.svg")
-        )
-        self.report_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "report.svg")
-        )
-        self.symbol_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "symbol.svg")
-        )
-        self.labels_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "labels.svg")
-        )
+        self.play_icon = qta.icon("mdi6.play", color="#005A9C")
+        self.stop_icon = qta.icon("mdi6.stop", color="#d9534f")
+        self.calc_icon = qta.icon("mdi6.calculator", color="#1f1f1f")
+        self.probe_icon = qta.icon("mdi6.crosshairs-gps", color="#1f1f1f")
+        self.undo_icon = qta.icon("mdi6.undo", color="#1f1f1f")
+        self.redo_icon = qta.icon("mdi6.redo", color="#1f1f1f")
+        self.report_icon = qta.icon("mdi6.chart-bar", color="#1f1f1f")
+        self.symbol_icon = qta.icon("mdi6.shape", color="#1f1f1f")
+        self.labels_icon = qta.icon("mdi6.label", color="#1f1f1f")
         self.active_calculators = []
         self._probi_calc = None  # Track which calculator is probing
 
@@ -175,42 +158,8 @@ class MainWindow(QMainWindow):
             )
 
     def closeEvent(self, event):
-        """Auto-save all tabs and close all child windows on exit."""
-        # 1. Save all open schematic/symbol tabs
-        for i in range(self.tabs.count()):
-            widget = self.tabs.widget(i)
-            file_name = getattr(widget, "filename", None)
-            if file_name:
-                try:
-                    if isinstance(widget, SymbolView):
-                        widget.save_symbol(file_name)
-                    elif isinstance(widget, SchematicView):
-                        analyses = (
-                            self.analysis_dock.get_all_analyses()
-                            if hasattr(self, "analysis_dock")
-                            else getattr(widget, "analyses", [])
-                        )
-                        outputs = (
-                            self.outputs_dock.get_expressions_data()
-                            if hasattr(self, "outputs_dock")
-                            else getattr(widget, "outputs", [])
-                        )
-                        variables = (
-                            self.variables_dock.get_variables()
-                            if hasattr(self, "variables_dock")
-                            else getattr(widget, "variables", [])
-                        )
-                        widget.save_schematic(
-                            file_name,
-                            analyses=analyses,
-                            outputs=outputs,
-                            variables=variables,
-                        )
-                    print(f"Auto-saved: {file_name}")
-                except Exception as e:
-                    print(f"Warning: Could not auto-save {file_name}: {e}")
-
-        # 2. Close all active calculator windows
+        """Close all child windows on exit (auto-save disabled)."""
+        # 1. Close all active calculator windows
         for calc in list(self.active_calculators):
             try:
                 calc.close()
@@ -263,8 +212,9 @@ class MainWindow(QMainWindow):
         self.new_action.triggered.connect(self.new_file)
 
         # Save Action
+        self.save_icon = qta.icon("mdi6.content-save", color="#1f1f1f")
         self.save_action = QAction(
-            self.style().standardIcon(QStyle.StandardPixmap.SP_DialogSaveButton),
+            self.save_icon,
             "&Save",
             self,
         )
@@ -614,6 +564,29 @@ class MainWindow(QMainWindow):
                         self.variables_dock.blockSignals(True)
                         self.variables_dock.set_variables(variables)
                         self.variables_dock.blockSignals(False)
+
+                    # Load design points from JSON files into Variables dock
+                    if hasattr(self, "variables_dock"):
+                        from opens_suite.design_points import DesignPoints
+                        from opens_suite.schematic_item import SchematicItem
+                        schematic_dir = os.path.dirname(os.path.abspath(file_name))
+                        json_files = []
+                        for si in view.scene().items():
+                            if isinstance(si, SchematicItem):
+                                script_name = si.parameters.get("SCRIPT", "")
+                                if script_name.endswith(".ipynb") and schematic_dir:
+                                    json_name = script_name.replace(".ipynb", ".json")
+                                    json_path = os.path.join(schematic_dir, json_name)
+                                    if os.path.exists(json_path) and json_path not in json_files:
+                                        json_files.append(json_path)
+                        if json_files:
+                            try:
+                                dps = DesignPoints(json_files)
+                                # Inject GUI variables so they show as user vars, not duplicated as DPs
+                                self.variables_dock.set_design_points(dps)
+                            except Exception as e:
+                                print(f"Warning: Failed to load design points on open: {e}")
+
                 except Exception:
                     pass
 
@@ -855,6 +828,13 @@ class SettingsDialog(QDialog):
         self.editor_edit.setText(self.settings.value("editor_command", "code '%s'"))
         form.addRow("Code Editor Command:", self.editor_edit)
 
+        # AI Command
+        self.ai_command_combo = QComboBox()
+        self.ai_command_combo.setEditable(True)
+        self.ai_command_combo.addItems(["copilot -ps '%s'", "gemini -p '%s'"])
+        self.ai_command_combo.setEditText(self.settings.value("ai_command", "copilot -ps '%s'"))
+        form.addRow("AI Analysis Command:", self.ai_command_combo)
+
         # Xyce: nodcpath resistance
         self.nodcpath_edit = QLineEdit()
         self.nodcpath_edit.setPlaceholderText("e.g. 1G (empty to disable)")
@@ -866,6 +846,13 @@ class SettingsDialog(QDialog):
         self.mcp_port_edit.setPlaceholderText("8000")
         self.mcp_port_edit.setText(self.settings.value("mcp_port", "8000"))
         form.addRow("MCP Server Port:", self.mcp_port_edit)
+
+        # AI Terminal
+        self.ai_terminal_combo = QComboBox()
+        self.ai_terminal_combo.setEditable(True)
+        self.ai_terminal_combo.addItems(["copilot", "gemini"])
+        self.ai_terminal_combo.setEditText(self.settings.value("ai_terminal_command", "copilot"))
+        form.addRow("AI Terminal Command:", self.ai_terminal_combo)
 
         # Library Search Paths
         self.lib_paths_list = QListWidget()
@@ -909,13 +896,25 @@ class SettingsDialog(QDialog):
         update_layout.addStretch()
         layout.addLayout(update_layout)
 
-        # MCP export button
-        mcp_layout = QHBoxLayout()
-        mcp_export_btn = QPushButton("Export To Copilot Config")
-        mcp_export_btn.clicked.connect(self._export_mcp_config)
-        mcp_layout.addWidget(QLabel("MCP Server Integration:"))
-        mcp_layout.addWidget(mcp_export_btn)
-        mcp_layout.addStretch()
+        # MCP export buttons
+        mcp_layout = QVBoxLayout()
+        mcp_label_layout = QHBoxLayout()
+        mcp_label_layout.addWidget(QLabel("MCP Server Integration:"))
+        mcp_label_layout.addStretch()
+        mcp_layout.addLayout(mcp_label_layout)
+
+        mcp_btn_layout = QHBoxLayout()
+        mcp_export_copilot_btn = QPushButton("Export To Copilot Config")
+        mcp_export_copilot_btn.clicked.connect(lambda: self._export_mcp_config("copilot"))
+        
+        mcp_export_gemini_btn = QPushButton("Export To Gemini Config")
+        mcp_export_gemini_btn.clicked.connect(lambda: self._export_mcp_config("gemini"))
+        
+        mcp_btn_layout.addWidget(mcp_export_copilot_btn)
+        mcp_btn_layout.addWidget(mcp_export_gemini_btn)
+        mcp_btn_layout.addStretch()
+        mcp_layout.addLayout(mcp_btn_layout)
+        
         layout.addLayout(mcp_layout)
 
         # Separator Line
@@ -971,7 +970,7 @@ class SettingsDialog(QDialog):
             self.parent()._check_for_xyce_updates(force=True)
             self.accept()
 
-    def _export_mcp_config(self):
+    def _export_mcp_config(self, target="copilot"):
         # Find MCP plugin
         plugin = None
         if self.parent() and hasattr(self.parent(), "plugin_manager"):
@@ -985,8 +984,8 @@ class SettingsDialog(QDialog):
             try:
                 # Save first to ensure current port is used
                 self.settings.setValue("mcp_port", self.mcp_port_edit.text().strip())
-                path = plugin.export_config()
-                QMessageBox.information(self, "Export Successful", f"MCP configuration exported to:\n{path}")
+                path = plugin.export_config(target=target)
+                QMessageBox.information(self, "Export Successful", f"MCP configuration exported to {target.capitalize()}:\n{path}")
             except Exception as e:
                 QMessageBox.critical(self, "Export Failed", f"Failed to export configuration: {e}")
         else:
@@ -1034,6 +1033,8 @@ class SettingsDialog(QDialog):
 
     def save(self):
         self.settings.setValue("editor_command", self.editor_edit.text())
+        self.settings.setValue("ai_command", self.ai_command_combo.currentText())
+        self.settings.setValue("ai_terminal_command", self.ai_terminal_combo.currentText())
         self.settings.setValue("nodcpath_resistance", self.nodcpath_edit.text().strip())
         self.settings.setValue("mcp_port", self.mcp_port_edit.text().strip())
 

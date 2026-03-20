@@ -102,7 +102,7 @@ class NetlistGenerator:
                             it, script_path
                         )
                         success, err = DesignScriptDialog.execute_notebook_sync(
-                            abs_script
+                            it, abs_script
                         )
                         if success:
                             json_res = os.path.splitext(abs_script)[0] + ".json"

@@ -85,35 +85,22 @@ class McpPlugin(OpenSPlugin):
         except Exception as e:
             logger.exception("FastMCP server exited unexpectedly")
 
-    def export_config(self):
-        """Export the MCP config to ~/.copilot/mcp-config.json"""
+    def export_config(self, target='copilot'):
+        """Export the MCP config to ~/.copilot/mcp-config.json or ~/.gemini/settings.json"""
         import json
         settings = QSettings("OpenS", "OpenS")
         port = int(settings.value("mcp_port", 8000))
 
-        config = {
-            "mcpServers": {
-                "OpenS": {
-                    "command": "npx",
-                    "args": [
-                        "-y",
-                        "@modelcontextprotocol/inspector",
-                        f"http://localhost:{port}/sse"
-                    ]
-                }
-            }
-        }
+        if target == 'copilot':
+            target_dir = os.path.expanduser("~/.copilot")
+            target_path = os.path.join(target_dir, "mcp-config.json")
+        else: # gemini
+            target_dir = os.path.expanduser("~/.gemini")
+            target_path = os.path.join(target_dir, "settings.json")
 
-        # Note: The user specifically asked for ~/.copilot/mcp-config.json
-        # which is likely for github copilot extension
-        target_dir = os.path.expanduser("~/.copilot")
         if not os.path.exists(target_dir):
             os.makedirs(target_dir)
 
-        target_path = os.path.join(target_dir, "mcp-config.json")
-
-        # Merge if exists? Or overwrite? User said 'export the mcp setup to ...'
-        # Usually these files are JSON objects with 'mcpServers' key.
         existing_config = {}
         if os.path.exists(target_path):
             try:
@@ -125,15 +112,11 @@ class McpPlugin(OpenSPlugin):
         if "mcpServers" not in existing_config:
             existing_config["mcpServers"] = {}
 
+        # OpenS entry
         existing_config["mcpServers"]["OpenS"] = {
             "type": "sse",
             "url": f"http://localhost:{port}/sse"
         }
-
-        # Wait, if it's SSE, some clients use "url", some use "command" for stdio.
-        # For SSE it should usually be "url".
-        # Let's provide both or follow a standard.
-        # Copilot/VSCode MCP typically supports "url" for SSE.
 
         with open(target_path, "w") as f:
             json.dump(existing_config, f, indent=4)

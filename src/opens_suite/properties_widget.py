@@ -73,7 +73,13 @@ class PropertiesWidget(QDockWidget):
                     sorted_keys.insert(0, "MODEL")
 
                 for name in sorted_keys:
-                    self.add_row(name, item.parameters[name], editable=True)
+                    p_type = getattr(item, "parameter_types", {}).get(name, "str")
+                    if p_type == "bool":
+                        self.add_bool_row(name, item.parameters[name])
+                    elif p_type == "color":
+                        self.add_color_row(name, item.parameters[name])
+                    else:
+                        self.add_row(name, item.parameters[name], editable=True)
 
             elif isinstance(item, Wire):
                 # Net Name
@@ -95,6 +101,75 @@ class PropertiesWidget(QDockWidget):
         if not editable:
             value_item.setFlags(value_item.flags() ^ Qt.ItemFlag.ItemIsEditable)
         self.table.setItem(row, 1, value_item)
+
+    def add_bool_row(self, name, value):
+        row = self.table.rowCount()
+        self.table.insertRow(row)
+
+        name_item = QTableWidgetItem(name)
+        name_item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
+        self.table.setItem(row, 0, name_item)
+
+        from PyQt6.QtWidgets import QCheckBox, QWidget, QHBoxLayout
+        bool_val = str(value).lower() in ("true", "1", "yes")
+        cb = QCheckBox()
+        cb.setChecked(bool_val)
+        
+        w = QWidget()
+        l = QHBoxLayout(w)
+        l.setContentsMargins(5, 0, 0, 0)
+        l.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        l.addWidget(cb)
+        self.table.setCellWidget(row, 1, w)
+
+        cb.stateChanged.connect(lambda state, n=name: self._on_bool_changed(n, state))
+
+    def add_color_row(self, name, value):
+        row = self.table.rowCount()
+        self.table.insertRow(row)
+
+        name_item = QTableWidgetItem(name)
+        name_item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
+        self.table.setItem(row, 0, name_item)
+
+        from PyQt6.QtWidgets import QPushButton, QColorDialog, QWidget, QHBoxLayout
+        from PyQt6.QtGui import QColor
+
+        color = QColor(value if value else "#888888")
+        if not color.isValid():
+            color = QColor("#888888")
+
+        btn = QPushButton()
+        btn.setStyleSheet(f"background-color: {color.name()}; border: 1px solid #ccc; border-radius: 2px;")
+        btn.setFixedSize(60, 20)
+
+        def pick_color():
+            new_color = QColorDialog.getColor(color, self, f"Select {name}")
+            if new_color.isValid():
+                btn.setStyleSheet(f"background-color: {new_color.name()}; border: 1px solid #ccc; border-radius: 2px;")
+                if self.current_item and hasattr(self.current_item, "set_parameter"):
+                    self.block_signals = True
+                    self.current_item.set_parameter(name, new_color.name())
+                    self.block_signals = False
+                    self.propertyChanged.emit()
+
+        btn.clicked.connect(pick_color)
+
+        w = QWidget()
+        l = QHBoxLayout(w)
+        l.setContentsMargins(5, 2, 5, 2)
+        l.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        l.addWidget(btn)
+        self.table.setCellWidget(row, 1, w)
+
+    def _on_bool_changed(self, name, state):
+        from PyQt6.QtCore import Qt
+        if self.block_signals or not self.current_item:
+            return
+        new_value = "True" if state == Qt.CheckState.Checked.value else "False"
+        if hasattr(self.current_item, "set_parameter"):
+            self.current_item.set_parameter(name, new_value)
+        self.propertyChanged.emit()
 
     def on_item_changed(self, item):
         if self.block_signals or not self.current_item:

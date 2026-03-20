@@ -1,4 +1,4 @@
-XYCE-generated Netlist file copy:  TIME='10:04:42 PM' DATE='Mar 19, 2026' 
+XYCE-generated Netlist file copy:  TIME='10:20:05 AM' DATE='Mar 20, 2026' 
 *Original Netlist Title:  
 
 ** OpenS Generated Netlist
@@ -6,6 +6,8 @@ XYCE-generated Netlist file copy:  TIME='10:04:42 PM' DATE='Mar 19, 2026'
 
 * Subcircuits
 .subckt h_bridge GND P1 P2 VIN en_1_i en_2_i
+.param VIN=36
+
 .model DRIVER npy MODULE=controller_hbridge CLASS=Controller PYTHONPATH=/Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/h_bridge
 .model BOOT_DIODE D (IS=1e-14 N=1 RS=0)
 .model POWER_MOS NMOS (LEVEL=1 VTO=2.5 KP=0.5 LAMBDA=0.02 CGSO=100p CGDO=10p CBD=50p)
@@ -27,23 +29,25 @@ V1 N_1 P1 dc 0 ac 0
 
 *.preprocess addresistors nodcpath 1G
 *Xyce:  ".PREPROCESS ADDRESISTORS" statement automatically commented out in netlist copy.
+.param VIN=36
+
 .model CONTROLLER npy MODULE=controller_llc CLASS=Controller PYTHONPATH=/Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/LLC
 .model BOOTDIODE D (IS=1e-14 N=1 RS=0 CJO=1p M=0.5 TT=1n)
 B1 Isoll N_2 V=LIMIT(V(N_3,REF_R_OUT)*1,-15,15)
 B2 Iist N_2 V=LIMIT(V(I_out_meas,0)*1,-15,15)
-C1 P1 N_6 1.818u IC=0
+C1 P1 N_6 1.2625356278894167e-06 IC=0
 C3 0 T2 100n IC=0
 C4 VZW T2 100n IC=0
 C5 I_out_meas 0 10p
 C6 N_3 REF_R_OUT 10n
 D2 T1 VZW BOOTDIODE
 D3 0 T1 BOOTDIODE
-L1 N_6 int_1 1.393u IC=0
-R1_ser int_1 N_7 0.1
+L1 N_6 int_1 2.0063034540204743e-06 IC=0
+R1_ser int_1 N_7 100m
 L2 N1 int_2 1m IC=0
 R2_ser int_2 VOUT 1
 N1 VIN Iist Isoll N_9 N_10 Vclk N_11 Vmeas 0 N_5 N_4 en2 en1 N_12 N_13 N_14 CONTROLLER
-R3 VIN N_8 0.1
+R3 VIN N_8 100m
 R4 REF_R_OUT N2_2 640
 R5 VZW Vmeas 1.596Meg
 R6 Vmeas 0 4.4k
@@ -51,13 +55,13 @@ R7 I_out_meas 0 200
 R8 VOUT N_3 1.6Meg
 R9 N_3 REF_R_OUT 4.4k
 * Skipping SCRIPT1: No template
-LP1 N_7 P2 13.93u IC=0
+LP1 N_7 P2 2.0063034540204743e-05 IC=0
 LS1 T1 T2 619.2u IC=0
-K1 LP1 LS1 0.99
+K1 LP1 LS1 990m
 LP2 N2_2 N2 2u IC=0
 LS2 I_out_meas 0 20m IC=0
-K2 LP2 LS2 0.9
-V1 N_8 0 dc 30 ac 0
+K2 LP2 LS2 900m
+V1 N_8 0 dc 30.0 ac 0
 V2 VOUT REF_R_OUT dc 300 ac 0
 V3 Vclk 0 PULSE(0 3.3 0 1n 1n {1/100k/2} {1/100k})
 V4 N_2 0 dc 1.65 ac 0

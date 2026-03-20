@@ -14,4 +14,5 @@ By providing an intuitive interface coupled with high-performance automation, Op
 - **Advanced Waveform Visualization**: High-fidelity viewer for detailed signal analysis.
 - **Programmatic Design Control**: Automated design space exploration (DSE) and dynamic stimuli generation.
 - **Extensible Architecture**: Built for modern workflows that require more than just a schematic editor.
+- [**Keyboard & Mouse Shortcuts**](shortcuts.md): Master the editor with a complete set of hotkeys.
 - **Automated Reporting**: Generate professional HTML reports with one click. [View Example Report](example_report/index.html).

@@ -12,8 +12,8 @@ plugins:
           options:
             docstring_style: google
 
-nav:
   - Home: index.md
+  - Shortcuts: shortcuts.md
   - API Reference: api.md
   - Calculator: calculator.md
 

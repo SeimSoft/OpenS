@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:opens="http://opens-schematic.org" viewBox="-10 -10 20 20">
+  <g opens:symbol="true" category="Misc">
+    <rect x="-10" y="-10" width="20" height="20" fill="transparent" stroke="none" />
+    <text x="0" y="0" font-family="monospace" font-size="8" text-anchor="middle" class="label">{TEXT}</text>
+    
+    <opens:param name="TEXT" value="* Enter code here" multiline="true" />
+    <opens:param name="NETLIST" value="False" type="bool" />
+    <opens:param name="EVALUATE" value="False" type="bool" />
+    <opens:param name="COLOR" value="#005A9C" type="color" />
+    
+    <opens:template format="xyce">{% if NETLIST == 'True' %}{{TEXT}}{% endif %}</opens:template>
+  </g>
+</svg>

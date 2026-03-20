@@ -230,6 +230,78 @@ class DesignScriptDialog(QDialog):
             pass
         return os.path.abspath(path)
 
+    _INTERNAL_PARAMS = frozenset({
+        "NETLIST", "EVALUATE", "SCRIPT", "TEXT", "COLOR",
+        "SUPPORTS_CURRENT", "NET_NAME",
+    })
+
+    @staticmethod
+    def _export_variables_to_json(item, abs_script_path):
+        if not abs_script_path or not item:
+            return
+
+        scene = item.scene()
+        if not scene or not scene.views():
+            return
+
+        from opens_suite.schematic_item import SchematicItem
+
+        notebook_dir = os.path.dirname(abs_script_path)
+
+        view = scene.views()[0]
+        main_win = view.window()
+        gui_variables = []
+
+        if hasattr(main_win, "variables_dock"):
+            gui_variables = main_win.variables_dock.get_variables()
+        elif hasattr(view, "variables"):
+            gui_variables = getattr(view, "variables", [])
+
+        # --- variables.json (GUI table variables) ---
+        if gui_variables:
+            dps = DesignPoints()
+            for var in gui_variables:
+                name = var.get("name", "").strip()
+                val = var.get("value", "").strip()
+                unit = var.get("unit", "").strip()
+                if name and val:
+                    key = f"{name} [{unit}]" if unit else name
+                    try: dps[key] = val
+                    except Exception: pass
+
+            var_json = os.path.join(notebook_dir, "variables.json")
+            try:
+                dps.save(var_json)
+            except Exception as e:
+                import logging
+                logging.warning(f"Failed to export variables.json: {e}")
+
+        # --- devices.json (all schematic device parameters) ---
+        dev_data = {}
+        for si in scene.items():
+            if not isinstance(si, SchematicItem):
+                continue
+            inst = getattr(si, "name", "")
+            if not inst:
+                continue
+            for pname, pval in si.parameters.items():
+                if pname in DesignScriptDialog._INTERNAL_PARAMS:
+                    continue
+                flat_key = f"{inst}.{pname}"
+                # Try to store as a number if possible
+                try:
+                    dev_data[flat_key] = DesignPoints._parse_val(str(pval))
+                except Exception:
+                    dev_data[flat_key] = pval
+
+        dev_json = os.path.join(notebook_dir, "devices.json")
+        try:
+            with open(dev_json, "w") as f:
+                json.dump(dev_data, f, indent=2, default=str)
+        except Exception as e:
+            import logging
+            logging.warning(f"Failed to export devices.json: {e}")
+
     @staticmethod
     def open_notebook(item):
         script_path = item.parameters.get("SCRIPT", "")
@@ -245,6 +317,8 @@ class DesignScriptDialog(QDialog):
         abs_script_path = DesignScriptDialog.get_absolute_path_for_item(
             item, script_path
         )
+        
+        DesignScriptDialog._export_variables_to_json(item, abs_script_path)
 
         # If does not exist, create using template
         if not os.path.exists(abs_script_path):
@@ -406,10 +480,12 @@ class DesignScriptDialog(QDialog):
                 )
 
     @staticmethod
-    def execute_notebook_sync(abs_script_path):
+    def execute_notebook_sync(item, abs_script_path):
         """Synchronously execute a notebook using nbconvert."""
         if not abs_script_path or not os.path.exists(abs_script_path):
             return False, f"Notebook file not found at: {abs_script_path}"
+
+        DesignScriptDialog._export_variables_to_json(item, abs_script_path)
 
         # Prepare environment
         src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -485,6 +561,8 @@ class DesignScriptDialog(QDialog):
             )
             return
 
+        DesignScriptDialog._export_variables_to_json(item, abs_script_path)
+
         # Prepare environment (for UI display purposes, we still use worker to avoid blocking)
         src_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         notebook_dir = os.path.dirname(abs_script_path)
@@ -524,6 +602,17 @@ class DesignScriptDialog(QDialog):
 
         worker = ScriptExecutionWorker(cmd, env, notebook_dir)
 
+        # Get main window reference for logging
+        main_win = None
+        scene = item.scene()
+        if scene and scene.views():
+            main_win = scene.views()[0].window()
+
+        def log_msg(msg):
+            if hasattr(main_win, "simulation_text"):
+                main_win.simulation_text.append(msg)
+            print(msg)
+
         def on_finished(success, error_msg):
             progress.close()
             if success:
@@ -532,22 +621,19 @@ class DesignScriptDialog(QDialog):
                 if os.path.exists(json_path):
                     DesignScriptDialog.apply_json_to_item_scene(item, json_path)
                 else:
-                    if "PYTEST_CURRENT_TEST" not in os.environ:
-                        QMessageBox.warning(
-                            None,
-                            "Missing Results",
-                            f"Execution finished but no result file found at:\n{json_path}",
-                        )
-                    else:
-                        import logging
-                        logging.warning(f"No result file found at: {json_path}")
+                    log_msg(f"Design script finished but no result file found at: {json_path}")
             else:
                 cwd_display = notebook_dir if notebook_dir else "<None>"
-                debug_info = f"\n\nDebug Info:\n- Interpreter: {sys.executable}\n- PYTHONPATH: {env.get('PYTHONPATH')}\n- CWD: {cwd_display}"
-                full_msg = f"Failed to execute notebook:\n\n{error_msg}{debug_info}"
-
-                dlg = ErrorDialog("Execution Error", full_msg)
-                dlg.exec()
+                log_msg(f"Design script failed: {error_msg}")
+                log_msg(f"  Interpreter: {sys.executable}")
+                log_msg(f"  CWD: {cwd_display}")
+            # Show log dock for visibility
+            if hasattr(main_win, "simulation_dock") and not main_win.simulation_dock.isVisible():
+                main_win.simulation_dock.show()
+            # Bring variables dock to the foreground
+            if main_win and hasattr(main_win, "variables_dock"):
+                main_win.variables_dock.show()
+                main_win.variables_dock.raise_()
 
         worker.finished.connect(on_finished)
         progress.canceled.connect(worker.stop)
@@ -609,21 +695,15 @@ class DesignScriptDialog(QDialog):
                 formatted_value = str(value)
 
             # 1. Update variables if name matches
-            if variables_dock:
-                var_match = False
-                for var in current_variables:
-                    if var["name"] == key:
-                        var["value"] = formatted_value
-                        var_match = True
-                        vars_updated = True
-                        applied_count += 1
-                        details.append(f"Variable '{key}' -> {formatted_value}")
-                        break
-                if var_match:
-                    continue
+            # DISABLED: manual variables (user variables) should NOT be overwritten by design points.
+            # They stay master and computed design points are shown separately (grey).
+            # We skip this part entirely to protect manual entries.
+            # ---
 
-            # 2. Update component parameters (format: CompName.ParamName)
-            parts = key.split(".")
+
+            # 2. Update component parameters (format: CompName.ParamName [Unit])
+            parsed_key, _ = DesignPoints._parse_key(key)
+            parts = parsed_key.split(".")
             if len(parts) == 2:
                 comp_name, param_name = parts
                 if comp_name in items_by_name:
@@ -653,6 +733,30 @@ class DesignScriptDialog(QDialog):
         if vars_updated and variables_dock:
             variables_dock.set_variables(current_variables)
 
+        # Reload design points into Variables dock
+        if not headless and main_window:
+            schematic_dir = ""
+            if scene.views():
+                view = scene.views()[0]
+                fn = getattr(view, "filename", "")
+                if fn:
+                    schematic_dir = os.path.dirname(os.path.abspath(fn))
+            dp_json_files = []
+            from opens_suite.schematic_item import SchematicItem as SI
+            for si in scene.items():
+                if isinstance(si, SI):
+                    sn = si.parameters.get("SCRIPT", "")
+                    if sn.endswith(".ipynb") and schematic_dir:
+                        jp = os.path.join(schematic_dir, sn.replace(".ipynb", ".json"))
+                        if os.path.exists(jp) and jp not in dp_json_files:
+                            dp_json_files.append(jp)
+            if dp_json_files and variables_dock:
+                try:
+                    dps = DesignPoints(dp_json_files)
+                    variables_dock.set_design_points(dps)
+                except Exception:
+                    pass
+
         # Trigger visual/connectivity updates
         if scene.views():
             view = scene.views()[0]
@@ -664,37 +768,35 @@ class DesignScriptDialog(QDialog):
         if headless:
             return applied_count
 
-        # Build message
+        # Log to simulation window instead of showing message boxes
+        def _log_to_sim(msg):
+            if main_window and hasattr(main_window, "simulation_text"):
+                main_window.simulation_text.append(msg)
+            print(msg)
+
         detail_msg = "\n".join(details)
         if is_stimuli:
             msg = "Stimuli runset updated." if has_runset else ""
             if applied_count > 0:
-                msg += f"\n\nUpdates:\n{detail_msg}"
-            if not msg:
-                msg = "No stimuli or parameters found in JSON."
-            _maybe_show_message(
-                QMessageBox.information,
-                None,
-                "Stimuli Generator",
-                msg,
-            )
+                _log_to_sim(f"Stimuli: Applied {applied_count} parameter(s):")
+                for d in details:
+                    _log_to_sim(f"  + {d}")
+            elif not msg:
+                _log_to_sim("No stimuli or parameters found in JSON.")
         else:
             if applied_count > 0:
-                QMessageBox.information(
-                    None,
-                    "Design Script",
-                    f"Applied {applied_count} parameters:\n\n{detail_msg}",
-                )
+                _log_to_sim(f"Design Script: Applied {applied_count} parameter(s):")
+                for d in details:
+                    _log_to_sim(f"  + {d}")
             elif not has_runset:
-                QMessageBox.information(
-                    None,
-                    "Design Script",
-                    "Execution finished, but no parameters were matched to schematic items or variables.",
-                )
+                _log_to_sim("Design script finished, but no parameters were matched.")
             else:
-                QMessageBox.information(
-                    None, "Design Script", "Custom netlist snippet (runset) updated."
-                )
+                _log_to_sim("Custom netlist snippet (runset) updated.")
+
+        # Show log dock
+        if main_window and hasattr(main_window, "simulation_dock"):
+            if not main_window.simulation_dock.isVisible():
+                main_window.simulation_dock.show()
 
         return applied_count
 

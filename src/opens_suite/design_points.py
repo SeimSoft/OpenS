@@ -11,13 +11,32 @@ class CrossProductAccessor:
 
 
 class DesignPoints:
-    def __init__(self):
+    def __init__(self, data_source=None):
         self._data = {}
         self._units = {}
         self._length = 0
         self.crossproduct = CrossProductAccessor(self)
 
-    def _parse_key(self, key):
+        if isinstance(data_source, str):
+            self.load(data_source)
+        elif isinstance(data_source, list):
+            self.load_many(data_source)
+
+    def load(self, filepath):
+        import json
+        with open(filepath, 'r') as f:
+            data = json.load(f)
+        for k, v in data.items():
+            self[k] = v
+
+    def load_many(self, filepaths):
+        import os
+        for p in filepaths:
+            if os.path.exists(p):
+                self.load(p)
+
+    @staticmethod
+    def _parse_key(key):
         # Allow spaces around name and unit
         m = re.match(r"^(.*?)(?:\[(.*?)\])?$", key.strip())
         if m:
@@ -352,7 +371,7 @@ class DesignPoints:
         return new_dp
 
     def to_dict(self, row_index=0):
-        """Returns a dictionary of a specific row in 'Component.Param' format if possible, or just 'Name' keys."""
+        """Returns a dictionary of a specific row in 'Component.Param [Unit]' format if possible, or just 'Name' keys."""
         if self._length == 0:
             return {}
         if row_index >= self._length:
@@ -360,7 +379,9 @@ class DesignPoints:
 
         res = {}
         for k in self._data.keys():
-            res[k] = self._data[k][row_index]
+            unit = self._units.get(k, "")
+            out_key = f"{k} [{unit}]" if unit else k
+            res[out_key] = self._data[k][row_index]
         return res
 
     def to_json(self, filepath, row_index=0):

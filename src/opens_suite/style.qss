@@ -75,6 +75,7 @@ QToolButton:hover {
 QToolBar QToolButton {
   background: transparent;
   border: none;
+  padding: 6px;
 }
 QToolBar QToolButton:hover {
   background: #cfd8ef;

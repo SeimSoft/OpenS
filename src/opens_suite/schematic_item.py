@@ -1,13 +1,13 @@
 import xml.etree.ElementTree as ET
 from PyQt6.QtWidgets import (
     QGraphicsRectItem,
-    QGraphicsSimpleTextItem,
+    QGraphicsTextItem,
     QGraphicsObject,
     QGraphicsItem,
     QDialog,
 )
 from PyQt6.QtCore import Qt, QPointF, QRectF, QByteArray, pyqtSignal
-from PyQt6.QtGui import QBrush, QPen, QColor, QFont
+from PyQt6.QtGui import QBrush, QPen, QColor, QFont, QFontMetrics
 from PyQt6.QtSvg import QSvgRenderer
 from opens_suite.theme import theme_manager
 
@@ -27,6 +27,7 @@ class SchematicItem(QGraphicsObject):
 
         self.pins = {}  # id -> QPointF (relative to item)
         self.parameters = {}  # name -> value_str
+        self.parameter_types = {}  # name_up -> type_str
         self.name = ""
         self.prefix = "X"
         self.connected_pins = []
@@ -46,6 +47,7 @@ class SchematicItem(QGraphicsObject):
         self.text_anchors = {}  # 'name': QPointF, 'value': QPointF
         self.label_items = {}  # template_str -> QGraphicsSimpleTextItem
         self.simulation_results = {}  # key -> float
+        self.border_rect_item = None
 
         self._parse_pins()
         self._parse_labels()
@@ -99,11 +101,11 @@ class SchematicItem(QGraphicsObject):
         for item in self.label_items.values():
             cls = item.data(0)
             if cls == "label":
-                item.setBrush(QBrush(theme_manager.get_color("font_label")))
+                item.setDefaultTextColor(theme_manager.get_color("font_label"))
             elif cls in ["value", "voltage"]:
-                item.setBrush(QBrush(theme_manager.get_color("font_voltage")))
+                item.setDefaultTextColor(theme_manager.get_color("font_voltage"))
             else:
-                item.setBrush(QBrush(theme_manager.get_color("font_default")))
+                item.setDefaultTextColor(theme_manager.get_color("font_default"))
 
     def boundingRect(self):
         if self._renderer.isValid():
@@ -228,7 +230,7 @@ class SchematicItem(QGraphicsObject):
                     # we could hide it or show empty. Let's show empty or "?"
                     text = text.replace(f"{{{p}}}", "--")
 
-            item.setText(text)
+            item.setPlainText(text)
 
             # Apply alignment based on stored metadata
             orig_x = item.data(1)
@@ -236,18 +238,62 @@ class SchematicItem(QGraphicsObject):
             anchor = item.data(3)
 
             if orig_x is not None and orig_y is not None:
-                # SVG y is baseline, Qt SimpleTextItem y is top.
                 rect = item.boundingRect()
+                margin = item.document().documentMargin()
 
                 new_x = orig_x
                 if anchor == "end":
-                    new_x = orig_x - rect.width()
+                    new_x = orig_x - rect.width() + 2 * margin
                 elif anchor == "middle":
-                    new_x = orig_x - rect.width() / 2
+                    new_x = orig_x - rect.width() / 2 + margin
 
-                # Baseline correction: Shift up by roughly 75% of the height
-                # to make the text appear on the baseline.
-                item.setPos(new_x, orig_y - rect.height() * 0.75)
+                # Anchor based on fonts exact ascent so the first line sits perfectly on the SVG baseline.
+                fm = QFontMetrics(item.font())
+                item.setPos(new_x - margin, orig_y - fm.ascent() - margin)
+
+        # Dynamic Border Logic
+        has_color_param = False
+        color_val = "#888888"
+        for k, t in self.parameter_types.items():
+            if t == "color":
+                has_color_param = True
+                color_val = self.parameters.get(k, "#888888")
+                break
+                
+        is_free_text = False
+        if self.svg_path and "free_text" in self.svg_path.lower():
+            is_free_text = True
+
+        if is_free_text and has_color_param:
+            for lbl in self.label_items.values():
+                lbl.setDefaultTextColor(QColor(color_val))
+
+        if is_free_text or has_color_param:
+            if not self.border_rect_item:
+                self.border_rect_item = QGraphicsRectItem(self)
+                self.border_rect_item.setZValue(-1) # Behind text
+                
+            # Compute bounding box of all text items
+            union_rect = QRectF()
+            for lbl in self.label_items.values():
+                mapped_rect = lbl.mapToParent(lbl.boundingRect()).boundingRect()
+                union_rect = union_rect.united(mapped_rect)
+
+            if union_rect.isNull() or union_rect.isEmpty():
+                # fallback size
+                union_rect = QRectF(-10, -10, 20, 20)
+
+            # Apply padding
+            padding = 6
+            union_rect.adjust(-padding, -padding, padding, padding)
+            self.border_rect_item.setRect(union_rect)
+            
+            pen = QPen(QColor(color_val), 1, Qt.PenStyle.DashLine)
+            self.border_rect_item.setPen(pen)
+            self.border_rect_item.setBrush(QBrush(Qt.BrushStyle.NoBrush))
+            self.border_rect_item.show()
+        elif getattr(self, "border_rect_item", None):
+            self.border_rect_item.hide()
 
     def _format_value(self, val):
         unit = "A"  # Default for currents
@@ -339,12 +385,14 @@ class SchematicItem(QGraphicsObject):
                 if "param" in elem.tag:
                     name = elem.get("name")
                     value = elem.get("value")
+                    p_type = elem.get("type", "str")
                     if name:
                         # Normalize parameter keys to upper-case to have a
                         # consistent internal representation.
                         name_up = name.upper()
                         if overwrite or name_up not in self.parameters:
                             self.parameters[name_up] = value or ""
+                        self.parameter_types[name_up] = p_type
 
                 elif "symbol" in elem.tag:
                     prefix = elem.get("prefix")
@@ -383,7 +431,7 @@ class SchematicItem(QGraphicsObject):
                     cls = elem.get("class", "")
 
                     # Create independent text item
-                    item = QGraphicsSimpleTextItem(self)
+                    item = QGraphicsTextItem(self)
                     item.setPos(x, y)
 
                     # Style parsing
@@ -428,17 +476,17 @@ class SchematicItem(QGraphicsObject):
 
                     # Apply color: prefer explicit SVG fill, then theme-by-class
                     if fill_color and fill_color.isValid():
-                        item.setBrush(QBrush(fill_color))
+                        item.setDefaultTextColor(fill_color)
                     else:
                         if cls == "label":
-                            item.setBrush(QBrush(theme_manager.get_color("font_label")))
+                            item.setDefaultTextColor(theme_manager.get_color("font_label"))
                         elif cls == "value" or cls == "voltage":
-                            item.setBrush(
-                                QBrush(theme_manager.get_color("font_voltage"))
+                            item.setDefaultTextColor(
+                                theme_manager.get_color("font_voltage")
                             )
                         else:
-                            item.setBrush(
-                                QBrush(theme_manager.get_color("font_default"))
+                            item.setDefaultTextColor(
+                                theme_manager.get_color("font_default")
                             )
 
                     item.setData(0, cls)  # Store class for theme updates
@@ -643,6 +691,7 @@ class {cls_name}:
             is_script = False
             is_stimuli = False
 
+            is_free_text = False
             if self.svg_path:
                 lower_path = self.svg_path.lower()
                 if (
@@ -655,9 +704,18 @@ class {cls_name}:
                     or "stimuli_generator/symbol.svg" in lower_path
                 ):
                     is_stimuli = True
+                elif "free_text" in lower_path:
+                    is_free_text = True
 
             if not is_script and not is_stimuli and "SCRIPT" in self.parameters:
                 is_script = True  # fallback if they use an arbitrary script symbol
+
+            if is_free_text:
+                from opens_suite.text_editor_dialog import TextEditorDialog
+                dlg = TextEditorDialog(None, initial_text=self.parameters.get("TEXT", ""))
+                if dlg.exec() == QDialog.DialogCode.Accepted:
+                    self.set_parameter("TEXT", dlg.get_text())
+                return
 
             if is_script or is_stimuli:
                 from opens_suite.design_script_dialog import DesignScriptDialog

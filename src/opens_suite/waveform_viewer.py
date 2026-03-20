@@ -1,4 +1,5 @@
 import os
+import qtawesome as qta
 import numpy as np
 import pyqtgraph as pg
 from PyQt6.QtWidgets import (
@@ -370,9 +371,7 @@ class WaveformViewer(QMainWindow):
         toolbar = self.addToolBar("Cursor Tools")
 
         # Calculator
-        calc_icon = QIcon(
-            os.path.join(os.path.dirname(__file__), "assets", "icons", "calculator.svg")
-        )
+        calc_icon = qta.icon("mdi6.calculator", color="#1f1f1f")
         self.calc_action = QAction(calc_icon, "Calculator", self)
         self.calc_action.triggered.connect(self.openCalculatorRequested.emit)
         toolbar.addAction(self.calc_action)

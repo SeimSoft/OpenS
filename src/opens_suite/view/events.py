@@ -17,6 +17,7 @@ from PyQt6.QtCore import (
     pyqtSignal,
     QThread,
     QSettings,
+    QEvent,
 )
 import math
 from PyQt6.QtGui import (
@@ -68,6 +69,18 @@ class EventsMixin:
             event.accept()
         else:
             super().wheelEvent(event)
+
+    def viewportEvent(self, event):
+        if event.type() == QEvent.Type.NativeGesture:
+            if event.gestureType() == Qt.NativeGestureType.ZoomNativeGesture:
+                factor = 1.0 + event.value()
+                # Use current viewport anchor logic for gesture center
+                old_anchor = self.transformationAnchor()
+                self.setTransformationAnchor(QGraphicsView.ViewportAnchor.AnchorUnderMouse)
+                self.scale(factor, factor)
+                self.setTransformationAnchor(old_anchor)
+                return True
+        return super().viewportEvent(event)
 
     def _delete_selected(self):
         items = self.scene().selectedItems()
@@ -124,6 +137,25 @@ class EventsMixin:
                 self.undo_stack.redo()
             else:
                 self.undo_stack.undo()
+
+        elif event.key() == Qt.Key.Key_Space:
+            items = self.scene().selectedItems()
+            net_name = None
+            for item in items:
+                from opens_suite.wire import Wire
+                if isinstance(item, Wire):
+                    if (
+                        hasattr(self, "last_item_to_node")
+                        and self.last_item_to_node
+                        and item in self.last_item_to_node
+                    ):
+                        net_name = self.last_item_to_node[item]
+                    else:
+                        net_name = item.name or "N_?"
+                    break
+            
+            if net_name:
+                self.netProbed.emit(net_name)
 
         elif event.key() == Qt.Key.Key_F:
             self.fitInView(

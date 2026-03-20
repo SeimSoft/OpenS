@@ -10,17 +10,23 @@
     <opens:symbol xmlns:opens="http://opens-schematic.org" prefix="Q" bindkey="w" category="Transistors" />
     <opens:xyce xmlns:opens="http://opens-schematic.org" template="Q{name} {pin_c} {pin_b} {pin_e} {MODEL}" />
   </defs>
-  <!-- PNP symbol: arrow on emitter inwards -->
-  <path class="symbol" d="M 20 10 L 60 30 L 20 50 Z" />
-  <path class="symbol" d="M 40 30 L 55 30" />
-  <path class="symbol" d="M 30 40 L 40 30 L 30 20" />
-  <circle class="symbol" cx="40" cy="30" r="2" />
+  <!-- PNP symbol: base line and connections -->
+  <line class="symbol" x1="0" y1="30" x2="20" y2="30" />
+  <line class="symbol" x1="20" y1="15" x2="20" y2="45" style="stroke-width: 3;" />
+  
+  <!-- Emitter (Top): vertical leg then diagonal with arrow -->
+  <polyline class="symbol" points="40,0 40,15 20,25" />
+  <!-- Arrow in the middle of the diagonal (30, 20) pointing towards (20, 25) -->
+  <polygon fill="black" points="26,18 34,20 28,26" transform="rotate(-15, 30, 20)" />
 
-  <!-- Pins: collector left, base top, emitter right -->
-  <circle class="pin" id="pin_c" cx="0" cy="30" r="2" />
-  <circle class="pin" id="pin_b" cx="40" cy="0" r="2" />
-  <circle class="pin" id="pin_e" cx="80" cy="30" r="2" />
+  <!-- Collector (Bottom): vertical leg then diagonal -->
+  <polyline class="symbol" points="40,60 40,45 20,35" />
 
-  <text x="82" y="12" class="label">{name}</text>
-  <text x="82" y="28" class="value">{MODEL}</text>
+  <!-- Pins: emitter top, base left, collector bottom -->
+  <circle class="pin" id="pin_e" cx="40" cy="0" r="2" />
+  <circle class="pin" id="pin_b" cx="0" cy="30" r="2" />
+  <circle class="pin" id="pin_c" cx="40" cy="60" r="2" />
+
+  <text x="50" y="15" class="label">{name}</text>
+  <text x="50" y="30" class="value">{MODEL}</text>
 </svg>
