@@ -1,0 +1,19 @@
+{
+  "R1.R": 6250.0,
+  "TX1.LP": 1e-06,
+  "TX1.LS": 0.01,
+  "TX1.K": 0.99,
+  "TX1.IC_P": "",
+  "TX1.IC_S": "",
+  ".model1.MODEL_NAME": "CONTROLLER_HERIC",
+  ".model1.MODULE": "controller",
+  ".model1.CLASS": "Controller",
+  ".model1.PYTHONPATH": "$SVG/",
+  "N1.MODEL_NAME": "CONTROLLER_HERIC",
+  "V1.V": 0.0,
+  "V1.VAC": 0.0,
+  "L1.L": 0.001,
+  "L1.RSER": 0.1,
+  "L1.IC": 0.0,
+  "X1.MODEL": "h_bridge.sch"
+}

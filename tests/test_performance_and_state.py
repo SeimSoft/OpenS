@@ -28,15 +28,15 @@ def view(qtbot):
 def test_modification_state_logic(view):
     """Basic logic for modification state in SchematicView."""
     assert not view.is_modified()
-    
+
     # 1. Mode change triggers modification
     view.set_mode(SchematicView.MODE_WIRE)
     assert view.is_modified()
-    
+
     # 2. Reset modified
     view.set_modified(False)
     assert not view.is_modified()
-    
+
     # 3. Undo stack triggers modification
     class DummyCommand(QUndoCommand):
         def redo(self): pass
@@ -47,11 +47,11 @@ def test_modification_state_logic(view):
 def test_connectivity_deferral(view):
     """Verify that connectivity recalculation is deferred to save."""
     view.recalculate_connectivity = MagicMock()
-    
+
     # Mode change should NOT trigger recalculate_connectivity
     view.set_mode(SchematicView.MODE_WIRE)
     view.recalculate_connectivity.assert_not_called()
-    
+
     # Save SHOULD trigger recalculate_connectivity
     with patch('xml.etree.ElementTree.ElementTree.write'), \
          patch('opens_suite.design_points.DesignPoints') as mock_dps:
@@ -59,7 +59,7 @@ def test_connectivity_deferral(view):
         mock_dps.return_value._data = {}
         view.save_schematic("dummy.svg")
         view.recalculate_connectivity.assert_called()
-    
+
     # After save, modification flag is reset
     assert not view.is_modified()
 
@@ -69,19 +69,19 @@ def test_auto_save_before_simulation(main_window):
     main_window.new_file()
     view = main_window.tabs.currentWidget()
     view.filename = os.path.join(main_window.project_dir, "test.svg")
-    
+
     # Mock save_file
     main_window.save_file = MagicMock()
-    
+
     xyce_plugin = next(p for p in main_window.plugin_manager.plugins if isinstance(p, XycePlugin))
-    
+
     # 1. If NOT modified, save_file should NOT be called by run_simulation
     view.set_modified(False)
     with patch('opens_suite.plugins.xyce_plugin.NetlistGenerator'), \
          patch('builtins.open', create=True):
         xyce_plugin.run_simulation()
     main_window.save_file.assert_not_called()
-    
+
     # 2. If modified, save_file SHOULD be called
     view.set_modified(True)
     with patch('opens_suite.plugins.xyce_plugin.NetlistGenerator'), \
@@ -94,21 +94,40 @@ def test_tab_title_indicator(main_window):
     main_window.new_file()
     view = main_window.tabs.currentWidget()
     index = main_window.tabs.indexOf(view)
-    
+
     # Initial state (Untitled)
     assert main_window.tabs.tabText(index) == "Untitled"
-    
+
     # 1. Modify -> Asterisk appears
     view.set_modified(True)
     assert main_window.tabs.tabText(index) == "Untitled*"
-    
+
     # 2. Save -> Asterisk disappears
     with patch.object(view, 'recalculate_connectivity'), \
          patch('xml.etree.ElementTree.ElementTree.write'), \
          patch('PyQt6.QtWidgets.QFileDialog.getSaveFileName', return_value=("test.svg", "")):
         main_window.save_file()
-    
+
     # After save, title should be updated to filename (basenamed) and NO asterisk
     assert "test.svg" in main_window.tabs.tabText(index)
     assert not view.is_modified()
     assert "*" not in main_window.tabs.tabText(index)
+
+
+def test_simulation_target_uses_owner_view(main_window):
+    top = SchematicView()
+    lvl2 = SchematicView()
+    lvl3 = SchematicView()
+
+    lvl2._simulation_owner_view = top
+    lvl3._simulation_owner_view = top
+
+    main_window.tabs.addTab(top, "top")
+    main_window.tabs.addTab(lvl2, "lvl2")
+    main_window.tabs.addTab(lvl3, "lvl3")
+    main_window.tabs.setCurrentWidget(lvl3)
+
+    xyce_plugin = next(
+        p for p in main_window.plugin_manager.plugins if isinstance(p, XycePlugin)
+    )
+    assert xyce_plugin._get_simulation_target_view() is top

@@ -2,6 +2,7 @@ import json
 import xml.etree.ElementTree as ET
 import qtawesome as qta
 from PyQt6.QtWidgets import (
+    QApplication,
     QMainWindow,
     QTabWidget,
     QToolBar,
@@ -195,6 +196,8 @@ class MainWindow(QMainWindow):
         self.setTabPosition(
             Qt.DockWidgetArea.AllDockWidgetAreas, QTabWidget.TabPosition.South
         )
+        self.tabs.tabBar().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tabs.tabBar().customContextMenuRequested.connect(self._on_tab_context_menu)
 
         # Status Bar
         self.status_bar = self.statusBar()
@@ -391,6 +394,8 @@ class MainWindow(QMainWindow):
         view = self.tabs.widget(index)
 
         if isinstance(view, SchematicView):
+            owner_view = self.get_simulation_owner_view(view)
+
             # Reload all symbols in case they were modified in the symbol editor
             view.reload_symbols()
 
@@ -401,18 +406,23 @@ class MainWindow(QMainWindow):
             # Ensure Analysis/Variables/Outputs dock widgets reflect the active schematic
             if hasattr(self, "analysis_dock"):
                 self.analysis_dock.blockSignals(True)
-                self.analysis_dock.restore_analyses(getattr(view, "analyses", []))
+                self.analysis_dock.restore_analyses(
+                    getattr(owner_view, "analyses", [])
+                )
                 self.analysis_dock.blockSignals(False)
 
             if hasattr(self, "variables_dock"):
                 self.variables_dock.blockSignals(True)
-                self.variables_dock.set_variables(getattr(view, "variables", []))
+                self.variables_dock.set_variables(getattr(owner_view, "variables", []))
                 self.variables_dock.blockSignals(False)
 
             if hasattr(self, "outputs_dock"):
                 self.outputs_dock.blockSignals(True)
-                self.outputs_dock.restore_expressions(getattr(view, "outputs", []))
+                self.outputs_dock.restore_expressions(getattr(owner_view, "outputs", []))
                 self.outputs_dock.blockSignals(False)
+                self.outputs_dock.hierarchy_prefix = getattr(
+                    view, "hierarchy_prefix", ""
+                )
 
             if hasattr(self, "results_selection_dock"):
                 self.results_selection_dock.set_scene(view.scene())
@@ -429,15 +439,135 @@ class MainWindow(QMainWindow):
                 if os.path.exists(raw_path):
                     has_results = True
 
+    def get_simulation_owner_view(self, view=None):
+        """Return the top-level owner view used for analysis/variables/simulation.
+
+        Subcircuit tabs inherit their owner's simulation context until they are
+        explicitly promoted to top-level via the tab context menu.
+        """
+        if view is None:
+            view = self.tabs.currentWidget()
+        if not isinstance(view, SchematicView):
+            return view
+        owner = getattr(view, "_simulation_owner_view", None)
+        if isinstance(owner, SchematicView):
+            return owner
+        return view
+
     def _update_action_states(self):
         pass
+
+    @staticmethod
+    def _full_net_name(prefix, net_name):
+        if not net_name:
+            return None
+        net_name = str(net_name)
+        if ":" in net_name:
+            return net_name
+        return f"{prefix}{net_name}"
+
+    @staticmethod
+    def _item_matches_instance_name(sch_item, inst_name):
+        item_name = getattr(sch_item, "name", "") or ""
+        if item_name == inst_name:
+            return True
+
+        # Schematic item names are often like "X3", while double-click emits
+        # Xyce-style instance names like "X_3".
+        prefix = getattr(sch_item, "prefix", "") or ""
+        idx = item_name
+        if prefix and idx.startswith(prefix):
+            idx = idx[len(prefix) :]
+        if idx:
+            return f"X_{idx}" == inst_name
+        return False
+
+    def _derive_child_highlight_context(self, parent_view, inst_name, child_prefix):
+        """Map highlighted parent nets to child context when diving into a subcircuit.
+
+        Returns:
+            (propagated_full_names, highlighted_child_pin_ids)
+        """
+        highlights = set(getattr(self, "_net_highlight_full_names", set()))
+        if not highlights:
+            return set(), set()
+
+        propagated = {n for n in highlights if n.startswith(child_prefix)}
+        pin_ids = set()
+        item_map = getattr(parent_view, "last_item_to_node", {})
+        parent_prefix = getattr(parent_view, "hierarchy_prefix", "")
+        for key, net_name in item_map.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                continue
+            sch_item, pin_id = key
+            if not isinstance(sch_item, SchematicItem):
+                continue
+            if not self._item_matches_instance_name(sch_item, inst_name):
+                continue
+            parent_full = self._full_net_name(parent_prefix, net_name)
+            if parent_full in highlights:
+                pin_ids.add(str(pin_id))
+                propagated.add(f"{child_prefix}{pin_id}")
+        return propagated, pin_ids
+
+    def _derive_child_highlight_names(self, parent_view, inst_name, child_prefix):
+        # Backward-compatible wrapper used by tests and callers expecting only names.
+        names, _ = self._derive_child_highlight_context(
+            parent_view, inst_name, child_prefix
+        )
+        return names
+
+    def _derive_child_pin_parent_nets(self, parent_view, inst_name):
+        """Map child pin IDs to fully-qualified parent net names for one instance."""
+        pin_to_parent = {}
+        item_map = getattr(parent_view, "last_item_to_node", {})
+        parent_prefix = getattr(parent_view, "hierarchy_prefix", "")
+        for key, net_name in item_map.items():
+            if not isinstance(key, tuple) or len(key) != 2:
+                continue
+            sch_item, pin_id = key
+            if not isinstance(sch_item, SchematicItem):
+                continue
+            if not self._item_matches_instance_name(sch_item, inst_name):
+                continue
+            parent_full = self._full_net_name(parent_prefix, net_name)
+            if parent_full:
+                pin_to_parent[str(pin_id)] = parent_full
+        return pin_to_parent
+
+    def _open_subcircuit_from_view(self, parent_view, path, inst_name):
+        child_prefix = parent_view.hierarchy_prefix + inst_name + ":"
+        owner_view = self.get_simulation_owner_view(parent_view)
+        propagated, pin_ids = self._derive_child_highlight_context(
+            parent_view, inst_name, child_prefix
+        )
+        pin_parent_nets = self._derive_child_pin_parent_nets(parent_view, inst_name)
+        if propagated:
+            if not hasattr(self, "_net_highlight_full_names"):
+                self._net_highlight_full_names = set()
+            self._net_highlight_full_names.update(propagated)
+
+        self.open_file(
+            path,
+            parent_breadcrumb=self._get_view_breadcrumb(parent_view),
+            hierarchy_instance=inst_name,
+            hierarchy_prefix=child_prefix,
+            raw_path=getattr(parent_view, "current_raw_path", None),
+            highlighted_full_names=propagated,
+            highlighted_pin_ids=pin_ids,
+            child_pin_parent_nets=pin_parent_nets,
+            simulation_owner_view=owner_view,
+        )
 
     def new_file(self):
         view = SchematicView()
         view.modeChanged.connect(self.update_status_mode)
         view.statusMessage.connect(self.update_status)
-        view.openSubcircuitRequested.connect(self.open_file)
+        view.openSubcircuitRequested.connect(
+            lambda path, inst, v=view: self._open_subcircuit_from_view(v, path, inst)
+        )
         view.modificationChanged.connect(lambda: self._update_tab_title_for_view(view))
+        view.returnToParentRequested.connect(lambda v=view: self.close_tab(self.tabs.indexOf(v)))
 
         # Connect Selection signals
         view.scene().selectionChanged.connect(self._on_selection_changed)
@@ -464,7 +594,18 @@ class MainWindow(QMainWindow):
         # Compatibility slot if needed, or just rely on statusMessage
         pass
 
-    def open_file(self, file_name=None):
+    def open_file(
+        self,
+        file_name=None,
+        parent_breadcrumb="",
+        hierarchy_instance="",
+        hierarchy_prefix="",
+        raw_path=None,
+        highlighted_full_names=None,
+        highlighted_pin_ids=None,
+        child_pin_parent_nets=None,
+        simulation_owner_view=None,
+    ):
         if not file_name:
             file_name, _ = QFileDialog.getOpenFileName(
                 self, "Open Schematic", "", "SVG Files (*.svg);;All Files (*)"
@@ -482,8 +623,26 @@ class MainWindow(QMainWindow):
                     and widget.filename
                     and os.path.abspath(widget.filename) == file_name
                 ):
-                    self.tabs.setCurrentIndex(i)
-                    return
+                    if getattr(widget, "hierarchy_prefix", "") == hierarchy_prefix:
+                        # Exact same instance/top-level is already open, just switch to it
+                        self.tabs.setCurrentIndex(i)
+                        if simulation_owner_view is not None:
+                            widget._simulation_owner_view = simulation_owner_view
+                        if highlighted_pin_ids is not None:
+                            widget._highlight_pin_ids = set(highlighted_pin_ids)
+                        if child_pin_parent_nets is not None:
+                            widget._child_pin_parent_nets = dict(child_pin_parent_nets)
+                        if hasattr(widget, "apply_net_highlight_full_names"):
+                            widget.apply_net_highlight_full_names(
+                                highlighted_full_names
+                                or getattr(self, "_net_highlight_full_names", set())
+                            )
+                        return
+                    else:
+                        # File is open but user wants to view it from a different hierarchical path.
+                        # Close the existing tab first to maintain single-open-tab rule per file.
+                        self.close_tab(i)
+                        break
 
             try:
                 if (
@@ -504,9 +663,22 @@ class MainWindow(QMainWindow):
 
                 view = SchematicView()
                 view.filename = file_name  # Track filename
+                view.parent_breadcrumb = parent_breadcrumb
+                view.hierarchy_instance = hierarchy_instance
+                view.hierarchy_prefix = hierarchy_prefix
+                view._highlight_pin_ids = set(highlighted_pin_ids or [])
+                view._child_pin_parent_nets = dict(child_pin_parent_nets or {})
+                view._simulation_owner_view = (
+                    simulation_owner_view if simulation_owner_view is not None else view
+                )
+
                 view.modeChanged.connect(self.update_status_mode)
                 view.statusMessage.connect(self.update_status)
-                view.openSubcircuitRequested.connect(self.open_file)
+                view.openSubcircuitRequested.connect(
+                    lambda path, inst, v=view: self._open_subcircuit_from_view(
+                        v, path, inst
+                    )
+                )
                 view.modificationChanged.connect(
                     lambda m, v=view: self._update_tab_title_for_view(v)
                 )
@@ -521,6 +693,13 @@ class MainWindow(QMainWindow):
 
                 # Use unified loading logic
                 view.load_schematic(file_name)
+
+                # Re-apply existing hierarchical net highlights for this tab.
+                active_highlights = highlighted_full_names
+                if active_highlights is None:
+                    active_highlights = getattr(self, "_net_highlight_full_names", set())
+                if active_highlights and hasattr(view, "apply_net_highlight_full_names"):
+                    view.apply_net_highlight_full_names(active_highlights)
 
                 # Load extra data (handled by plugins or view if needed, but for now we can read them)
                 try:
@@ -590,7 +769,27 @@ class MainWindow(QMainWindow):
                 except Exception:
                     pass
 
-                self.tabs.addTab(view, self._get_tab_title(file_name))
+                # Propagate results if available
+                if not raw_path and hierarchy_prefix:
+                    # Try to find parent's raw path from the currently shown tab
+                    parent_view = self.tabs.currentWidget()
+                    if parent_view and hasattr(parent_view, "current_raw_path"):
+                        raw_path = parent_view.current_raw_path
+                    if not raw_path and parent_view:
+                        # Fallback: compute from parent's filename
+                        parent_fn = getattr(parent_view, "filename", None)
+                        if parent_fn:
+                            p_sim_dir = os.path.join(os.path.dirname(parent_fn), "simulation")
+                            p_base = os.path.splitext(os.path.basename(parent_fn))[0]
+                            candidate = os.path.join(p_sim_dir, f"{p_base}.raw")
+                            if os.path.exists(candidate):
+                                raw_path = candidate
+
+                if raw_path and os.path.exists(raw_path) and hasattr(view, "load_simulation_results"):
+                    view.load_simulation_results(raw_path)
+
+                self.tabs.addTab(view, "Loading...")
+                self._update_tab_title_for_view(view)
                 self.tabs.setCurrentWidget(view)
                 self.update_status(f"Loaded {file_name}")
 
@@ -600,13 +799,102 @@ class MainWindow(QMainWindow):
 
                 traceback.print_exc()
 
+    def _get_view_breadcrumb(self, view):
+        """Return the breadcrumb title for a view (without the '*' modified marker)."""
+        base_title = self._get_tab_title(getattr(view, "filename", None))
+        if hasattr(view, "parent_breadcrumb") and view.parent_breadcrumb:
+            return f"{view.parent_breadcrumb} > {getattr(view, 'hierarchy_instance', '?')}: {base_title}"
+        return base_title
+
     def _update_tab_title_for_view(self, view):
         index = self.tabs.indexOf(view)
         if index != -1:
-            title = self._get_tab_title(getattr(view, "filename", None))
+            title = self._get_view_breadcrumb(view)
             if hasattr(view, "is_modified") and view.is_modified():
                 title += "*"
             self.tabs.setTabText(index, title)
+
+    def _on_tab_context_menu(self, pos):
+        index = self.tabs.tabBar().tabAt(pos)
+        if index == -1:
+            return
+
+        menu, actions = self._create_tab_context_menu(index)
+        if menu is None:
+            return
+
+        action = menu.exec(self.tabs.tabBar().mapToGlobal(pos))
+        if action == actions["save"]:
+            self._save_tab(index)
+        elif action == actions["copy_path"]:
+            self._copy_tab_path(index)
+        elif action == actions["close"]:
+            self.close_tab(index)
+        elif action == actions["close_others"]:
+            self._close_other_tabs(index)
+        elif action == actions["close_all"]:
+            self._close_all_tabs()
+        elif action == actions["make_top"]:
+            view = self.tabs.widget(index)
+            view.hierarchy_prefix = ""
+            view.parent_breadcrumb = ""
+            view.hierarchy_instance = ""
+            view._simulation_owner_view = view
+            self._update_tab_title_for_view(view)
+            # Re-sync docks
+            self._on_tab_changed(index)
+
+    def _create_tab_context_menu(self, index):
+        view = self.tabs.widget(index)
+        if not isinstance(view, SchematicView):
+            return None, None
+
+        menu = QMenu(self)
+        file_path = getattr(view, "filename", None)
+        actions = {
+            "save": menu.addAction("Save"),
+            "copy_path": menu.addAction("Copy Path"),
+            "close": menu.addAction("Close"),
+            "close_others": menu.addAction("Close Others"),
+            "close_all": menu.addAction("Close All"),
+        }
+        actions["copy_path"].setEnabled(bool(file_path))
+        menu.addSeparator()
+        actions["make_top"] = menu.addAction("Make Top Level")
+        return menu, actions
+
+    def _copy_tab_path(self, index):
+        if index < 0 or index >= self.tabs.count():
+            return
+
+        widget = self.tabs.widget(index)
+        file_path = getattr(widget, "filename", None)
+        if not file_path:
+            self.update_status("No file path available for this tab")
+            return
+
+        QApplication.clipboard().setText(file_path)
+        self.update_status(f"Copied path: {file_path}")
+
+    def _save_tab(self, index):
+        if index < 0 or index >= self.tabs.count():
+            return
+
+        previous_index = self.tabs.currentIndex()
+        self.tabs.setCurrentIndex(index)
+        self.save_file()
+
+        if previous_index != -1 and previous_index < self.tabs.count():
+            self.tabs.setCurrentIndex(previous_index)
+
+    def _close_all_tabs(self):
+        for i in reversed(range(self.tabs.count())):
+            self.close_tab(i)
+
+    def _close_other_tabs(self, keep_index):
+        for i in reversed(range(self.tabs.count())):
+            if i != keep_index:
+                self.close_tab(i)
 
     def save_file(self):
         current_widget = self.tabs.currentWidget()
@@ -663,8 +951,8 @@ class MainWindow(QMainWindow):
                         variables=variables,
                     )
 
-                index = self.tabs.currentIndex()
-                self.tabs.setTabText(index, self._get_tab_title(file_name))
+                current_widget.filename = file_name
+                self._update_tab_title_for_view(current_widget)
                 self.update_status(f"Saved to {file_name}")
 
             except Exception as e:
@@ -673,9 +961,22 @@ class MainWindow(QMainWindow):
 
                 traceback.print_exc()
 
-    def close_tab(self, index):
+    def close_tab(self, index, force=False):
         widget = self.tabs.widget(index)
         if widget:
+            if not force and hasattr(widget, "undo_stack") and not widget.undo_stack.isClean():
+                title = getattr(widget, "filename", None) or "Untitled"
+                res = QMessageBox.question(
+                    self,
+                    "Save Changes",
+                    f"The schematic '{title}' has unsaved changes. Do you want to save before closing?",
+                    QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Discard | QMessageBox.StandardButton.Cancel,
+                )
+                if res == QMessageBox.StandardButton.Save:
+                    self.tabs.setCurrentIndex(index)
+                    self.save_file()
+                elif res == QMessageBox.StandardButton.Cancel:
+                    return
             widget.deleteLater()
             self.tabs.removeTab(index)
 
@@ -748,6 +1049,20 @@ class MainWindow(QMainWindow):
         dialog = SettingsDialog(self)
         dialog.exec()
 
+    def apply_ai_feature_state(self, enabled):
+        if hasattr(self, "simulation_log") and hasattr(
+            self.simulation_log, "set_ai_features_enabled"
+        ):
+            self.simulation_log.set_ai_features_enabled(enabled)
+
+        pm = getattr(self, "plugin_manager", None)
+        if pm is None:
+            return
+
+        for plugin in pm.plugins:
+            if plugin.__class__.__name__ == "CopilotPlugin" and hasattr(plugin, "action"):
+                plugin.action.setVisible(enabled)
+
     def generate_report(self):
         current_widget = self.tabs.currentWidget()
         if not isinstance(current_widget, SchematicView) or not getattr(
@@ -816,45 +1131,27 @@ class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Settings")
-        self.resize(500, 450)
+        self.resize(640, 540)
         self.settings = QSettings("OpenS", "OpenS")
+        self._initial_ai_enabled = (
+            str(self.settings.value("ai_features_enabled", "false")).lower()
+            in ("1", "true", "yes", "on")
+        )
 
         layout = QVBoxLayout(self)
-        form = QFormLayout()
+        tabs = QTabWidget()
+        layout.addWidget(tabs)
 
-        # Code Editor
+        # General tab
+        general_tab = QWidget()
+        general_layout = QVBoxLayout(general_tab)
+        general_form = QFormLayout()
+
         self.editor_edit = QLineEdit()
         self.editor_edit.setPlaceholderText("e.g. code '%s'")
         self.editor_edit.setText(self.settings.value("editor_command", "code '%s'"))
-        form.addRow("Code Editor Command:", self.editor_edit)
+        general_form.addRow("Code Editor Command:", self.editor_edit)
 
-        # AI Command
-        self.ai_command_combo = QComboBox()
-        self.ai_command_combo.setEditable(True)
-        self.ai_command_combo.addItems(["copilot -ps '%s'", "gemini -p '%s'"])
-        self.ai_command_combo.setEditText(self.settings.value("ai_command", "copilot -ps '%s'"))
-        form.addRow("AI Analysis Command:", self.ai_command_combo)
-
-        # Xyce: nodcpath resistance
-        self.nodcpath_edit = QLineEdit()
-        self.nodcpath_edit.setPlaceholderText("e.g. 1G (empty to disable)")
-        self.nodcpath_edit.setText(self.settings.value("nodcpath_resistance", "1G"))
-        form.addRow(".preprocess nodcpath R:", self.nodcpath_edit)
-
-        # MCP Port
-        self.mcp_port_edit = QLineEdit()
-        self.mcp_port_edit.setPlaceholderText("8000")
-        self.mcp_port_edit.setText(self.settings.value("mcp_port", "8000"))
-        form.addRow("MCP Server Port:", self.mcp_port_edit)
-
-        # AI Terminal
-        self.ai_terminal_combo = QComboBox()
-        self.ai_terminal_combo.setEditable(True)
-        self.ai_terminal_combo.addItems(["copilot", "gemini"])
-        self.ai_terminal_combo.setEditText(self.settings.value("ai_terminal_command", "copilot"))
-        form.addRow("AI Terminal Command:", self.ai_terminal_combo)
-
-        # Library Search Paths
         self.lib_paths_list = QListWidget()
         self.lib_paths_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.lib_paths_list.customContextMenuRequested.connect(
@@ -883,20 +1180,72 @@ class SettingsDialog(QDialog):
                 item.setData(Qt.ItemDataRole.UserRole, "custom")
                 self.lib_paths_list.addItem(item)
 
-        form.addRow("Library Search Paths:", self.lib_paths_list)
+        general_form.addRow("Library Search Paths:", self.lib_paths_list)
+        general_layout.addLayout(general_form)
+        tabs.addTab(general_tab, "General")
 
-        layout.addLayout(form)
+        # Simulation tab
+        simulation_tab = QWidget()
+        simulation_layout = QVBoxLayout(simulation_tab)
+        simulation_form = QFormLayout()
 
-        # Xyce update button
+        self.nodcpath_edit = QLineEdit()
+        self.nodcpath_edit.setPlaceholderText("e.g. 1G (empty to disable)")
+        self.nodcpath_edit.setText(self.settings.value("nodcpath_resistance", "1G"))
+        simulation_form.addRow(".preprocess nodcpath R:", self.nodcpath_edit)
+
+        self.mcp_port_edit = QLineEdit()
+        self.mcp_port_edit.setPlaceholderText("8000")
+        self.mcp_port_edit.setText(self.settings.value("mcp_port", "8000"))
+        simulation_form.addRow("MCP Server Port:", self.mcp_port_edit)
+        simulation_layout.addLayout(simulation_form)
+
         update_layout = QHBoxLayout()
         update_btn = QPushButton("Force Reinstall Xyce")
         update_btn.clicked.connect(self._force_update_xyce)
         update_layout.addWidget(QLabel("Manage Xyce Simulator:"))
         update_layout.addWidget(update_btn)
         update_layout.addStretch()
-        layout.addLayout(update_layout)
+        simulation_layout.addLayout(update_layout)
+        tabs.addTab(simulation_tab, "Simulation")
 
-        # MCP export buttons
+        # AI tab
+        ai_tab = QWidget()
+        ai_layout = QVBoxLayout(ai_tab)
+
+        self.ai_enabled_checkbox = QCheckBox(
+            "Enable AI features (experimental)"
+        )
+        self.ai_enabled_checkbox.setChecked(self._initial_ai_enabled)
+        self.ai_enabled_checkbox.setToolTip(
+            "Experimental feature: enables AI toolbar actions and FastMCP server startup."
+        )
+        ai_layout.addWidget(self.ai_enabled_checkbox)
+        ai_hint = QLabel(
+            "Experimental: when disabled, FastMCP is not started and AI buttons are hidden."
+        )
+        ai_hint.setStyleSheet("color: #666;")
+        ai_layout.addWidget(ai_hint)
+
+        self.ai_command_combo = QComboBox()
+        self.ai_command_combo.setEditable(True)
+        self.ai_command_combo.addItems(["copilot -ps '%s'", "gemini -p '%s'"])
+        self.ai_command_combo.setEditText(
+            self.settings.value("ai_command", "copilot -ps '%s'")
+        )
+
+        self.ai_terminal_combo = QComboBox()
+        self.ai_terminal_combo.setEditable(True)
+        self.ai_terminal_combo.addItems(["copilot", "gemini"])
+        self.ai_terminal_combo.setEditText(
+            self.settings.value("ai_terminal_command", "copilot")
+        )
+
+        ai_form = QFormLayout()
+        ai_form.addRow("AI Analysis Command:", self.ai_command_combo)
+        ai_form.addRow("AI Terminal Command:", self.ai_terminal_combo)
+        ai_layout.addLayout(ai_form)
+
         mcp_layout = QVBoxLayout()
         mcp_label_layout = QHBoxLayout()
         mcp_label_layout.addWidget(QLabel("MCP Server Integration:"))
@@ -904,35 +1253,37 @@ class SettingsDialog(QDialog):
         mcp_layout.addLayout(mcp_label_layout)
 
         mcp_btn_layout = QHBoxLayout()
-        mcp_export_copilot_btn = QPushButton("Export To Copilot Config")
-        mcp_export_copilot_btn.clicked.connect(lambda: self._export_mcp_config("copilot"))
-        
-        mcp_export_gemini_btn = QPushButton("Export To Gemini Config")
-        mcp_export_gemini_btn.clicked.connect(lambda: self._export_mcp_config("gemini"))
-        
-        mcp_btn_layout.addWidget(mcp_export_copilot_btn)
-        mcp_btn_layout.addWidget(mcp_export_gemini_btn)
+        self.mcp_export_copilot_btn = QPushButton("Export To Copilot Config")
+        self.mcp_export_copilot_btn.clicked.connect(
+            lambda: self._export_mcp_config("copilot")
+        )
+
+        self.mcp_export_gemini_btn = QPushButton("Export To Gemini Config")
+        self.mcp_export_gemini_btn.clicked.connect(
+            lambda: self._export_mcp_config("gemini")
+        )
+
+        mcp_btn_layout.addWidget(self.mcp_export_copilot_btn)
+        mcp_btn_layout.addWidget(self.mcp_export_gemini_btn)
         mcp_btn_layout.addStretch()
         mcp_layout.addLayout(mcp_btn_layout)
-        
-        layout.addLayout(mcp_layout)
+        ai_layout.addLayout(mcp_layout)
 
-        # Separator Line
-        line = QFrame()
-        line.setFrameShape(QFrame.Shape.HLine)
-        line.setFrameShadow(QFrame.Shadow.Sunken)
-        layout.addWidget(line)
+        self.ai_enabled_checkbox.toggled.connect(self._on_ai_enabled_toggled)
+        self._on_ai_enabled_toggled(self.ai_enabled_checkbox.isChecked())
+        tabs.addTab(ai_tab, "AI")
 
-        # Theme Presets
+        # Appearance tab
+        appearance_tab = QWidget()
+        appearance_layout = QVBoxLayout(appearance_tab)
         theme_layout = QHBoxLayout()
         theme_layout.addWidget(QLabel("Theme Presets:"))
         self.preset_combo = QComboBox()
         self.preset_combo.addItems(["Custom", "Bright Theme", "Dark (Virtuoso)"])
         self.preset_combo.currentIndexChanged.connect(self._on_preset_changed)
         theme_layout.addWidget(self.preset_combo)
-        layout.addLayout(theme_layout)
+        appearance_layout.addLayout(theme_layout)
 
-        # Colors
         self.color_buttons = {}
         colors_form = QFormLayout()
         color_labels = {
@@ -956,7 +1307,8 @@ class SettingsDialog(QDialog):
             self.color_buttons[key] = btn
             colors_form.addRow(text + ":", btn)
 
-        layout.addLayout(colors_form)
+        appearance_layout.addLayout(colors_form)
+        tabs.addTab(appearance_tab, "Appearance")
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
@@ -969,6 +1321,13 @@ class SettingsDialog(QDialog):
         if self.parent() and hasattr(self.parent(), "_check_for_xyce_updates"):
             self.parent()._check_for_xyce_updates(force=True)
             self.accept()
+
+    def _on_ai_enabled_toggled(self, enabled):
+        self.ai_command_combo.setEnabled(enabled)
+        self.ai_terminal_combo.setEnabled(enabled)
+        self.mcp_port_edit.setEnabled(enabled)
+        self.mcp_export_copilot_btn.setEnabled(enabled)
+        self.mcp_export_gemini_btn.setEnabled(enabled)
 
     def _export_mcp_config(self, target="copilot"):
         # Find MCP plugin
@@ -1032,9 +1391,11 @@ class SettingsDialog(QDialog):
                 self.color_buttons[key]._color = val
 
     def save(self):
+        ai_enabled = self.ai_enabled_checkbox.isChecked()
         self.settings.setValue("editor_command", self.editor_edit.text())
         self.settings.setValue("ai_command", self.ai_command_combo.currentText())
         self.settings.setValue("ai_terminal_command", self.ai_terminal_combo.currentText())
+        self.settings.setValue("ai_features_enabled", ai_enabled)
         self.settings.setValue("nodcpath_resistance", self.nodcpath_edit.text().strip())
         self.settings.setValue("mcp_port", self.mcp_port_edit.text().strip())
 
@@ -1048,4 +1409,15 @@ class SettingsDialog(QDialog):
         for key, btn in self.color_buttons.items():
             if hasattr(btn, "_color"):
                 theme_manager.set_color(key, btn._color)
+
+        parent = self.parent()
+        if parent and hasattr(parent, "apply_ai_feature_state"):
+            parent.apply_ai_feature_state(ai_enabled)
+
+        if ai_enabled != self._initial_ai_enabled:
+            QMessageBox.information(
+                self,
+                "Restart Recommended",
+                "AI feature mode changed. Please restart OpenS so plugin loading and FastMCP startup state are fully applied.",
+            )
         self.accept()

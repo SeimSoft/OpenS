@@ -1,0 +1,70 @@
+    def updateScaleBox(self, p1, p2):
+        r = QtCore.QRectF(p1, p2)
+        r = self.childGroup.mapRectFromParent(r)
+        self.rbScaleBox.setPos(r.topLeft())
+        tr = QtGui.QTransform.fromScale(r.width(), r.height())
+        self.rbScaleBox.setTransform(tr)
+        self.rbScaleBox.show()
+
+    def mouseDragEvent(self, ev, axis=None):
+        ## if axis is specified, event will only affect that axis.
+        ev.accept()  ## we accept all buttons
+
+        pos = ev.pos()
+        lastPos = ev.lastPos()
+        dif = pos - lastPos
+        dif = dif * -1
+
+        ## Ignore axes if mouse is disabled
+        mouseEnabled = np.array(self.state['mouseEnabled'], dtype=np.float64)
+        mask = mouseEnabled.copy()
+        if axis is not None:
+            mask[1-axis] = 0.0
+
+        ## Scale or translate based on mouse button
+        if ev.button() in [QtCore.Qt.MouseButton.LeftButton, QtCore.Qt.MouseButton.MiddleButton]:
+            if self.state['mouseMode'] == ViewBox.RectMode and axis is None:
+                if ev.isFinish():  ## This is the final move in the drag; change the view scale now
+                    #print "finish"
+                    self.rbScaleBox.hide()
+                    ax = QtCore.QRectF(Point(ev.buttonDownPos(ev.button())), Point(pos))
+                    ax = self.childGroup.mapRectFromParent(ax)
+                    self.showAxRect(ax)
+                    self.axHistoryPointer += 1
+                    self.axHistory = self.axHistory[:self.axHistoryPointer] + [ax]
+                else:
+                    ## update shape of scale box
+                    self.updateScaleBox(ev.buttonDownPos(), ev.pos())
+            else:
+                tr = self.childGroup.transform()
+                tr = fn.invertQTransform(tr)
+                tr = tr.map(dif*mask) - tr.map(Point(0,0))
+
+                x = tr.x() if mask[0] == 1 else None
+                y = tr.y() if mask[1] == 1 else None
+
+                self._resetTarget()
+                if x is not None or y is not None:
+                    self.translateBy(x=x, y=y)
+                self.sigRangeChangedManually.emit(self.state['mouseEnabled'])
+        elif ev.button() & QtCore.Qt.MouseButton.RightButton:
+            #print "vb.rightDrag"
+            if self.state['aspectLocked'] is not False:
+                mask[0] = 0
+
+            dif = ev.screenPos() - ev.lastScreenPos()
+            dif = np.array([dif.x(), dif.y()])
+            dif[0] *= -1
+            s = ((mask * 0.02) + 1) ** dif
+
+            tr = self.childGroup.transform()
+            tr = fn.invertQTransform(tr)
+
+            x = s[0] if mouseEnabled[0] == 1 else None
+            y = s[1] if mouseEnabled[1] == 1 else None
+
+            center = Point(tr.map(ev.buttonDownPos(QtCore.Qt.MouseButton.RightButton)))
+            self._resetTarget()
+            self.scaleBy(x=x, y=y, center=center)
+            self.sigRangeChangedManually.emit(self.state['mouseEnabled'])
+

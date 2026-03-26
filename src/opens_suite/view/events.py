@@ -20,6 +20,7 @@ from PyQt6.QtCore import (
     QEvent,
 )
 import math
+import random
 from PyQt6.QtGui import (
     QPainter,
     QPen,
@@ -140,35 +141,55 @@ class EventsMixin:
 
         elif event.key() == Qt.Key.Key_Space:
             items = self.scene().selectedItems()
-            net_name = None
+            probed_names = []
+
             for item in items:
-                from opens_suite.wire import Wire
                 if isinstance(item, Wire):
                     if (
                         hasattr(self, "last_item_to_node")
                         and self.last_item_to_node
                         and item in self.last_item_to_node
                     ):
-                        net_name = self.last_item_to_node[item]
+                        raw_name = self.last_item_to_node[item]
                     else:
-                        net_name = item.name or "N_?"
-                    break
-            
-            if net_name:
-                self.netProbed.emit(net_name)
+                        raw_name = item.name or item.net_name or "N_?"
 
+                    canon = self._canonical_probe_net_name(raw_name)
+                    if canon is None and (item.name or item.net_name):
+                        canon = self._canonical_probe_net_name(item.name or item.net_name)
+                    if canon:
+                        probed_names.append(canon)
+                elif isinstance(item, SchematicItem):
+                    if item.name:
+                        probed_names.append(item.name + "#branch")
+
+            if not probed_names:
+                return
+
+            if len(probed_names) == 2 and all(isinstance(i, Wire) for i in items[:2]):
+                n1, n2 = probed_names[0], probed_names[1]
+                self.netProbed.emit(f"DIFF:{n1},{n2}")
+            else:
+                for name in probed_names:
+                    self.netProbed.emit(name)
+
+        elif event.key() == Qt.Key.Key_9 and event.modifiers() == Qt.KeyboardModifier.NoModifier:
+            self._highlight_selected_net()
+        elif event.key() == Qt.Key.Key_0 and event.modifiers() == Qt.KeyboardModifier.NoModifier:
+            self._unhighlight_all_nets()
         elif event.key() == Qt.Key.Key_F:
             self.fitInView(
                 self.scene().itemsBoundingRect(), Qt.AspectRatioMode.KeepAspectRatio
             )
-        elif (
-            event.key() == Qt.Key.Key_E
-            and event.modifiers() == Qt.KeyboardModifier.NoModifier
-        ):
-            # Mirror selection horizontally across selection center
-            items = [
-                it for it in self.scene().selectedItems() if it.parentItem() is None
-            ]
+        elif event.key() == Qt.Key.Key_E:
+            if event.modifiers() == Qt.KeyboardModifier.ControlModifier:
+                if hasattr(self, "hierarchy_prefix") and self.hierarchy_prefix:
+                    self.returnToParentRequested.emit()
+            elif event.modifiers() == Qt.KeyboardModifier.NoModifier:
+                # Mirror selection horizontally across selection center
+                items = [
+                    it for it in self.scene().selectedItems() if it.parentItem() is None
+                ]
             if items:
                 self._transform_selection(mode="mirror")
         else:
@@ -251,6 +272,289 @@ class EventsMixin:
         y = round(pos.y() / grid_size) * grid_size
         return QPointF(x, y)
 
+    def _get_wire_net_name(self, wire):
+        """Return the net name for a wire, using last_item_to_node if available."""
+        fallback_name = wire.name or wire.net_name
+        if (
+            hasattr(self, "last_item_to_node")
+            and self.last_item_to_node
+            and wire in self.last_item_to_node
+        ):
+            mapped = self.last_item_to_node[wire]
+            # Some connectivity paths can yield instance-pin pseudo names
+            # (e.g. X_3:P2). Prefer explicit wire names when available.
+            if self._looks_like_instance_pin_name(mapped) and fallback_name:
+                return fallback_name
+            return mapped
+        return fallback_name
+
+    @staticmethod
+    def _looks_like_instance_pin_name(name):
+        if not name or ":" not in str(name):
+            return False
+        lhs, rhs = str(name).split(":", 1)
+        if not lhs or not rhs:
+            return False
+        # Heuristic: instance-like left side and pin-like right side.
+        return lhs[0].upper() == "X" and rhs[0].upper() == "P"
+
+    def _bridge_to_parent_full_net(self, name):
+        if not name:
+            return None
+        pin_map = getattr(self, "_child_pin_parent_nets", {}) or {}
+        s = str(name)
+        if s in pin_map:
+            return pin_map[s]
+        if ":" in s:
+            pin_id = s.split(":")[-1]
+            if pin_id in pin_map:
+                return pin_map[pin_id]
+        return None
+
+    def _canonical_probe_net_name(self, name):
+        bridged = self._bridge_to_parent_full_net(name)
+        if bridged:
+            return bridged
+        if self._looks_like_instance_pin_name(name):
+            # Ignore pseudo instance-pin names like X_3:P2.
+            return None
+        return self._full_net_name(name)
+
+    def _full_net_name(self, net_name):
+        if not net_name:
+            return None
+        net_name = str(net_name)
+        if ":" in net_name:
+            return net_name
+        return f"{getattr(self, 'hierarchy_prefix', '')}{net_name}"
+
+    def _get_pin_item_net_name(self, item):
+        if not isinstance(item, SchematicItem):
+            return None
+        is_pin_like = (
+            item.category in ("IO", "Global")
+            or item.prefix == "PIN"
+            or getattr(item, "is_global_net", False)
+        )
+        if not is_pin_like:
+            return None
+        params = getattr(item, "parameters", {}) or {}
+        return params.get("NET_NAME") or item.name
+
+    def _get_highlight_store(self):
+        main_window = self.window()
+        if not hasattr(main_window, "_net_highlight_full_names"):
+            main_window._net_highlight_full_names = set()
+        if not hasattr(main_window, "_net_highlight_colors"):
+            main_window._net_highlight_colors = {}
+        return main_window._net_highlight_full_names, main_window._net_highlight_colors
+
+    def apply_net_highlight_full_names(self, full_names=None):
+        if full_names is None:
+            full_names, color_map = self._get_highlight_store()
+            full_names = set(full_names)
+        else:
+            full_names = set(full_names)
+            _, color_map = self._get_highlight_store()
+
+        # If child-highlight pin IDs were propagated, convert them to mapped local nets.
+        pin_ids = set(getattr(self, "_highlight_pin_ids", set()))
+        if pin_ids and hasattr(self, "last_item_to_node") and self.last_item_to_node:
+            for key, mapped_name in self.last_item_to_node.items():
+                if not isinstance(key, tuple) or len(key) != 2:
+                    continue
+                _, pin_id = key
+                if str(pin_id) in pin_ids and mapped_name:
+                    mapped_full = self._canonical_probe_net_name(mapped_name)
+                    if mapped_full:
+                        full_names.add(mapped_full)
+
+        for item in self.scene().items():
+            if isinstance(item, Wire):
+                local_name = self._get_wire_net_name(item)
+                full_name = self._canonical_probe_net_name(local_name)
+                item.highlight_color = color_map.get(full_name)
+                item.update()
+            elif isinstance(item, SchematicItem):
+                local_pin_name = self._get_pin_item_net_name(item)
+                full_name = self._canonical_probe_net_name(local_pin_name)
+                item_color = color_map.get(full_name)
+
+                # Fallback: if this item has highlighted pin IDs, derive color via connectivity map.
+                if (
+                    item_color is None
+                    and pin_ids
+                    and hasattr(item, "pins")
+                    and hasattr(self, "last_item_to_node")
+                ):
+                    for pin_id in item.pins.keys():
+                        if str(pin_id) not in pin_ids:
+                            continue
+                        mapped_name = self.last_item_to_node.get((item, pin_id))
+                        mapped_full = self._canonical_probe_net_name(mapped_name or pin_id)
+                        item_color = color_map.get(mapped_full)
+                        if item_color is not None:
+                            break
+
+                item.net_highlight_color = item_color
+                item.update()
+
+        # Geometric fallback for child pin IDs when connectivity map does not
+        # yet resolve to local nets (e.g. freshly opened child without sim map).
+        if pin_ids:
+            self._apply_pin_component_highlights(pin_ids, color_map)
+
+    def _wire_endpoints_scene(self, wire):
+        line = wire.line()
+        return wire.mapToScene(line.p1()), wire.mapToScene(line.p2())
+
+    def _wire_touches_pos(self, wire, pos, tol=2.5):
+        p1, p2 = self._wire_endpoints_scene(wire)
+        return self._distance_point_to_line(pos, p1, p2) <= tol
+
+    def _wires_connected(self, w1, w2):
+        a1, a2 = self._wire_endpoints_scene(w1)
+        b1, b2 = self._wire_endpoints_scene(w2)
+        if (
+            (a1 - b1).manhattanLength() < 1
+            or (a1 - b2).manhattanLength() < 1
+            or (a2 - b1).manhattanLength() < 1
+            or (a2 - b2).manhattanLength() < 1
+        ):
+            return True
+        return (
+            self._distance_point_to_line(a1, b1, b2) < 1
+            or self._distance_point_to_line(a2, b1, b2) < 1
+            or self._distance_point_to_line(b1, a1, a2) < 1
+            or self._distance_point_to_line(b2, a1, a2) < 1
+        )
+
+    def _apply_pin_component_highlights(self, pin_ids, color_map):
+        wires = [it for it in self.scene().items() if isinstance(it, Wire)]
+        if not wires:
+            return
+
+        # Build wire adjacency once
+        adj = {w: [] for w in wires}
+        for i, w1 in enumerate(wires):
+            for w2 in wires[i + 1 :]:
+                if self._wires_connected(w1, w2):
+                    adj[w1].append(w2)
+                    adj[w2].append(w1)
+
+        for item in self.scene().items():
+            if not isinstance(item, SchematicItem) or not hasattr(item, "pins"):
+                continue
+            for pin_id, info in item.pins.items():
+                if str(pin_id) not in pin_ids:
+                    continue
+                pin_pos = item.mapToScene(info["pos"])
+                pin_color = color_map.get(self._canonical_probe_net_name(pin_id))
+                if pin_color is None:
+                    continue
+
+                starts = [w for w in wires if self._wire_touches_pos(w, pin_pos)]
+                stack = list(starts)
+                seen = set(starts)
+                while stack:
+                    curr = stack.pop()
+                    if curr.highlight_color is None:
+                        curr.highlight_color = pin_color
+                        curr.update()
+                    for nxt in adj[curr]:
+                        if nxt not in seen:
+                            seen.add(nxt)
+                            stack.append(nxt)
+
+    @staticmethod
+    def _distance_point_to_line(point, p1, p2):
+        ap = point - p1
+        ab = p2 - p1
+        len_sq = ab.x() ** 2 + ab.y() ** 2
+        if len_sq == 0:
+            return (point - p1).manhattanLength()
+        t = max(0, min(1, (ap.x() * ab.x() + ap.y() * ab.y()) / len_sq))
+        proj = p1 + t * ab
+        return (point - proj).manhattanLength()
+
+    def _resolve_probe_net_from_pin(self, sch_item, pin_id, pin_pos):
+        # 1) Direct connectivity map lookup for this exact pin
+        if (
+            hasattr(self, "last_item_to_node")
+            and self.last_item_to_node
+            and (sch_item, pin_id) in self.last_item_to_node
+        ):
+            mapped = self.last_item_to_node[(sch_item, pin_id)]
+            pseudo = f"{getattr(sch_item, 'name', '')}:{pin_id}"
+            if str(mapped).lower() != pseudo.lower():
+                return mapped
+
+        # 2) Geometric fallback: nearest connected wire -> mapped net
+        nearest_wire = None
+        nearest_d = 1e9
+        for obj in self.scene().items():
+            if not isinstance(obj, Wire):
+                continue
+            line = obj.line()
+            p1 = obj.mapToScene(line.p1())
+            p2 = obj.mapToScene(line.p2())
+            d = self._distance_point_to_line(pin_pos, p1, p2)
+            if d < nearest_d:
+                nearest_d = d
+                nearest_wire = obj
+
+        if nearest_wire is not None and nearest_d < 2.0:
+            if (
+                hasattr(self, "last_item_to_node")
+                and self.last_item_to_node
+                and nearest_wire in self.last_item_to_node
+            ):
+                return self.last_item_to_node[nearest_wire]
+            return nearest_wire.name or nearest_wire.net_name
+
+        # 3) Last-resort pin-like naming without artificial V(...) wrapping
+        params = getattr(sch_item, "parameters", {}) or {}
+        return params.get("NET_NAME") or sch_item.name
+
+    def _apply_net_highlights_to_open_views(self):
+        main_window = self.window()
+        if hasattr(main_window, "tabs"):
+            for i in range(main_window.tabs.count()):
+                widget = main_window.tabs.widget(i)
+                if hasattr(widget, "apply_net_highlight_full_names"):
+                    widget.apply_net_highlight_full_names()
+        else:
+            self.apply_net_highlight_full_names()
+
+    def _highlight_selected_net(self):
+        selected = [w for w in self.scene().selectedItems() if isinstance(w, Wire)]
+        if not selected:
+            return
+        full_names = {
+            self._canonical_probe_net_name(self._get_wire_net_name(w)) for w in selected
+        }
+        full_names.discard(None)
+        if not full_names:
+            return
+
+        store_names, color_map = self._get_highlight_store()
+
+        # Assign a random vivid color per net name
+        for full_name in full_names:
+            if full_name not in color_map:
+                h = random.randint(0, 359)
+                color = QColor.fromHsvF(h / 360.0, 0.85, 1.0)
+                color_map[full_name] = color
+        store_names.update(full_names)
+
+        self._apply_net_highlights_to_open_views()
+
+    def _unhighlight_all_nets(self):
+        store_names, color_map = self._get_highlight_store()
+        store_names.clear()
+        color_map.clear()
+        self._apply_net_highlights_to_open_views()
+
     def mousePressEvent(self, event: QMouseEvent):
         from PyQt6.QtCore import Qt
 
@@ -309,21 +613,17 @@ class EventsMixin:
                         for pin_id, info in item.pins.items():
                             pin_pos = item.mapToScene(info["pos"])
                             if (pin_pos - pos).manhattanLength() < 7:
-                                if (
-                                    hasattr(self, "last_item_to_node")
-                                    and self.last_item_to_node
-                                    and (item, pin_id) in self.last_item_to_node
-                                ):
-                                    net_name = self.last_item_to_node[(item, pin_id)]
-                                else:
-                                    net_name = f"V({item.name}:{pin_id})"
+                                net_name = self._resolve_probe_net_from_pin(
+                                    item, pin_id, pin_pos
+                                )
                                 break
-                    if net_name:
-                        break
+                        if net_name:
+                            break
 
             if net_name:
-                self.netProbed.emit(net_name)
-
+                canon = self._canonical_probe_net_name(net_name)
+                if canon:
+                    self.netProbed.emit(canon)
             self.set_mode(self.MODE_SELECT)
             return
 

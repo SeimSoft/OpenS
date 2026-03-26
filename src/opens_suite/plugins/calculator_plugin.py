@@ -72,6 +72,21 @@ class CalculatorPlugin(OpenSPlugin):
                 has_results = True
         self.calc_action.setEnabled(has_results)
 
+    def _get_raw_path(self, view):
+        if not view:
+            return None
+        raw_path = getattr(view, "current_raw_path", None)
+        if raw_path:
+            return raw_path
+        
+        filename = getattr(view, "filename", None)
+        if not filename:
+            return None
+            
+        sim_dir = os.path.join(os.path.dirname(filename), "simulation")
+        base = os.path.splitext(os.path.basename(filename))[0]
+        return os.path.join(sim_dir, f"{base}.raw")
+
     def _connect_view(self, view):
         # Prevent multiple connections
         try:
@@ -85,49 +100,71 @@ class CalculatorPlugin(OpenSPlugin):
         view.simulationFinished.connect(self.refresh_calculators)
         self._update_action_state(view)
 
+    def _is_alive(self, obj):
+        if obj is None:
+            return False
+        try:
+            obj.objectName()
+            return not getattr(obj, "_is_deleted", False)
+        except RuntimeError:
+            return False
+
     def refresh_calculators(self):
         self._update_action_state()
         if hasattr(self.main_window, "active_calculators"):
-            # Filter out hidden or deleted calculators
-            # Exclude them if they are hidden AND their viewer is also hidden/missing.
+            # Cleanup is handled by destroyed signal, but let's be safe
             self.main_window.active_calculators = [
-                c
-                for c in self.main_window.active_calculators
-                if c is not None and (not c.isHidden() or (getattr(c, "viewer", None) and not c.viewer.isHidden()))
+                c for c in self.main_window.active_calculators if self._is_alive(c)
             ]
             for calc in self.main_window.active_calculators:
-                calc._refresh_and_replot()
+                try:
+                    calc._refresh_and_replot()
+                except RuntimeError:
+                    pass
 
     def open_calculator(self):
         view = self.main_window.tabs.currentWidget()
         if not isinstance(view, SchematicView):
             return
 
-        filename = getattr(view, "filename", None)
-        if not filename:
-            QMessageBox.warning(
-                self.main_window,
-                "Warning",
-                "Save the schematic and run simulation first.",
-            )
+        raw_path = self._get_raw_path(view)
+
+        if not raw_path or not os.path.exists(raw_path):
+            filename = getattr(view, "filename", None)
+            msg = f"Raw results not found at: {raw_path}\nPlease run simulation first." if raw_path else "Save the schematic and run simulation first."
+            QMessageBox.warning(self.main_window, "Warning", msg)
             return
 
-        sim_dir = os.path.join(os.path.dirname(filename), "simulation")
-        base = os.path.splitext(os.path.basename(filename))[0]
-        raw_path = os.path.join(sim_dir, f"{base}.raw")
+        # Check for existing calculator with same raw_path
+        dialog = None
+        if hasattr(self.main_window, "active_calculators"):
+            # Clean up first
+            self.main_window.active_calculators = [
+                c for c in self.main_window.active_calculators if self._is_alive(c)
+            ]
+            for c in self.main_window.active_calculators:
+                if c.raw_path == raw_path:
+                    dialog = c
+                    break
 
-        if not os.path.exists(raw_path):
-            QMessageBox.warning(
-                self.main_window,
-                "Warning",
-                f"Raw results not found at: {raw_path}\nPlease run simulation first.",
-            )
-            return
+        if dialog:
+            dialog.hierarchy_prefix = getattr(view, "hierarchy_prefix", "")
+            dialog._refresh_and_replot()
+            return dialog
 
         dialog = CalculatorDialog(raw_path, self.main_window)
+        dialog.hierarchy_prefix = getattr(view, "hierarchy_prefix", "")
         if not hasattr(self.main_window, "active_calculators"):
             self.main_window.active_calculators = []
         self.main_window.active_calculators.append(dialog)
+        
+        # Automatic cleanup
+        def on_destroyed():
+            if hasattr(self.main_window, "active_calculators"):
+                if dialog in self.main_window.active_calculators:
+                    self.main_window.active_calculators.remove(dialog)
+        dialog.destroyed.connect(on_destroyed)
+
         dialog.sendToOutputsRequested.connect(
             lambda expr: self.main_window.outputs_dock.update_or_add_expression(expr, origin_row=None)
         )
@@ -137,15 +174,9 @@ class CalculatorPlugin(OpenSPlugin):
 
     def _plot_output_expression(self, expression):
         view = self.main_window.tabs.currentWidget()
-        filename = getattr(view, "filename", None) if view else None
-        if not filename:
-            return
+        raw_path = self._get_raw_path(view)
 
-        sim_dir = os.path.join(os.path.dirname(filename), "simulation")
-        base = os.path.splitext(os.path.basename(filename))[0]
-        raw_path = os.path.join(sim_dir, f"{base}.raw")
-
-        if not os.path.exists(raw_path):
+        if not raw_path or not os.path.exists(raw_path):
             return
 
         dialog = CalculatorDialog(raw_path, self.main_window)
@@ -162,15 +193,9 @@ class CalculatorPlugin(OpenSPlugin):
 
     def _plot_net_signals(self, net_name):
         view = self.main_window.tabs.currentWidget()
-        filename = getattr(view, "filename", None) if view else None
-        if not filename:
-            return
+        raw_path = self._get_raw_path(view)
 
-        sim_dir = os.path.join(os.path.dirname(filename), "simulation")
-        base = os.path.splitext(os.path.basename(filename))[0]
-        raw_path = os.path.join(sim_dir, f"{base}.raw")
-
-        if not os.path.exists(raw_path):
+        if not raw_path or not os.path.exists(raw_path):
             self.main_window.status_bar.showMessage(
                 "No simulation results available. Run simulation first."
             )
@@ -205,15 +230,9 @@ class CalculatorPlugin(OpenSPlugin):
 
     def _send_output_to_calculator(self, row, expression):
         view = self.main_window.tabs.currentWidget()
-        filename = getattr(view, "filename", None) if view else None
-        if not filename:
-            return
+        raw_path = self._get_raw_path(view)
 
-        sim_dir = os.path.join(os.path.dirname(filename), "simulation")
-        base = os.path.splitext(os.path.basename(filename))[0]
-        raw_path = os.path.join(sim_dir, f"{base}.raw")
-
-        if not os.path.exists(raw_path):
+        if not raw_path or not os.path.exists(raw_path):
             return
 
         dialog = CalculatorDialog(raw_path, self.main_window)
@@ -229,15 +248,9 @@ class CalculatorPlugin(OpenSPlugin):
 
     def _plot_output_expressions_bulk(self, expressions):
         view = self.main_window.tabs.currentWidget()
-        filename = getattr(view, "filename", None) if view else None
-        if not filename:
-            return
+        raw_path = self._get_raw_path(view)
 
-        sim_dir = os.path.join(os.path.dirname(filename), "simulation")
-        base = os.path.splitext(os.path.basename(filename))[0]
-        raw_path = os.path.join(sim_dir, f"{base}.raw")
-
-        if not os.path.exists(raw_path):
+        if not raw_path or not os.path.exists(raw_path):
             return
 
         dialog = CalculatorDialog(raw_path, self.main_window)
@@ -266,26 +279,28 @@ class CalculatorPlugin(OpenSPlugin):
             if hasattr(self.main_window, "analysis_dock")
             else "Tran"
         )
-        prefix_map = {"Tran": "vt", "AC": "vf", "OP": "op", "DC": "vdc"}
-        prefix = prefix_map.get(an_type, "vt")
+        prefix_map = {"Tran": "st", "AC": "sf", "OP": "sop", "DC": "sdc"}
+        prefix = prefix_map.get(an_type, "st")
 
-        expr = f"plot({prefix}('{net_name}'), label=\"{prefix}('{net_name}')\")"
+        if net_name.startswith("DIFF:"):
+            nets = net_name[5:].split(",")
+            if len(nets) == 2:
+                n1, n2 = nets[0], nets[1]
+                expr_str = f"{prefix}('{n1}') - {prefix}('{n2}')"
+                expr = f"plot({expr_str}, label=\"{expr_str}\")"
+            else:
+                return
+        else:
+            expr = f"plot({prefix}('{net_name}'), label=\"{prefix}('{net_name}')\")"
 
         calc = getattr(self, "_probi_calc", None)
-        if not calc or calc.isHidden():
-            has_calcs = (
-                hasattr(self.main_window, "active_calculators")
-                and self.main_window.active_calculators
-            )
-            if has_calcs:
-                self.main_window.active_calculators = [
-                    c for c in self.main_window.active_calculators 
-                    if c is not None and (not c.isHidden() or (getattr(c, "viewer", None) and not c.viewer.isHidden()))
-                ]
-
-            if has_calcs and self.main_window.active_calculators:
-                calc = self.main_window.active_calculators[-1]
-            else:
+        if not self._is_alive(calc) or calc.isHidden():
+            calc = self.open_calculator()
+        else:
+            # If we had a locked calculator, make sure it matches the current raw_path
+            # Otherwise, find/open the correct one.
+            raw_path = self._get_raw_path(self.main_window.tabs.currentWidget())
+            if calc.raw_path != raw_path:
                 calc = self.open_calculator()
 
         if calc:

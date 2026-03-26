@@ -1,0 +1,44 @@
+XYCE-generated Netlist file copy:  TIME='09:12:37 PM' DATE='Mar 24, 2026' 
+*Original Netlist Title:  
+
+** OpenS Generated Netlist
+
+*.preprocess addresistors nodcpath 1G
+*Xyce:  ".PREPROCESS ADDRESISTORS" statement automatically commented out in netlist copy.
+.model CONTROLLER npy MODULE=controller CLASS=Controller PYTHONPATH=/Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/test
+N1 N_1 0 N_14 N_15 N_16 N_17 N_18 N_19 0 N_20 N_21 N_22 N_23 N_24 N_25 VOUT CONTROLLER
+N2 N_1 VOUT N_2 N_3 N_4 N_5 N_6 N_7 0 N_8 N_9 N_10 N_11 N_12 N_13 VOUT2 CONTROLLER
+V1 N_1 0 dc 1 ac 0
+.tran 1u 100u
+.print tran v(*) 
+
+
+*XYCE-GENERATED OUTPUT:  Adding resistors between ground and nodes with no DC path to ground:
+
+RNODCPATH1 N_17 0 1G
+RNODCPATH2 N_18 0 1G
+RNODCPATH3 N_19 0 1G
+RNODCPATH4 N_20 0 1G
+RNODCPATH5 N_21 0 1G
+RNODCPATH6 N_16 0 1G
+RNODCPATH7 N_25 0 1G
+RNODCPATH8 N_13 0 1G
+RNODCPATH9 N_22 0 1G
+RNODCPATH10 N_12 0 1G
+RNODCPATH11 VOUT2 0 1G
+RNODCPATH12 N_11 0 1G
+RNODCPATH13 N_10 0 1G
+RNODCPATH14 N_9 0 1G
+RNODCPATH15 N_14 0 1G
+RNODCPATH16 N_23 0 1G
+RNODCPATH17 N_8 0 1G
+RNODCPATH18 N_6 0 1G
+RNODCPATH19 N_5 0 1G
+RNODCPATH20 N_4 0 1G
+RNODCPATH21 N_15 0 1G
+RNODCPATH22 N_7 0 1G
+RNODCPATH23 N_3 0 1G
+RNODCPATH24 N_24 0 1G
+RNODCPATH25 N_2 0 1G
+
+.END

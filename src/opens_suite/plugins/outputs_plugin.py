@@ -25,22 +25,28 @@ class OutputsPlugin(OpenSPlugin):
         from opens_suite.schematic_view import SchematicView
 
         if isinstance(view, SchematicView):
+            owner = self.main_window.get_simulation_owner_view(view)
             try:
-                view.simulationFinished.disconnect(self._evaluate_all)
+                owner.simulationFinished.disconnect(self._evaluate_all)
             except TypeError:
                 pass
-            view.simulationFinished.connect(self._evaluate_all)
+            owner.simulationFinished.connect(self._evaluate_all)
 
             # Initial restore if view has outputs
-            if hasattr(view, "outputs"):
+            if hasattr(owner, "outputs"):
                 self.dock.blockSignals(True)
-                self.dock.restore_expressions(view.outputs)
+                self.dock.restore_expressions(owner.outputs)
                 self.dock.blockSignals(False)
+
+            self.dock.hierarchy_prefix = getattr(view, "hierarchy_prefix", "")
+            self._evaluate_all()
 
     def _evaluate_all(self):
         view = self.main_window.tabs.currentWidget()
         if not view:
             return
+
+        view = self.main_window.get_simulation_owner_view(view)
 
         filename = getattr(view, "filename", None)
         if filename:
@@ -55,4 +61,5 @@ class OutputsPlugin(OpenSPlugin):
         from opens_suite.schematic_view import SchematicView
 
         if isinstance(view, SchematicView):
-            view.outputs = self.dock.get_expressions_data()
+            owner = self.main_window.get_simulation_owner_view(view)
+            owner.outputs = self.dock.get_expressions_data()

@@ -9,12 +9,22 @@ from opens_suite.plugins.base import OpenSPlugin
 
 class CopilotPlugin(OpenSPlugin):
     def setup(self):
+        from PyQt6.QtCore import QSettings
+
+        settings = QSettings("OpenS", "OpenS")
+        ai_enabled = str(settings.value("ai_features_enabled", "false")).lower() in (
+            "1",
+            "true",
+            "yes",
+            "on",
+        )
+        if not ai_enabled:
+            return
+
         # Load icon
         self.copilot_icon = qta.icon("mdi6.auto-fix", color="#1f1f1f")
 
         # Create action
-        from PyQt6.QtCore import QSettings
-        settings = QSettings("OpenS", "OpenS")
         self.action = QAction(self.copilot_icon, "AI Terminal", self.main_window)
         self.action.setStatusTip("Launch AI in system terminal")
         self.action.triggered.connect(self.launch_ai)
@@ -37,7 +47,7 @@ class CopilotPlugin(OpenSPlugin):
         from PyQt6.QtCore import QSettings
         settings = QSettings("OpenS", "OpenS")
         ai_cmd = settings.value("ai_terminal_command", "copilot")
-        
+
         # Use AppleScript to open a new terminal window and run the command
         # This is specific to macOS.
         script = f'tell application "Terminal" to do script "{ai_cmd}"'

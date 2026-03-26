@@ -128,50 +128,83 @@ class SpiceRawParser:
         return self.plots
 
     @staticmethod
-    def find_signal(data, name, type_hint=None):
+    def find_signal(data, name, type_hint=None, prefix=""):
         """Helper to find a signal in a data dictionary using various naming conventions.
         name: the base name (e.g. 'vin' or 'r1')
         type_hint: 'v' for voltage, 'i' for current
+        prefix: hierarchical prefix (e.g. 'X1:X2:')
         """
         if not data:
             return None
 
-        # Try exact match first
-        if name in data:
-            return data[name]
+        # Apply prefix to name if not GND and not already prefixed
+        lookup_name = name
+        if prefix and name.lower() not in ("0", "gnd"):
+            if "(" in name and name.endswith(")"):
+                # e.g. "i(v1)" -> "i(X1:v1)"
+                start_p = name.find("(")
+                inner = name[start_p + 1 : -1]
+                if not inner.lower().startswith(prefix.lower()):
+                    lookup_name = name[: start_p + 1] + prefix + inner + ")"
+                else:
+                    lookup_name = name
+            elif not name.lower().startswith(prefix.lower()):
+                # e.g. "v1" -> "X1:v1"
+                lookup_name = prefix + name
+            else:
+                lookup_name = name
 
-        nl = name.lower()
-        # Try case-insensitive exact map
-        for k in data.keys():
-            if k.lower() == nl:
-                return data[k]
+        # Build list of candidates to try
+        candidates = [lookup_name]
+        if lookup_name != name:
+            # Fallback to the EXACT un-prefixed name (allows subcircuits to find top-level signals)
+            candidates.append(name)
+            
+        # Handle Xyce's weird subcircuit device branch naming (e.g., X_1:V1#branch gets parsed as V:X_1:1#branch)
+        if "#branch" in lookup_name:
+            import re
+            m = re.match(r"(.*:)?([A-Za-z]+)(\d+)#branch$", lookup_name)
+            if m:
+                hier = m.group(1) or ""
+                typ = m.group(2)
+                num = m.group(3)
+                if hier:
+                    xyce_mangled = f"{typ}:{hier}{num}#branch"
+                    candidates.append(xyce_mangled)
+                    
+        for cand in candidates:
+            # Try exact match first
+            if cand in data:
+                return data[cand]
 
-        # Try common SPICE/Xyce prefixes
-        prefixes = []
-        if type_hint == "v":
-            prefixes = ["v("]
-        elif type_hint == "i":
-            prefixes = ["i(", "@"]
-        else:
-            prefixes = ["v(", "i(", "@"]
+            nl = cand.lower()
+            # Try case-insensitive exact map
+            for k in data.keys():
+                if k.lower() == nl:
+                    return data[k]
 
-        for p in prefixes:
-            target = f"{p}{nl})" if p.endswith("(") else f"{p}{nl}"
+            # Common SPICE/Xyce signal patterns to try
+            search_patterns = []
+            if type_hint == "v":
+                search_patterns = [f"v({nl})", nl]
+            elif type_hint == "i":
+                search_patterns = [f"i({nl})", f"{nl}:i", f"{nl}#branch", f"@{nl}[i]"]
+            else:
+                search_patterns = [f"v({nl})", f"i({nl})", f"{nl}:i", f"{nl}#branch", nl]
+
+            for target in search_patterns:
+                for k in data.keys():
+                    kl = k.lower()
+                    if kl == target or kl.replace("#branch", "") == target or kl.startswith(target + "["):
+                        return data[k]
+            
+            # If still not found, try a very broad search
             for k in data.keys():
                 kl = k.lower()
-                if (
-                    kl == target
-                    or kl.startswith(target + "[")
-                    or kl.replace("#branch", "") == nl
-                ):
-                    return data[k]
-                if p == "i(" and (kl == f"{nl}:i" or kl == f"i({nl})"):
-                    return data[k]
-
-        # Last resort: if name contains :i or resembles a current
-        if nl.endswith(":i"):
-            base = nl[:-2]
-            return SpiceRawParser.find_signal(data, base, "i")
+                if nl in kl:
+                    # Potential match, e.g. "v(x1:node)" matches "x1:node"
+                    if f"({nl})" in kl or kl.endswith(f":{nl}") or kl.endswith(f"({nl})"):
+                        return data[k]
 
         return None
 

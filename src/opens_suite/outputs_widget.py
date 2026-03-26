@@ -104,6 +104,7 @@ class OutputsWidget(QDockWidget):
 
         self.model.itemChanged.connect(self._on_item_changed)
         self._last_raw_path = None
+        self.hierarchy_prefix = ""
         self._results_cache = {}  # name -> result_object
 
     def add_expression(
@@ -218,6 +219,7 @@ class OutputsWidget(QDockWidget):
 
         try:
             temp_calc = CalculatorDialog(raw_path)
+            temp_calc.hierarchy_prefix = getattr(self, "hierarchy_prefix", "")
             scope = temp_calc._create_scope()
             scope["plot"] = lambda *args, **kwargs: None
             scope["bode"] = lambda *args, **kwargs: None
@@ -274,6 +276,7 @@ class OutputsWidget(QDockWidget):
 
             try:
                 temp_calc = CalculatorDialog(raw_path)
+                temp_calc.hierarchy_prefix = getattr(self, "hierarchy_prefix", "")
                 scope = temp_calc._create_scope()
                 scope["plot"] = lambda *args, **kwargs: None
                 scope["bode"] = lambda *args, **kwargs: None

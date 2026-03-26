@@ -13,7 +13,8 @@ from opens_suite.theme import theme_manager
 
 
 class SchematicItem(QGraphicsObject):
-    openSubcircuitRequested = pyqtSignal(str)
+    # Signal to request opening a subcircuit (path, instance_name)
+    openSubcircuitRequested = pyqtSignal(str, str)
 
     def __init__(self, svg_path, parent=None):
         super().__init__(parent)
@@ -30,12 +31,14 @@ class SchematicItem(QGraphicsObject):
         self.parameter_types = {}  # name_up -> type_str
         self.name = ""
         self.prefix = "X"
+        self.category = ""
         self.connected_pins = []
         self.buttons = {}  # action -> QRectF
 
         # Simulation export settings
         self.save_voltage = True
         self.save_current = False
+        self.net_highlight_color = None
 
         # Template-based Text
         with open(svg_path, "r") as f:
@@ -124,6 +127,11 @@ class SchematicItem(QGraphicsObject):
             # Render SVG onto its native bounds (not the enlarged bounding box)
             self._renderer.render(painter, viewbox)
 
+        if self.net_highlight_color is not None:
+            painter.setPen(QPen(self.net_highlight_color, 2, Qt.PenStyle.SolidLine))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+            painter.drawRect(self.boundingRect())
+
         # Draw Bounding Box if selected
         if self.isSelected():
             painter.setPen(
@@ -162,7 +170,9 @@ class SchematicItem(QGraphicsObject):
             self._update_svg()
             self._parse_pins()
 
-    def _update_labels(self):
+    def _update_labels(self, prefix=None):
+        if prefix is None:
+            prefix = getattr(self, "hierarchy_prefix", "")
         # Update independent text items
         # Compute "index" which is name without prefix (e.g. "R1" -> "1")
         idx = self.name or ""
@@ -215,7 +225,7 @@ class SchematicItem(QGraphicsObject):
                     else "v"
                 )
                 val = SpiceRawParser.find_signal(
-                    self.simulation_results, p, type_hint=hint
+                    self.simulation_results, p, type_hint=hint, prefix=prefix
                 )
 
                 if val is not None:
@@ -259,7 +269,7 @@ class SchematicItem(QGraphicsObject):
                 has_color_param = True
                 color_val = self.parameters.get(k, "#888888")
                 break
-                
+
         is_free_text = False
         if self.svg_path and "free_text" in self.svg_path.lower():
             is_free_text = True
@@ -272,7 +282,7 @@ class SchematicItem(QGraphicsObject):
             if not self.border_rect_item:
                 self.border_rect_item = QGraphicsRectItem(self)
                 self.border_rect_item.setZValue(-1) # Behind text
-                
+
             # Compute bounding box of all text items
             union_rect = QRectF()
             for lbl in self.label_items.values():
@@ -287,7 +297,7 @@ class SchematicItem(QGraphicsObject):
             padding = 6
             union_rect.adjust(-padding, -padding, padding, padding)
             self.border_rect_item.setRect(union_rect)
-            
+
             pen = QPen(QColor(color_val), 1, Qt.PenStyle.DashLine)
             self.border_rect_item.setPen(pen)
             self.border_rect_item.setBrush(QBrush(Qt.BrushStyle.NoBrush))
@@ -398,6 +408,9 @@ class SchematicItem(QGraphicsObject):
                     prefix = elem.get("prefix")
                     if prefix:
                         self.prefix = prefix
+                    cat = elem.get("category")
+                    if cat:
+                        self.category = cat
 
                 elif "spice" in elem.tag or "xyce" in elem.tag:
                     template = elem.get("template")
@@ -745,7 +758,14 @@ class {cls_name}:
 
                 for sch_path in sch_paths_to_try:
                     if os.path.exists(sch_path):
-                        self.openSubcircuitRequested.emit(sch_path)
+                        # Compute the Xyce-compatible netlist instance name
+                        # The netlister strips the prefix to get the index, then
+                        # creates X_{index}.  E.g. name="X2", prefix="X" -> "X_2"
+                        idx = self.name
+                        if self.prefix and self.name.startswith(self.prefix):
+                            idx = self.name[len(self.prefix):]
+                        xyce_inst = f"X_{idx}"
+                        self.openSubcircuitRequested.emit(sch_path, xyce_inst)
                         return
 
         except Exception as e:

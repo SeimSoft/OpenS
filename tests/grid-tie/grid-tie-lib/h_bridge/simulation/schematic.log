@@ -3,7 +3,7 @@ Building connectivity graph and generating Xyce netlist...
 ***** Welcome to the Xyce(TM) Parallel Electronic Simulator
 *****
 ***** This is version Xyce Release 7.10-opensource
-***** Date: Fri Mar 20 17:35:56 CET 2026
+***** Date: Thu Mar 26 07:15:12 CET 2026
 
 
 ***** Executing netlist /Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/h_bridge/simulation/schematic.net
@@ -18,148 +18,171 @@ DEBUG checkIfModelValid: device_type=M, modelType=NMOS, modelLevel=1, isModelLev
 DEBUG checkIfModelValid: device_type=N, modelType=NPY, modelLevel=1, isModelLevelValid=1, isModelTypeValid=1, numNodes=16
 ***** Setting up topology...
 
-Netlist warning: Voltage Node (N_2) connected to only 1 device Terminal
-Netlist warning: Voltage Node (N_3) connected to only 1 device Terminal
-Netlist warning: Voltage Node (N_4) connected to only 1 device Terminal
-Netlist warning: Voltage Node (N_5) connected to only 1 device Terminal
-Netlist warning: Voltage Node (H2) does not have a DC path to ground
-Netlist warning: Voltage Node (L2) does not have a DC path to ground
+Netlist warning: Voltage Node (H1) does not have a DC path to ground
+Netlist warning: Voltage Node (L1) does not have a DC path to ground
+Netlist warning: Voltage Node (N_2) does not have a DC path to ground
 Netlist warning: Voltage Node (N_3) does not have a DC path to ground
 Netlist warning: Voltage Node (N_4) does not have a DC path to ground
-Netlist warning: Voltage Node (L1) does not have a DC path to ground
-Netlist warning: Voltage Node (N_5) does not have a DC path to ground
-Netlist warning: Voltage Node (H1) does not have a DC path to ground
+Netlist warning: Voltage Node (L2) does not have a DC path to ground
+Netlist warning: Voltage Node (H2) does not have a DC path to ground
 ***** Device Count Summary ...
        C level 1 (Capacitor)                        4
        D level 1,2 (Diode)                          2
        M level 1 (MOSFET level 1)                   4
        NPY level 1 (Python Device) (Python Device)  1
-       R level 1 (Resistor)                         1
-       V level 1 (Independent Voltage Source)       5
+       R level 1 (Resistor)                         2
+       V level 1 (Independent Voltage Source)       4
        ----------------------------------------------
        Total Devices                               17
 ***** Setting up matrix structure...
-***** Number of Unknowns = 22
+***** Number of Unknowns = 23
 ***** Initializing...
 
 ***** Beginning DC Operating Point Calculation...
 
 ***** Beginning Transient Calculation...
 
-***** Percent complete: 1.18057 %
-***** Current system time: Fri Mar 20 17:35:56 2026
-***** Estimated time to completion:  2 sec.
-
-***** Percent complete: 2.23161 %
-***** Current system time: Fri Mar 20 17:35:56 2026
-***** Estimated time to completion:  1 sec.
-
-***** Percent complete: 3.28264 %
-***** Current system time: Fri Mar 20 17:35:56 2026
+***** Percent complete: 1.5875 %
+***** Current system time: Thu Mar 26 07:15:12 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 4.33368 %
-***** Current system time: Fri Mar 20 17:35:56 2026
+***** Percent complete: 2.6267 %
+***** Current system time: Thu Mar 26 07:15:12 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 5.38472 %
-***** Current system time: Fri Mar 20 17:35:56 2026
+***** Percent complete: 4.121 %
+***** Current system time: Thu Mar 26 07:15:12 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 6.43576 %
-***** Current system time: Fri Mar 20 17:35:56 2026
+***** Percent complete: 5.71492 %
+***** Current system time: Thu Mar 26 07:15:12 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 7.4868 %
-***** Current system time: Fri Mar 20 17:35:56 2026
+***** Percent complete: 8.90276 %
+***** Current system time: Thu Mar 26 07:15:12 2026
 ***** Estimated time to completion:  0 sec.
 
-***** Percent complete: 8.53784 %
-***** Current system time: Fri Mar 20 17:35:56 2026
-***** Estimated time to completion:  0 sec.
-
-***** Percent complete: 9.58887 %
-***** Current system time: Fri Mar 20 17:35:56 2026
-***** Estimated time to completion:  0 sec.
-
-***** Percent complete: 10.8501 %
-***** Current system time: Fri Mar 20 17:35:56 2026
-***** Estimated time to completion:  0 sec.
-
-***** Percent complete: 12.1114 %
-***** Current system time: Fri Mar 20 17:35:56 2026
-***** Estimated time to completion:  0 sec.
-
-***** Percent complete: 13.793 %
-***** Current system time: Fri Mar 20 17:35:56 2026
-***** Estimated time to completion:  0 sec.
-
-***** Percent complete: 15.4747 %
-***** Current system time: Fri Mar 20 17:35:56 2026
-***** Estimated time to completion:  0 sec.
-
-***** Percent complete: 17.1564 %
-***** Current system time: Fri Mar 20 17:35:56 2026
-***** Estimated time to completion:  0 sec.
-
-***** Percent complete: 18.838 %
-***** Current system time: Fri Mar 20 17:35:56 2026
-***** Estimated time to completion:  0 sec.
-
-***** Percent complete: 22.2013 %
-***** Current system time: Fri Mar 20 17:35:56 2026
+***** Percent complete: 15.2784 %
+***** Current system time: Thu Mar 26 07:15:12 2026
 ***** Estimated time to completion:  0 sec.
 
 ***** Percent complete: 25 %
-***** Current system time: Fri Mar 20 17:35:56 2026
+***** Current system time: Thu Mar 26 07:15:12 2026
 ***** Estimated time to completion:  0 sec.
 
- *** Transient failure history: 
-Time        Time      Step   EstErr       Non-Linear Solver       node     node
-(sec)       Step     Status  OverTol    Status    Iters  ||F||    index    name
- 1.010e-07  1.883e-18  pass  7.009e-01  P:normal   2  1.799e-03     17    BOOT2
- 1.010e-07  1.682e-18  pass  7.080e-01  P:normal   2  1.068e-03     18    N_1
- 1.010e-07  1.498e-18  pass  7.010e-01  P:normal   2  2.897e-03     20    P2
- 1.010e-07  1.339e-18  pass  7.079e-01  P:normal   2  2.998e-03     20    P2
- 1.010e-07  1.192e-18  pass  7.008e-01  P:normal   2  1.599e-03     18    N_1
- 1.010e-07  1.065e-18  pass  7.078e-01  P:normal   2  2.621e-03      5    BOOT1
- 1.010e-07  9.485e-19  pass  7.007e-01  P:normal   2  2.674e-03      5    BOOT1
- 1.010e-07  8.475e-19  pass  7.075e-01  P:normal   2  6.465e-03     18    N_1
- 1.010e-07  7.549e-19  pass  7.005e-01  P:normal   2  5.559e-03     18    N_1
- 1.010e-07  6.746e-19  pass  7.073e-01  P:normal   2  5.461e-03      5    BOOT1
- 1.010e-07  6.009e-19  pass  7.000e-01  P:normal   2  4.860e-03      5    BOOT1
- 1.010e-07  5.371e-19  pass  7.067e-01  P:normal   2  5.675e-03     18    N_1
- 1.010e-07  4.786e-19  pass  6.993e-01  P:normal   2  3.954e-03     18    N_1
- 1.010e-07  4.280e-19  pass  7.059e-01  P:normal   2  2.329e-03     18    N_1
- 1.010e-07  3.815e-19  pass  6.989e-01  P:normal   3  4.701e-03      5    BOOT1
- 1.010e-07  3.412e-19  pass  7.056e-01  P:normal   3  2.339e-03      5    BOOT1
- 1.010e-07  3.041e-19  pass  6.983e-01  P:normal   2  6.574e-03      5    BOOT1
- 1.010e-07  2.721e-19  pass  7.048e-01  P:normal   2  8.696e-03     18    N_1
- 1.010e-07  2.426e-19  pass  6.975e-01  P:normal   3  6.243e-03      5    BOOT1
- 1.010e-07  2.172e-19  pass  7.043e-01  P:normal   2  7.288e-03     18    N_1
- 1.010e-07  1.937e-19  pass  6.980e-01  P:normal   4  8.577e-03     18    N_1
- 1.010e-07  1.733e-19  pass  7.062e-01  P:normal   8  4.516e-03     20    P2
- 1.010e-07  1.545e-19  fail  7.062e-01  P:near    20  2.413e-02     18    N_1
- 1.010e-07  1.931e-20  fail  7.062e-01  F:max s   20  1.513e-01     18    N_1
- 1.010e-07  2.414e-21  fail  7.062e-01  F:max s   20  3.262e+00     20    P2
-Time step too small near step number: 201  Exiting transient loop.
+***** Percent complete: 26.0758 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 27.5506 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 28.6714 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 31.4794 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 35.2234 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 42.7114 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 50.25 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 51.2938 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 52.4735 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 53.7272 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 55.8235 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 58.6186 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 64.2089 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 74.2089 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 75.5 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 78.5 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 82.5 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Percent complete: 90.5 %
+***** Current system time: Thu Mar 26 07:15:12 2026
+***** Estimated time to completion:  0 sec.
+
+***** Problem read in and set up time: 0.038985 seconds
+ ***** DCOP time: 0.00216103 seconds.  Breakdown follows:
+	Number Successful Steps Taken:		1
+	Number Failed Steps Attempted:		0
+	Number Jacobians Evaluated:		8
+	Number Linear Solves:			8
+	Number Failed Linear Solves:		0
+	Number Residual Evaluations:		9
+	Number Nonlinear Convergence Failures:	0
+	Total Residual Load Time:		0.000171185 seconds
+	Total Jacobian Load Time:		0.000131845 seconds
+	Total Linear Solution Time:		0.000306368 seconds
+
+ ***** Transient Stepping time: 0.0553601 seconds.  Breakdown follows:
+	Number Successful Steps Taken:		358
+	Number Failed Steps Attempted:		15
+	Number Jacobians Evaluated:		723
+	Number Linear Solves:			723
+	Number Failed Linear Solves:		0
+	Number Residual Evaluations:		1096
+	Number Nonlinear Convergence Failures:	0
+	Total Residual Load Time:		0.00995564 seconds
+	Total Jacobian Load Time:		0.00361657 seconds
+	Total Linear Solution Time:		0.0126657 seconds
 
 
 ***** Solution Summary *****
-	Number Successful Steps Taken:		202
-	Number Failed Steps Attempted:		19
-	Number Jacobians Evaluated:		599
-	Number Linear Solves:			599
+	Number Successful Steps Taken:		359
+	Number Failed Steps Attempted:		15
+	Number Jacobians Evaluated:		731
+	Number Linear Solves:			731
 	Number Failed Linear Solves:		0
-	Number Residual Evaluations:		820
-	Number Nonlinear Convergence Failures:	3
-	Total Residual Load Time:		0.009 seconds
-	Total Jacobian Load Time:		0.004 seconds
-	Total Linear Solution Time:		0.014 seconds
+	Number Residual Evaluations:		1105
+	Number Nonlinear Convergence Failures:	0
+	Total Residual Load Time:		0.0101268 seconds
+	Total Jacobian Load Time:		0.00374842 seconds
+	Total Linear Solution Time:		0.0129721 seconds
 
 
-***** Total Simulation Solvers Run Time: 0.071 seconds
-***** Total Elapsed Run Time:            0.334 seconds
+***** Total Simulation Solvers Run Time: 0.0577171 seconds
+***** Total Elapsed Run Time:            0.096674 seconds
 *****
 ***** End of Xyce(TM) Simulation
 *****
@@ -167,23 +190,22 @@ Time step too small near step number: 201  Exiting transient loop.
 Timing summary of 1 processor
                  Stats                   Count       CPU Time              Wall Time
 ---------------------------------------- ----- --------------------- ---------------------
-Xyce                                         1        0.114 (100.0%)        0.364 (100.0%)
-  Analysis                                   1        0.047 (41.13%)        0.071 (19.41%)
-    Transient                                1        0.047 (41.11%)        0.071 (19.40%)
-      Nonlinear Solve                      221        0.037 (32.49%)        0.056 (15.33%)
-        Residual                           820        0.010 ( 8.53%)        0.011 ( 3.01%)
-        Jacobian                           599        0.004 ( 3.74%)        0.005 ( 1.39%)
-        Linear Solve                       599        0.012 (10.19%)        0.015 ( 4.25%)
-      Successful DCOP Steps                  1        0.001 ( 0.52%)        0.002 ( 0.47%)
-      Successful Step                      201        0.006 ( 5.00%)        0.009 ( 2.39%)
-      Failed Steps                          19        0.000 ( 0.29%)        0.000 ( 0.11%)
-        Nonlinear Failure                    3        0.000 (<0.01%)        0.000 (<0.01%)
-  Netlist Import                             1        0.058 (50.63%)        0.214 (58.83%)
-    Parse Context                            1        0.000 ( 0.44%)        0.003 ( 0.94%)
-    Distribute Devices                       1        0.003 ( 2.51%)        0.008 ( 2.21%)
+Xyce                                         1        0.101 (100.0%)        0.234 (100.0%)
+  Analysis                                   1        0.047 (46.07%)        0.058 (24.67%)
+    Transient                                1        0.047 (46.05%)        0.058 (24.66%)
+      Nonlinear Solve                      374        0.037 (36.22%)        0.042 (18.02%)
+        Residual                          1105        0.010 (10.07%)        0.012 ( 4.97%)
+        Jacobian                           731        0.004 ( 3.99%)        0.005 ( 2.02%)
+        Linear Solve                       731        0.013 (12.77%)        0.014 ( 5.97%)
+      Successful DCOP Steps                  1        0.000 ( 0.38%)        0.001 ( 0.34%)
+      Successful Step                      358        0.006 ( 6.29%)        0.011 ( 4.65%)
+      Failed Steps                          15        0.000 ( 0.02%)        0.000 ( 0.01%)
+  Netlist Import                             1        0.027 (26.19%)        0.035 (14.91%)
+    Parse Context                            1        0.000 ( 0.28%)        0.000 ( 0.19%)
+    Distribute Devices                       1        0.001 ( 1.37%)        0.002 ( 0.68%)
     Verify Devices                           1        0.000 ( 0.01%)        0.000 (<0.01%)
-    Instantiate                              1        0.053 (46.15%)        0.159 (43.64%)
-  Late Initialization                        1        0.003 ( 2.42%)        0.020 ( 5.60%)
-    Global Indices                           1        0.000 ( 0.40%)        0.001 ( 0.37%)
-  Setup Matrix Structure                     1        0.001 ( 0.51%)        0.008 ( 2.30%)
+    Instantiate                              1        0.024 (23.70%)        0.031 (13.36%)
+  Late Initialization                        1        0.002 ( 1.48%)        0.003 ( 1.08%)
+    Global Indices                           1        0.000 ( 0.24%)        0.001 ( 0.37%)
+  Setup Matrix Structure                     1        0.000 ( 0.30%)        0.000 ( 0.18%)
 

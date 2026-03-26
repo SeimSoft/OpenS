@@ -23,6 +23,15 @@ class SimulationLogPlugin(OpenSPlugin):
         # Handle input field (stdin vs copilot)
         self.log_widget.sendInputRequested.connect(self._on_log_input)
 
+        settings = QSettings("OpenS", "OpenS")
+        ai_enabled = str(settings.value("ai_features_enabled", "false")).lower() in (
+            "1",
+            "true",
+            "yes",
+            "on",
+        )
+        self.log_widget.set_ai_features_enabled(ai_enabled)
+
         self.main_window.addDockWidget(
             Qt.DockWidgetArea.BottomDockWidgetArea, self.dock
         )
@@ -31,23 +40,43 @@ class SimulationLogPlugin(OpenSPlugin):
         self.copilot_process = None
 
     def _on_log_input(self, text):
+        settings = QSettings("OpenS", "OpenS")
+        ai_enabled = str(settings.value("ai_features_enabled", "false")).lower() in (
+            "1",
+            "true",
+            "yes",
+            "on",
+        )
+
         # Determine if we send to simulation or ask copilot
         is_running = False
         if hasattr(self.main_window, "simulation_process") and self.main_window.simulation_process:
             from PyQt6.QtCore import QProcess
             if self.main_window.simulation_process.state() == QProcess.ProcessState.Running:
                 is_running = True
-        
+
         if is_running:
             # Traditional stdin pipe handled by main_window or xyce_plugin
             # We just need to make sure it's passed through
             if hasattr(self.main_window, "on_simulation_input"):
                 self.main_window.on_simulation_input(text)
         else:
+            if not ai_enabled:
+                return
             # Ask copilot with this specific prompt
             self.run_copilot_analysis(user_prompt=text.strip())
 
     def run_copilot_analysis(self, user_prompt=None):
+        settings = QSettings("OpenS", "OpenS")
+        ai_enabled = str(settings.value("ai_features_enabled", "false")).lower() in (
+            "1",
+            "true",
+            "yes",
+            "on",
+        )
+        if not ai_enabled:
+            return
+
         if self.copilot_process and self.copilot_process.state() != QProcess.ProcessState.NotRunning:
             return
 
@@ -65,11 +94,11 @@ class SimulationLogPlugin(OpenSPlugin):
         analyses = []
         if hasattr(self.main_window, "analysis_dock"):
             analyses = self.main_window.analysis_dock.get_all_analyses()
-        
+
         variables = []
         if hasattr(self.main_window, "variables_dock"):
             variables = self.main_window.variables_dock.get_variables()
-        
+
         from opens_suite.netlister import NetlistGenerator
         try:
             generator = NetlistGenerator(view.scene(), analyses, variables=variables)
@@ -90,25 +119,25 @@ class SimulationLogPlugin(OpenSPlugin):
         else:
             header = "\n\n--- AI Error Analysis (GitHub Copilot) ---\n"
             base_prompt = "Analyze this simulation netlist and log for errors:\n\n"
-        
+
         full_prompt = f"{base_prompt}Netlist:\n{netlist}\n\nLog:\n{log_text}"
-        
+
         self.log_widget.appendText(header)
         self.log_widget.appendText("Connecting to AI service...\n")
 
         # 4. Get command from settings
         settings = QSettings("OpenS", "OpenS")
         cmd_template = settings.value("ai_command", "copilot -ps '%s'")
-        
+
         try:
             # Parse command template safely
             cmd_parts = shlex.split(cmd_template)
             # Replace %s with our prompt in the correct argument
             final_args = [p.replace("%s", full_prompt) if "%s" in p else p for p in cmd_parts]
-            
+
             if not final_args:
                 raise ValueError("AI command is empty")
-                
+
             program = final_args[0]
             args = final_args[1:]
 
@@ -117,9 +146,9 @@ class SimulationLogPlugin(OpenSPlugin):
             self.copilot_process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
             self.copilot_process.readyReadStandardOutput.connect(self._on_copilot_ready_read)
             self.copilot_process.finished.connect(self._on_copilot_finished)
-            
+
             self.copilot_process.start(program, args)
-            
+
         except Exception as e:
             self.log_widget.appendText(f"\n[Error] Failed to start AI process: {e}\n")
             if hasattr(self.log_widget, "copilot_btn"):

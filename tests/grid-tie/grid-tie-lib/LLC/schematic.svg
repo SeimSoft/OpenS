@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<svg xmlns:opens="http://opens-schematic.org" width="3322.0" height="1208.7571628232006" viewBox="-631.0 -367.75716282320053 3322.0 1208.7571628232006" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns:opens="http://opens-schematic.org" width="3322.0" height="1172.0" viewBox="-631.0 -331.0 3322.0 1172.0" xmlns="http://www.w3.org/2000/svg">
   <g transform="translate(-240.0,0.0) rotate(0.0)" symbol_name="symbol" name="V1" save_v="True" save_i="True" param_V="30.0" param_VAC="0" param_SUPPORTS_CURRENT="True" library_path="opensLib/vdc/symbol.svg">
     <svg width="40" height="60" viewBox="0 0 40 60">
       <defs>

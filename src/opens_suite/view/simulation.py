@@ -53,6 +53,7 @@ class SimulationMixin:
         if not os.path.exists(raw_path):
             return
 
+        self.current_raw_path = raw_path
         self.statusMessage.emit("Loading simulation results...")
 
         # Collect data for background connectivity check (fast GUI-thread operation)
@@ -96,6 +97,9 @@ class SimulationMixin:
                     "name": item.name,
                     "prefix": item.prefix,
                     "pins": pins,
+                    "is_global_net": getattr(item, "is_global_net", False) or getattr(item, "category", "") == "Global",
+                    "category": getattr(item, "category", ""),
+                    "params": getattr(item, "parameters", {}),
                 }
             )
 
@@ -118,20 +122,26 @@ class SimulationMixin:
         # Apply to wires and items in UI thread (fast enough once calculations are done)
         from opens_suite.spice_parser import SpiceRawParser
 
+        prefix = getattr(self, "hierarchy_prefix", "")
         for item in self.scene().items():
             if isinstance(item, Wire):
                 node_name = self.last_item_to_node.get(item)
                 if node_name:
                     # Use smart helper to find voltage for this node
                     val = SpiceRawParser.find_signal(
-                        op_results, node_name, type_hint="v"
+                        op_results, node_name, type_hint="v", prefix=prefix
                     )
                     item.voltage = val
                 else:
                     item.voltage = None
             elif isinstance(item, SchematicItem):
                 item.simulation_results = op_results
-                item._update_labels()
+                item.hierarchy_prefix = prefix
+                item._update_labels(prefix=prefix)
+
+        # Connectivity map is now available; re-apply hierarchical highlights if enabled.
+        if hasattr(self, "apply_net_highlight_full_names"):
+            self.apply_net_highlight_full_names()
 
         self.scene().update()
         self.statusMessage.emit("Simulation results loaded.")
@@ -234,10 +244,15 @@ class SimulationResultLoader(QThread):
                     item_prefix = ""
                     for info in self.items_data:
                         if info["item"] == sch_item:
-                            item_prefix = info["prefix"]
+                            if info["prefix"] in ("GND", "0") or info["category"] == "Global":
+                                return "0" if info["prefix"] in ("GND", "0") else info["name"]
+                            if info["category"] == "IO" or info["prefix"] == "PIN":
+                                # Return net name from PIN parameter if present
+                                params = info.get("params", {})
+                                return params.get("NET_NAME", info["name"])
+                            if info.get("is_global_net"):
+                                return info["name"]
                             break
-                    if item_prefix == "GND":
-                        return "0"
 
             for item in group_items:
                 if not isinstance(item, tuple):

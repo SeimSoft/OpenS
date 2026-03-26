@@ -1,0 +1,9 @@
+* OpenS Generated Netlist
+.preprocess addresistors nodcpath 1G
+.model CONTROLLER npy MODULE=controller CLASS=Controller PYTHONPATH=/Users/rennekef/Documents/SchematicEntry/backup/tests/grid-tie/grid-tie-lib/test
+N1 N_1 0 N_14 N_15 N_16 N_17 N_18 N_19 0 N_20 N_21 N_22 N_23 N_24 N_25 VOUT CONTROLLER
+N2 N_1 VOUT N_2 N_3 N_4 N_5 N_6 N_7 0 N_8 N_9 N_10 N_11 N_12 N_13 VOUT2 CONTROLLER
+V1 N_1 0 dc 1 ac 0
+.tran 1u 100u
+.print tran v(*) 
+.end

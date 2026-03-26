@@ -19,13 +19,13 @@ import traceback
 
 class NetlistWorker(QThread):
     finished = pyqtSignal(str, str)  # netlist content, error
-    
+
     def __init__(self, scene, analyses, variables):
         super().__init__()
         self.scene = scene
         self.analyses = analyses
         self.variables = variables
-        
+
     def run(self):
         try:
             from opens_suite.netlister import NetlistGenerator
@@ -69,7 +69,7 @@ class XycePlugin(OpenSPlugin):
         sim_toolbar.addAction(self.simulate_action)
 
     def create_netlist(self):
-        view = self.main_window.tabs.currentWidget()
+        view = self._get_simulation_target_view()
         if not isinstance(view, SchematicView):
             return
 
@@ -86,7 +86,7 @@ class XycePlugin(OpenSPlugin):
         self.main_window.simulation_text.append("Generating Netlist in background...")
         self.main_window.simulation_dock.setWindowTitle("Netlist")
         self.main_window.simulation_dock.show()
-        
+
         self.netlist_action.setEnabled(False)
         self.simulate_action.setEnabled(False)
 
@@ -118,7 +118,7 @@ class XycePlugin(OpenSPlugin):
             )
             return
 
-        view = self.main_window.tabs.currentWidget()
+        view = self._get_simulation_target_view()
         if not isinstance(view, SchematicView):
             return
 
@@ -165,7 +165,7 @@ class XycePlugin(OpenSPlugin):
         self.main_window.simulation_text.append("Building connectivity graph and generating Xyce netlist...")
         self.main_window.simulation_dock.setWindowTitle(f"Simulation Log - {base}")
         self.main_window.simulation_dock.show()
-        
+
         # Update action to 'Stop' mode
         self.simulate_action.setIcon(self.main_window.stop_icon)
         self.simulate_action.setText("Stop Simulation")
@@ -173,6 +173,16 @@ class XycePlugin(OpenSPlugin):
         self.worker = NetlistWorker(view.scene(), analyses, variables)
         self.worker.finished.connect(lambda netlist, err: self._on_sim_netlist_finished(netlist, err, view, netlist_path, raw_path, log_path, base))
         self.worker.start()
+
+    def _get_simulation_target_view(self):
+        view = self.main_window.tabs.currentWidget()
+        if not isinstance(view, SchematicView):
+            return view
+        if hasattr(self.main_window, "get_simulation_owner_view"):
+            owner = self.main_window.get_simulation_owner_view(view)
+            if isinstance(owner, SchematicView):
+                return owner
+        return view
 
     def _on_sim_netlist_finished(self, netlist, error, view, netlist_path, raw_path, log_path, base):
         if self.simulate_action.text() == "Simulate":

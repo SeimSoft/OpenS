@@ -536,11 +536,134 @@ class IOMixin:
             ET.indent(root, space="  ", level=0)
         tree = ET.ElementTree(root)
         tree.write(filename, encoding="utf-8", xml_declaration=True)
+        
+        # Sync to KiCad if local project available
+        self._sync_kicad_parameters(filename)
+        
         self.statusMessage.emit(f"Saved to {filename}")
         
         # Reset modified flag if it's a SchematicView
         if hasattr(self, "set_modified"):
             self.set_modified(False)
+
+    def _sync_kicad_parameters(self, schematic_filename):
+        import os
+        import numpy as np
+        
+        try:
+            from kiutils.schematic import Schematic
+            from kiutils.items.schitems import SchematicSymbol
+            from kiutils.items.common import Position, Property, Effects, Font, Justify
+            import uuid
+        except ImportError:
+            print("kiutils not installed. Skipping KiCad sync.")
+            return
+
+        kicad_sch_path = os.path.join(os.path.dirname(os.path.abspath(schematic_filename)), "kicad", "kicad.kicad_sch")
+        if not os.path.exists(kicad_sch_path):
+            return
+            
+        param_updates = {}
+        for item in self.scene().items():
+            if not isinstance(item, SchematicItem) or not getattr(item, "name", ""):
+                continue
+            
+            value = None
+            for p in ["value", "R", "C", "L", "Resistance", "Capacitance", "Inductance"]:
+                if p in item.parameters:
+                    value = item.parameters[p]
+                    break
+                    
+            # Infer basic libId from svg_path (or fallback)
+            svg_lower = getattr(item, 'svg_path', '').lower()
+            if "device" in svg_lower and "r" in svg_lower or "resistor" in svg_lower:
+                lib_id = "Device:R"
+            elif "device" in svg_lower and "c" in svg_lower or "capacitor" in svg_lower:
+                lib_id = "Device:C"
+            elif "device" in svg_lower and "l" in svg_lower or "inductor" in svg_lower:
+                lib_id = "Device:L"
+            elif "gnd" in svg_lower:
+                lib_id = "power:GND"
+            elif "v_dc" in svg_lower:
+                lib_id = "Simulation_SPICE:VDC"
+            else:
+                lib_id = "Device:R"  # Fallback
+                
+            val_fmt = value
+            if value is not None:
+                from opens_suite.design_points import DesignPoints
+                val_fmt = DesignPoints._format_si(value) if isinstance(value, (int, float, np.number)) else str(value)
+
+            # Convert coords
+            pos_x = item.scenePos().x() * 0.1
+            pos_y = item.scenePos().y() * 0.1
+
+            param_updates[item.name] = {
+                "value": val_fmt,
+                "lib_id": lib_id,
+                "x": pos_x,
+                "y": pos_y
+            }
+
+        if not param_updates:
+            return
+
+        try:
+            sch = Schematic().from_file(kicad_sch_path)
+            
+            existing_refs = set()
+            for sym in sch.schematicSymbols:
+                ref_prop = next((p for p in sym.properties if p.key == "Reference"), None)
+                if ref_prop and ref_prop.value:
+                    existing_refs.add(ref_prop.value)
+                    if ref_prop.value in param_updates:
+                        update_info = param_updates[ref_prop.value]
+                        if update_info["value"] is not None:
+                            val_prop = next((p for p in sym.properties if p.key == "Value"), None)
+                            if val_prop:
+                                val_prop.value = update_info["value"]
+                            else:
+                                sym.properties.append(Property(
+                                    key="Value", 
+                                    value=update_info["value"], 
+                                    id=1, 
+                                    position=Position(X=sym.position.X, Y=sym.position.Y + 2.54),
+                                    effects=Effects(font=Font(height=1.27, width=1.27), justify=Justify(left=True))
+                                ))
+
+            # Place missing devices
+            for ref, info in param_updates.items():
+                if ref not in existing_refs:
+                    new_sym = SchematicSymbol()
+                    new_sym.libId = info["lib_id"]
+                    new_sym.position = Position(X=info["x"], Y=info["y"], angle=0)
+                    new_sym.inBom = True
+                    new_sym.onBoard = True
+                    new_sym.uuid = str(uuid.uuid4())
+                    
+                    new_sym.properties = [
+                        Property(
+                            key="Reference", 
+                            value=ref, 
+                            id=0, 
+                            position=Position(X=info["x"] + 2.54, Y=info["y"] - 1.27),
+                            effects=Effects(font=Font(height=1.27, width=1.27), justify=Justify(left=True))
+                        ),
+                        Property(
+                            key="Value", 
+                            value=info["value"] or "Val", 
+                            id=1, 
+                            position=Position(X=info["x"] + 2.54, Y=info["y"] + 1.27),
+                            effects=Effects(font=Font(height=1.27, width=1.27), justify=Justify(left=True))
+                        )
+                    ]
+                    sch.schematicSymbols.append(new_sym)
+
+            sch.to_file(kicad_sch_path)
+        except Exception as e:
+            print(f"Warning: Failed to sync KiCad parameters using kiutils: {e}")
+            import traceback
+            traceback.print_exc()
 
     def load_schematic(self, filename):
         self.scene().clear()

@@ -20,4 +20,5 @@ class AnalysisPlugin(OpenSPlugin):
         from opens_suite.schematic_view import SchematicView
 
         if isinstance(view, SchematicView):
-            view.analyses = self.dock.get_all_analyses()
+            owner = self.main_window.get_simulation_owner_view(view)
+            owner.analyses = self.dock.get_all_analyses()

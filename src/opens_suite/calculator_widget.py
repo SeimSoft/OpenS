@@ -15,7 +15,14 @@ from PyQt6.QtWidgets import (
     QToolBar,
     QDockWidget,
 )
-from PyQt6.QtGui import QStandardItemModel, QStandardItem, QAction, QIcon
+from PyQt6.QtGui import (
+    QStandardItemModel,
+    QStandardItem,
+    QAction,
+    QIcon,
+    QKeySequence,
+    QShortcut,
+)
 from PyQt6.QtCore import Qt, QModelIndex, pyqtSignal
 from opens_suite.spice_parser import SpiceRawParser
 from opens_suite.waveform_viewer import WaveformViewer
@@ -28,7 +35,9 @@ class CalculatorDialog(QMainWindow):
     def __init__(self, raw_path, parent=None):
         super().__init__(parent)
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.raw_path = raw_path
+        self.hierarchy_prefix = ""
         self.all_plots = {}
         self._load_data()
         self.viewer = None  # Waveform viewer window
@@ -40,6 +49,11 @@ class CalculatorDialog(QMainWindow):
     def _load_data(self):
         if not self.raw_path or not os.path.exists(self.raw_path):
             return
+
+        mtime = os.path.getmtime(self.raw_path)
+        if getattr(self, "_last_mtime", 0) >= mtime:
+            return  # Already loaded this exact file version
+        self._last_mtime = mtime
 
         parser = SpiceRawParser(self.raw_path)
         self.all_plots = parser.parse() or {}
@@ -57,11 +71,30 @@ class CalculatorDialog(QMainWindow):
         self.refresh()
         self.evaluate()
 
+    def closeEvent(self, event):
+        """Ensure we remove ourselves from the active calculator list so plugins don't reuse a deleted widget."""
+        main_window = self.window()
+        if hasattr(main_window, "active_calculators"):
+            if self in main_window.active_calculators:
+                main_window.active_calculators.remove(self)
+
+        # Also clean up the probi_calc reference in the plugin if it points to this instance
+        try:
+            from opens_suite.plugins.calculator_plugin import CalculatorPlugin
+            for p in getattr(main_window, "plugins", []):
+                if isinstance(p, CalculatorPlugin):
+                    if getattr(p, "_probi_calc", None) == self:
+                        p._probi_calc = None
+        except Exception:
+            pass
+
+        super().closeEvent(event)
+
     def _request_simulation(self):
         """Trigger simulation via the main window."""
-        main_window = self.parent()
+        main_window = self.window()
         # Find main window if parented differently
-        while main_window and not hasattr(main_window, "simulate_action"):
+        if not hasattr(main_window, "simulate_action"):
             main_window = main_window.parent()
 
         if main_window and hasattr(main_window, "simulate_action"):
@@ -85,28 +118,36 @@ class CalculatorDialog(QMainWindow):
         self.send_to_outputs_action.setToolTip(
             "Add this expression to the Output Expressions dock"
         )
+        # Use native Save key sequence (Ctrl+S on Windows/Linux, Cmd+S on macOS).
+        self.send_to_outputs_action.setShortcuts(
+            QKeySequence.keyBindings(QKeySequence.StandardKey.Save)
+        )
+        self.send_to_outputs_action.setShortcutContext(
+            Qt.ShortcutContext.WidgetWithChildrenShortcut
+        )
         self.send_to_outputs_action.triggered.connect(self._send_to_outputs)
-        self.toolbar.addAction(self.send_to_outputs_action)
 
-        self.eval_action = QAction(qta.icon("mdi6.play", color="#1f1f1f"), "Evaluate", self)
+        # Explicit shortcut handler so Save in the editor triggers "Send to Outputs".
+        self.send_to_outputs_shortcut = QShortcut(
+            QKeySequence.StandardKey.Save, self
+        )
+        self.send_to_outputs_shortcut.setContext(
+            Qt.ShortcutContext.WidgetWithChildrenShortcut
+        )
+        self.send_to_outputs_shortcut.activated.connect(self._send_to_outputs)
+
+        self.eval_action = QAction(qta.icon("mdi6.chart-line", color="#1976D2"), "Evaluate", self)
         self.eval_action.setToolTip("Execute the Python script")
         self.eval_action.triggered.connect(self.evaluate)
-        self.toolbar.addAction(self.eval_action)
-
-        self.probe_action = QAction(self.probe_icon, "Probe Schematic", self)
-        self.probe_action.setToolTip("Click a net in the schematic to insert it here")
-        self.probe_action.triggered.connect(self.probeRequested.emit)
-        self.toolbar.addAction(self.probe_action)
 
         self.clear_action = QAction(qta.icon("mdi6.broom", color="#1f1f1f"), "Clear", self)
         self.clear_action.setToolTip("Clear the python script")
-        self.toolbar.addAction(self.clear_action)
+        self.clear_action.triggered.connect(lambda: self.script_edit.clear())
 
         # Help action to show available functions/variables
         self.help_action = QAction(qta.icon("mdi6.help-circle-outline", color="#1f1f1f"), "Help", self)
         self.help_action.setToolTip("Show available functions and variables")
         self.help_action.triggered.connect(self._show_help_dialog)
-        self.toolbar.addAction(self.help_action)
 
         self.addToolBar(self.toolbar)
 
@@ -131,6 +172,14 @@ class CalculatorDialog(QMainWindow):
 
         self.setCentralWidget(central)
         self._setup_result_dock()  # Add result dock
+
+        # Add toolbar actions in desired order
+        self.toolbar.addAction(self.eval_action)
+        self.toolbar.addAction(self.clear_action)
+        self.toolbar.addAction(self.result_dock_action)
+        self.toolbar.addAction(self.send_to_outputs_action)
+        self.toolbar.addAction(self.help_action)
+
         self._setup_signal_browser()
 
     def _setup_result_dock(self):
@@ -143,12 +192,11 @@ class CalculatorDialog(QMainWindow):
         self.result_dock.setAllowedAreas(Qt.DockWidgetArea.BottomDockWidgetArea)
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.result_dock)
         self.result_dock.hide()
-        
+
         import qtawesome as qta
         self.result_dock_action = self.result_dock.toggleViewAction()
         self.result_dock_action.setIcon(qta.icon("mdi6.numeric", color="#1f1f1f"))
         self.result_dock_action.setToolTip("Toggle Scalar Results Dock")
-        self.toolbar.addAction(self.result_dock_action)
 
     def insert_expression(self, expr):
         """Insert a string into the script editor at the current cursor position."""
@@ -360,6 +408,7 @@ class CalculatorDialog(QMainWindow):
             )
 
     def _create_scope(self):
+        prefix = getattr(self, "hierarchy_prefix", "")
         # Default plots
         tran_plot = None
         ac_plot = None
@@ -410,37 +459,37 @@ class CalculatorDialog(QMainWindow):
 
         def vt(name, plot=None):
             ds = self.all_plots.get(plot, tran_plot) if plot else tran_plot
-            val = SpiceRawParser.find_signal(ds, name, type_hint="v")
+            val = SpiceRawParser.find_signal(ds, name, type_hint="v", prefix=prefix)
             if val is None:
                 raise ValueError(f"Transient signal '{name}' not found.")
             return np.array(val)
 
         def it(name, plot=None):
             ds = self.all_plots.get(plot, tran_plot) if plot else tran_plot
-            val = SpiceRawParser.find_signal(ds, name, type_hint="i")
+            val = SpiceRawParser.find_signal(ds, name, type_hint="i", prefix=prefix)
             if val is None:
                 raise ValueError(f"Transient current '{name}' not found.")
             return np.array(val)
 
         def vf(name, plot=None):
             ds = self.all_plots.get(plot, ac_plot) if plot else ac_plot
-            val = SpiceRawParser.find_signal(ds, name, type_hint="v")
+            val = SpiceRawParser.find_signal(ds, name, type_hint="v", prefix=prefix)
             if val is None:
                 raise ValueError(f"AC signal '{name}' not found.")
             return np.array(val)
 
         def ifc(name, plot=None):
             ds = self.all_plots.get(plot, ac_plot) if plot else ac_plot
-            val = SpiceRawParser.find_signal(ds, name, type_hint="i")
+            val = SpiceRawParser.find_signal(ds, name, type_hint="i", prefix=prefix)
             if val is None:
                 raise ValueError(f"AC current '{name}' not found.")
             return np.array(val)
 
         def op(name, plot=None):
             ds = self.all_plots.get(plot, op_plot) if plot else op_plot
-            val = SpiceRawParser.find_signal(ds, name, type_hint="v")
+            val = SpiceRawParser.find_signal(ds, name, type_hint="v", prefix=prefix)
             if val is None:
-                val = SpiceRawParser.find_signal(ds, name, type_hint="i")
+                val = SpiceRawParser.find_signal(ds, name, type_hint="i", prefix=prefix)
             if val is None:
                 raise ValueError(f"OP signal '{name}' not found.")
             return val[0] if len(val) > 0 else None
@@ -477,7 +526,7 @@ class CalculatorDialog(QMainWindow):
 
         def vdc(name, plot=None):
             ds = self.all_plots.get(plot, dc_plot) if plot else dc_plot
-            val = SpiceRawParser.find_signal(ds, name, type_hint="v")
+            val = SpiceRawParser.find_signal(ds, name, type_hint="v", prefix=prefix)
             if val is None:
                 raise ValueError(f"DC signal '{name}' not found.")
             return np.array(val)
@@ -497,7 +546,7 @@ class CalculatorDialog(QMainWindow):
                 ds = self.all_plots.get(plot_key)
                 if not ds:
                     continue
-                val = SpiceRawParser.find_signal(ds, name, type_hint="v")
+                val = SpiceRawParser.find_signal(ds, name, type_hint="v", prefix=prefix)
                 if val is not None:
                     return val[0] if plot_key == "Operating Point" else np.array(val)
             raise ValueError(f"Signal '{name}' not found in any plot.")
@@ -537,7 +586,7 @@ class CalculatorDialog(QMainWindow):
         def st(name, plot=None):
             """Generic signal fetcher for Transient results."""
             ds = self.all_plots.get(plot, tran_plot) if plot else tran_plot
-            val = SpiceRawParser.find_signal(ds, name)
+            val = SpiceRawParser.find_signal(ds, name, prefix=prefix)
             if val is None:
                 raise ValueError(f"Transient signal '{name}' not found.")
             return np.array(val)
@@ -545,7 +594,7 @@ class CalculatorDialog(QMainWindow):
         def sf(name, plot=None):
             """Generic signal fetcher for Frequency (AC) results."""
             ds = self.all_plots.get(plot, ac_plot) if plot else ac_plot
-            val = SpiceRawParser.find_signal(ds, name)
+            val = SpiceRawParser.find_signal(ds, name, prefix=prefix)
             if val is None:
                 raise ValueError(f"AC signal '{name}' not found.")
             return np.array(val)
@@ -553,7 +602,7 @@ class CalculatorDialog(QMainWindow):
         def sop(name, plot=None):
             """Generic signal fetcher for Operating Point results."""
             ds = self.all_plots.get(plot, op_plot) if plot else op_plot
-            val = SpiceRawParser.find_signal(ds, name)
+            val = SpiceRawParser.find_signal(ds, name, prefix=prefix)
             if val is None:
                 raise ValueError(f"OP signal '{name}' not found.")
             return val[0] if len(val) > 0 else None
@@ -561,7 +610,7 @@ class CalculatorDialog(QMainWindow):
         def sdc(name, plot=None):
             """Generic signal fetcher for DC sweep results."""
             ds = self.all_plots.get(plot, dc_plot) if plot else dc_plot
-            val = SpiceRawParser.find_signal(ds, name)
+            val = SpiceRawParser.find_signal(ds, name, prefix=prefix)
             if val is None:
                 raise ValueError(f"DC signal '{name}' not found.")
             return np.array(val)
@@ -621,12 +670,12 @@ class CalculatorDialog(QMainWindow):
         # Ensure core calculator functions/variables ALWAYS override everything else
         core_scope = {
             "v": v,
-            "vt": st,
-            "it": st,
-            "vf": sf,
-            "ifc": sf,
-            "vdc": sdc,
-            "op": sop,
+            "vt": vt,
+            "it": it,
+            "vf": vf,
+            "ifc": ifc,
+            "vdc": vdc,
+            "op": op,
             "st": st,
             "sf": sf,
             "sop": sop,

@@ -337,6 +337,27 @@ class LibraryWidget(QDockWidget):
                     # 4. List Views
                     for f in sorted(os.listdir(cell_path)):
                         f_path = os.path.join(cell_path, f)
+                        
+                        if f == "kicad" and os.path.isdir(f_path):
+                            sch_view_item = self._get_or_create_node(
+                                cell_node,
+                                "🔌 pcb_schematic",
+                                path_data=os.path.join(f_path, "kicad.kicad_sch"),
+                                node_type="KICAD_SCH",
+                                editable=is_path_editable,
+                            )
+                            sch_view_item.setToolTip(0, os.path.join(f_path, "kicad.kicad_sch"))
+
+                            pcb_view_item = self._get_or_create_node(
+                                cell_node,
+                                "🛤️ pcb_layout",
+                                path_data=os.path.join(f_path, "kicad.kicad_pcb"),
+                                node_type="KICAD_PCB",
+                                editable=is_path_editable,
+                            )
+                            pcb_view_item.setToolTip(0, os.path.join(f_path, "kicad.kicad_pcb"))
+                            continue
+
                         if os.path.isdir(f_path):
                             continue
 
@@ -391,6 +412,20 @@ class LibraryWidget(QDockWidget):
             return
         elif node_type == "REPORT":
             QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+            return
+        elif node_type in ["KICAD_SCH", "KICAD_PCB"]:
+            import subprocess
+            if not os.path.exists(path):
+                QMessageBox.warning(self, "Error", f"File not found: {path}")
+                return
+            
+            try:
+                if os.uname().sysname == "Darwin":
+                    subprocess.Popen(["open", path])
+                else:
+                    subprocess.Popen(["kicad", path])
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to open KiCad: {e}")
             return
         elif node_type in ["PYTHON", "NOTEBOOK"]:
             # Even if non-editable, viewing code might be okay, but user said
@@ -468,6 +503,13 @@ class LibraryWidget(QDockWidget):
                 menu.addSeparator()
                 rename_action = menu.addAction("Rename Cell...")
                 rename_action.triggered.connect(lambda: self._rename_cell(node_path))
+                
+                menu.addSeparator()
+                kicad_action = menu.addAction("Create KiCad Project...")
+                kicad_action.triggered.connect(lambda: self._create_kicad_project(node_path))
+                
+                sync_action = menu.addAction("Sync with KiCad...")
+                sync_action.triggered.connect(lambda: self._sync_with_kicad(node_path))
             elif node_type == "VIEW":
                 copy_action = menu.addAction("Copy View...")
                 copy_action.triggered.connect(lambda: self._copy_view(item))
@@ -566,6 +608,136 @@ class LibraryWidget(QDockWidget):
                     QMessageBox.warning(self, "Error", f"Failed to create view: {e}")
             else:
                 QMessageBox.warning(self, "Error", "View already exists!")
+
+    def _create_kicad_project(self, cell_path):
+        import shutil
+        template_dir = os.path.join(os.path.dirname(__file__), "assets", "kicad")
+        dest_dir = os.path.join(cell_path, "kicad")
+        
+        if os.path.exists(dest_dir):
+            QMessageBox.warning(self, "Error", "A KiCad project already exists in this cell!")
+            return
+            
+        if not os.path.exists(template_dir):
+            QMessageBox.warning(self, "Error", f"KiCad template not found at {template_dir}")
+            return
+            
+        try:
+            shutil.copytree(template_dir, dest_dir)
+            self._populate_library()
+            QMessageBox.information(self, "Success", "KiCad project created successfully!")
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to create KiCad project: {e}")
+
+    def _sync_with_kicad(self, cell_path):
+        import xml.etree.ElementTree as ET
+        import uuid
+        import re
+        
+        sch_svg_path = os.path.join(cell_path, "schematic.svg")
+        kicad_sch_path = os.path.join(cell_path, "kicad", "kicad.kicad_sch")
+        
+        if not os.path.exists(sch_svg_path):
+            QMessageBox.warning(self, "Error", "No schematic.svg found in this cell.")
+            return
+            
+        if not os.path.exists(kicad_sch_path):
+            QMessageBox.warning(self, "Error", "No KiCad project (kicad/kicad.kicad_sch) found in this cell.")
+            return
+
+        try:
+            tree = ET.parse(sch_svg_path)
+            root = tree.getroot()
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to parse schematic.svg: {e}")
+            return
+            
+        instances = []
+        for elem in root.iter("g"):
+            sym_name = elem.get("symbol_name")
+            inst_name = elem.get("name")
+            lib_path = elem.get("library_path")
+            
+            if not sym_name or not inst_name or not lib_path: 
+                continue
+            
+            abs_lib_path = None
+            if os.path.isabs(lib_path):
+                abs_lib_path = lib_path
+            else:
+                cand = os.path.normpath(os.path.join(cell_path, lib_path))
+                if os.path.exists(cand):
+                    abs_lib_path = cand
+                else:
+                    cand = os.path.normpath(os.path.join(self.project_dir, lib_path))
+                    if os.path.exists(cand):
+                        abs_lib_path = cand
+            
+            if abs_lib_path:
+                sub_cell_dir = os.path.dirname(abs_lib_path)
+                sub_kicad_sch = os.path.join(sub_cell_dir, "kicad", "kicad.kicad_sch")
+                if os.path.exists(sub_kicad_sch):
+                    rel_path = os.path.relpath(sub_kicad_sch, os.path.join(cell_path, "kicad"))
+                    instances.append({"name": inst_name, "path": rel_path})
+
+        if not instances:
+            QMessageBox.information(self, "Sync", "No KiCad sub-circuits found in schematic.svg.")
+            return
+
+        with open(kicad_sch_path, "r", encoding="utf-8") as f:
+            lines = f.read().split('\n')
+            
+        existing_sheets = set()
+        for line in lines:
+            m = re.search(r'\(property\s+"Sheetname"\s+"([^"]+)"', line)
+            if m:
+                existing_sheets.add(m.group(1))
+                
+        insert_idx = -1
+        for i in range(len(lines)-1, -1, -1):
+            if lines[i].strip() == ")":
+                insert_idx = i
+                break
+                
+        if insert_idx == -1:
+            QMessageBox.warning(self, "Error", "Malformed kicad_sch file (no closing paren).")
+            return
+            
+        new_blocks = []
+        x_base = 20.0
+        y_base = 20.0
+        x_offset = 30.0
+        idx = len(existing_sheets)
+        
+        for inst in instances:
+            if inst["name"] in existing_sheets:
+                continue
+                
+            x = x_base + (idx % 5) * x_offset
+            y = y_base + (idx // 5) * x_offset
+            sheet_uuid = str(uuid.uuid4())
+            
+            block = f"""  (sheet (at {x:.2f} {y:.2f}) (size 15 15) (fields_autoplaced)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0000))
+    (uuid {sheet_uuid})
+    (property "Sheetname" "{inst["name"]}" (at {x:.2f} {y-1:.2f} 0)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "{inst["path"]}" (at {x:.2f} {y+16:.2f} 0)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+  )"""
+            new_blocks.append(block)
+            idx += 1
+            
+        if new_blocks:
+            lines.insert(insert_idx, "\n".join(new_blocks))
+            with open(kicad_sch_path, "w", encoding="utf-8") as f:
+                f.write("\n".join(lines))
+            QMessageBox.information(self, "Success", f"Added {len(new_blocks)} KiCad hierarchical sheets!")
+        else:
+            QMessageBox.information(self, "Sync", "All sub-circuits are already synced.")
 
     def start_drag(self, supported_actions):
         selected = self.tree_widget.selectedItems()

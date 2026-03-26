@@ -1,11 +1,15 @@
 import os
 import pytest
 from PyQt6.QtWidgets import QApplication
+from PyQt6.QtCore import Qt, QEvent
+from PyQt6.QtGui import QKeyEvent
 from opens_suite.library import LibraryWidget
+from opens_suite.schematic_view import SchematicView
+from opens_suite.schematic_item import SchematicItem
 import xml.etree.ElementTree as ET
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def qapp():
     app = QApplication.instance()
     if app is None:
@@ -75,3 +79,43 @@ def test_bindkey_repopulation(qapp, tmp_path):
 
     assert "a" not in widget.bindkey_map
     assert "b" in widget.bindkey_map
+
+
+def test_shift_c_bindkey_places_symbol_without_scope_error(qapp, qtbot, tmp_path, monkeypatch):
+    symbol_path = tmp_path / "capacitor.svg"
+    symbol_path.write_text("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>")
+
+    class DummyLibraryDock:
+        def __init__(self, path):
+            self._path = str(path)
+
+        def get_symbol_by_bindkey(self, key):
+            if key == "c":
+                return self._path
+            return None
+
+    from PyQt6.QtWidgets import QWidget
+    import opens_suite.main_window as main_window_module
+
+    class DummyMainWindow(QWidget):
+        def __init__(self, path):
+            super().__init__()
+            self.library_dock = DummyLibraryDock(path)
+
+    monkeypatch.setattr(main_window_module, "MainWindow", DummyMainWindow)
+
+    host = DummyMainWindow(symbol_path)
+    view = SchematicView(host)
+    qtbot.addWidget(host)
+    qtbot.addWidget(view)
+
+    event = QKeyEvent(
+        QEvent.Type.KeyPress,
+        Qt.Key.Key_C,
+        Qt.KeyboardModifier.ShiftModifier,
+        "C",
+    )
+
+    view.keyPressEvent(event)
+
+    assert any(isinstance(item, SchematicItem) for item in view.scene().items())

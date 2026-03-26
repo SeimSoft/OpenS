@@ -1,4 +1,5 @@
 import os
+import re
 import qtawesome as qta
 import numpy as np
 import pyqtgraph as pg
@@ -17,13 +18,54 @@ from PyQt6.QtWidgets import (
     QMenu,
     QTextEdit,
 )
-from PyQt6.QtGui import QAction, QColor, QIcon
-from PyQt6.QtCore import Qt, pyqtSignal, QPointF
+from PyQt6.QtGui import QAction, QColor, QIcon, QShortcut, QKeySequence, QFontDatabase
+from PyQt6.QtCore import Qt, pyqtSignal, QPointF, QRectF
 
 # Set some global PyQtGraph configs for better performance
 pg.setConfigOption("antialias", False)  # Fast
 pg.setConfigOption("background", (20, 20, 20))
 pg.setConfigOption("foreground", "d")
+
+class RightClickRectViewBox(pg.ViewBox):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setMouseMode(pg.ViewBox.PanMode)
+
+    def wheelEvent(self, ev, axis=None):
+        if ev.modifiers() & Qt.KeyboardModifier.ShiftModifier:
+            super().wheelEvent(ev, axis=0)  # X-axis only when Shift is held
+        elif ev.modifiers() & Qt.KeyboardModifier.ControlModifier:
+            super().wheelEvent(ev, axis=1)  # Y-axis only when Ctrl is held
+        else:
+            super().wheelEvent(ev, axis=axis)
+
+    def mouseDragEvent(self, ev, axis=None):
+        if ev.button() == Qt.MouseButton.RightButton:
+            ev.accept()
+            p2 = ev.pos()
+            orig_p1 = ev.buttonDownPos(Qt.MouseButton.RightButton)
+
+            if ev.isStart():
+                self._rb_p1 = orig_p1
+                self.updateScaleBox(self._rb_p1, p2)
+            elif ev.isFinish():
+                self.rbScaleBox.hide()
+                if not hasattr(self, '_rb_p1') or self._rb_p1 is None:
+                    return
+                # pyqtgraph mapRectFromParent handles Scene/View mapping locally
+                rect = QRectF(QPointF(self._rb_p1), QPointF(p2)).normalized()
+                ax = self.childGroup.mapRectFromParent(rect)
+                self.showAxRect(ax)
+                self.axHistoryPointer += 1
+                self.axHistory = self.axHistory[:self.axHistoryPointer] + [self.viewRect()]
+                self._rb_p1 = None
+            else:
+                if hasattr(self, '_rb_p1') and self._rb_p1 is not None:
+                    self.updateScaleBox(self._rb_p1, p2)
+        else:
+            super().mouseDragEvent(ev, axis=axis)
+
+
 
 
 class SignalItem:
@@ -77,6 +119,7 @@ class WaveformViewer(QMainWindow):
         self.browser_dock = QDockWidget("Signals", self)
         self.signal_tree = QTreeWidget()
         self.signal_tree.setHeaderLabels(["Plot / Signal", "Value"])
+        self.signal_tree.setSelectionMode(QTreeWidget.SelectionMode.ExtendedSelection)
         self.signal_tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.signal_tree.customContextMenuRequested.connect(self._show_browser_menu)
         self.signal_tree.itemSelectionChanged.connect(self._on_tree_selection_changed)
@@ -92,16 +135,51 @@ class WaveformViewer(QMainWindow):
         self.measurements_dock = QDockWidget("Measurements", self)
         self.measurements_text = QTextEdit()
         self.measurements_text.setReadOnly(True)
-        # Use Monospace font for alignment
-        font = self.measurements_text.font()
-        font.setFamily("Courier New")
-        self.measurements_text.setFont(font)
+        # Use the platform's native fixed-pitch font for aligned measurements.
+        self.measurements_text.setFont(
+            QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont)
+        )
         self.measurements_dock.setWidget(self.measurements_text)
         self.addDockWidget(
             Qt.DockWidgetArea.BottomDockWidgetArea, self.measurements_dock
         )
 
         self.glw.scene().sigMouseMoved.connect(self.on_mouse_moved)
+        self.signal_tree.installEventFilter(self)
+
+    @staticmethod
+    def _fmt_si(value):
+        from opens_suite.design_points import DesignPoints
+
+        return DesignPoints._format_si(value)
+
+    def eventFilter(self, obj, event):
+        if obj == self.signal_tree and event.type() == event.Type.KeyPress:
+            if event.key() == Qt.Key.Key_Space:
+                self._handle_shift_space()
+                return True
+            if event.key() in (Qt.Key.Key_Delete, Qt.Key.Key_Backspace):
+                self._handle_delete()
+                return True
+        return super().eventFilter(obj, event)
+
+    def _handle_delete(self):
+        selected_items = self.signal_tree.selectedItems()
+        signals = []
+        plots = []
+        for item in selected_items:
+            if item.parent():  # It's a signal
+                signals.append(item.text(0))
+            else:  # It's a plot
+                plots.append(self.signal_tree.indexOfTopLevelItem(item))
+
+        for sig_name in signals:
+            self.remove_signal(sig_name, update_tree=False)
+
+        for plot_idx in sorted(plots, reverse=True):
+            self.remove_plot(plot_idx, update_tree=False)
+
+        self._update_tree()
 
     def on_mouse_moved(self, pos):
         self.last_mouse_scene_pos = pos
@@ -142,7 +220,7 @@ class WaveformViewer(QMainWindow):
                         continue
                 except TypeError:
                     continue
-                
+
                 dx = (sig.x - mx) / rx
                 dy = (sig.y - my) / ry
                 dist = dx**2 + dy**2
@@ -179,6 +257,14 @@ class WaveformViewer(QMainWindow):
                 self.hover_text_added_to = None
 
     def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Space:
+            self._handle_shift_space()
+            return
+
+        if event.key() in (Qt.Key.Key_Delete, Qt.Key.Key_Backspace):
+            self._handle_delete()
+            return
+
         key = event.text().upper()
         if key == "F":
             for p in self.plots:
@@ -189,6 +275,48 @@ class WaveformViewer(QMainWindow):
             self.handle_cursor_key(key)
         else:
             super().keyPressEvent(event)
+
+    def _handle_shift_space(self):
+        calc = self.parent()
+        if not hasattr(calc, 'script_edit'):
+            return
+
+        selected_items = self.signal_tree.selectedItems()
+        signals = []
+        for item in selected_items:
+            if item.parent():
+                signals.append(item.text(0))
+
+        if not signals:
+            return
+
+        script = calc.script_edit.toPlainText().strip()
+
+        matches = list(re.finditer(r"(subaxis|subfigure)\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)", script))
+        if matches:
+            max_row = max(int(m.group(2)) for m in matches)
+            new_row = max_row + 1
+
+            def repl(m):
+                func = m.group(1)
+                return f"{func}({new_row}, {m.group(3)})"
+            new_script = re.sub(r"(subaxis|subfigure)\s*\(\s*\d+\s*,\s*(\d+)\s*\)", repl, script)
+        elif script:
+            new_row = 2
+            new_script = f"subaxis(2, 1)\n{script}"
+        else:
+            new_row = 1
+            new_script = ""
+
+        if new_row > 1:
+            new_script += f"\nsubaxis({new_row}, {new_row})"
+
+        for sig in signals[:2]:  # Plot up to 2 signals
+            new_script += f"\nplot({sig}, label=\"{sig}\")"
+
+        new_script = new_script.strip()
+        calc.script_edit.setPlainText(new_script)
+        calc.evaluate()
 
     def handle_cursor_key(self, key):
         if key == "E":
@@ -300,11 +428,11 @@ class WaveformViewer(QMainWindow):
                     sy = sig.y[sort_idx]
                     if sx[0] <= mx <= sx[-1]:
                         y_val = np.interp(mx, sx, sy)
-                        vals.append(f"{sig.name}: y={y_val:.4g}")
+                        vals.append(f"{sig.name}: y={self._fmt_si(y_val)}")
                 except:
                     pass
 
-            text = "V-Line @ x={:.4g}\n".format(mx) + "\n".join(vals)
+            text = f"V-Line @ x={self._fmt_si(mx)}\n" + "\n".join(vals)
             self.markers_data[f"V_{mx}_{len(self.custom_markers)}"] = text
             self._update_measurements()
 
@@ -333,7 +461,7 @@ class WaveformViewer(QMainWindow):
                                     x_val = sig.x[c] - sy[c] * (
                                         sig.x[c + 1] - sig.x[c]
                                     ) / (sy[c + 1] - sy[c])
-                                xs.append(f"{x_val:.4g}")
+                                xs.append(self._fmt_si(x_val))
                             res = f"{sig.name}: x=" + ", ".join(xs)
                             if len(crossings) > 5:
                                 res += " ..."
@@ -341,7 +469,7 @@ class WaveformViewer(QMainWindow):
                     except:
                         pass
 
-            text = "H-Line @ y={:.4g}\n".format(my) + "\n".join(vals)
+            text = f"H-Line @ y={self._fmt_si(my)}\n" + "\n".join(vals)
             self.markers_data[f"H_{my}_{len(self.custom_markers)}"] = text
             self._update_measurements()
 
@@ -349,16 +477,18 @@ class WaveformViewer(QMainWindow):
         lines = []
         if "A" in self.markers_data:
             ax, ay = self.markers_data["A"]
-            lines.append(f"A: x={ax:.4g}, y={ay:.4g}")
+            lines.append(f"A: x={self._fmt_si(ax)}, y={self._fmt_si(ay)}")
         if "B" in self.markers_data:
             bx, by = self.markers_data["B"]
-            lines.append(f"B: x={bx:.4g}, y={by:.4g}")
+            lines.append(f"B: x={self._fmt_si(bx)}, y={self._fmt_si(by)}")
         if "A" in self.markers_data and "B" in self.markers_data:
             ax, ay = self.markers_data["A"]
             bx, by = self.markers_data["B"]
             dx = bx - ax
             dy = by - ay
-            lines.append(f"Delta (B-A): dx={dx:.4g}, dy={dy:.4g}")
+            lines.append(f"Delta (B-A): dx={self._fmt_si(dx)}, dy={self._fmt_si(dy)}")
+            if dx != 0:
+                lines.append(f"1/dx={self._fmt_si(1.0 / dx)}Hz")
 
         for k, v in self.markers_data.items():
             if k.startswith("V_") or k.startswith("H_"):
@@ -380,7 +510,7 @@ class WaveformViewer(QMainWindow):
         main_window = self.parent()
         while main_window and not hasattr(main_window, "simulate_action"):
             main_window = main_window.parent()
-            
+
         if main_window and hasattr(main_window, "simulate_action"):
             self.sim_action = main_window.simulate_action
             toolbar.addAction(self.sim_action)
@@ -395,51 +525,13 @@ class WaveformViewer(QMainWindow):
             self.sim_action.triggered.connect(self.runSimulationRequested.emit)
             toolbar.addAction(self.sim_action)
 
-        toolbar.addSeparator()
 
-        # Rect Zoom Mode (standard)
-        self.rect_zoom_action = QAction("Rect Zoom", self)
-        self.rect_zoom_action.setCheckable(True)
-        self.rect_zoom_action.setChecked(
-            False
-        )  # Default to False -> PanMode (right click scale/zoom, left click pan/click)
-        self.rect_zoom_action.triggered.connect(self._toggle_rect_zoom)
-        toolbar.addAction(self.rect_zoom_action)
-
-        toolbar.addSeparator()
-
-        self.cursor_a_action = QAction("Cursor A", self)
-        self.cursor_a_action.setCheckable(True)
-        self.cursor_a_action.triggered.connect(lambda: self.toggle_cursor("A"))
-        toolbar.addAction(self.cursor_a_action)
-
-        self.cursor_b_action = QAction("Cursor B", self)
-        self.cursor_b_action.setCheckable(True)
-        self.cursor_b_action.triggered.connect(lambda: self.toggle_cursor("B"))
-        toolbar.addAction(self.cursor_b_action)
-
-        toolbar.addSeparator()
-
-        self.probe_cursor_action = QAction("Probe Cursor", self)
-        self.probe_cursor_action.setCheckable(True)
-        self.probe_cursor_action.triggered.connect(lambda: self.toggle_cursor("Probe"))
-        toolbar.addAction(self.probe_cursor_action)
-
-    def _toggle_rect_zoom(self, checked):
-        mode = pg.ViewBox.RectMode if checked else pg.ViewBox.PanMode
-        for p in self.plots:
-            p.getViewBox().setMouseMode(mode)
 
     def _get_or_create_axis(self, idx):
         while len(self.plots) <= idx:
             # Create new plot
-            p = self.glw.addPlot(row=len(self.plots), col=0)
+            p = self.glw.addPlot(row=len(self.plots), col=0, viewBox=RightClickRectViewBox())
             p.showGrid(x=True, y=True, alpha=0.3)
-            p.getViewBox().setMouseMode(
-                pg.ViewBox.RectMode
-                if self.rect_zoom_action.isChecked()
-                else pg.ViewBox.PanMode
-            )
 
             # Sync X axis
             if len(self.plots) > 0:
@@ -477,11 +569,12 @@ class WaveformViewer(QMainWindow):
         self.signals[name] = SignalItem(name, x, y, item, axis_idx)
         self._update_tree()
 
-    def remove_signal(self, name):
+    def remove_signal(self, name, update_tree=True):
         if name in self.signals:
             sig = self.signals.pop(name)
             self.plots[sig.axis_idx].removeItem(sig.plot_data_item)
-            self._update_tree()
+            if update_tree:
+                self._update_tree()
 
     def move_signal(self, name, target_idx):
         if name in self.signals:
@@ -498,49 +591,43 @@ class WaveformViewer(QMainWindow):
             sig.axis_idx = target_idx
             self._update_tree()
 
-    def _highlight_signal(self, name):
-        """Highlight a signal by making it bold and bringing it to top."""
-        self.selected_signal = name
+    def _highlight_signals(self, names):
+        """Highlight signals by making them bold and bringing them to top."""
+        self.selected_signal = names[0] if names else None
         for sig_name, sig in self.signals.items():
-            # In pyqtgraph, pen is stored in opts['pen']
             old_pen = sig.plot_data_item.opts.get("pen")
 
-            if sig_name == name:
+            if sig_name in names:
                 width = 4
                 sig.plot_data_item.setZValue(10)
             else:
                 width = 1.5
                 sig.plot_data_item.setZValue(0)
 
-            # Create a new pen with the same color but different width
             new_pen = pg.mkPen(old_pen)
             new_pen.setWidthF(width)
             sig.plot_data_item.setPen(new_pen)
 
     def _on_tree_selection_changed(self):
         selected_items = self.signal_tree.selectedItems()
-        if not selected_items:
-            return
-
-        item = selected_items[0]
-        # Check if it's a signal item (has a parent)
-        if item.parent():
-            sig_name = item.text(0)
-            self._highlight_signal(sig_name)
+        selected_names = [item.text(0) for item in selected_items if item.parent()]
+        self._highlight_signals(selected_names)
 
     def _on_curve_clicked(self, name, curve_item, event):
         if event.button() != Qt.MouseButton.LeftButton:
             return
 
-        # Select in tree
+        modifiers = event.modifiers()
+        if not (modifiers & Qt.KeyboardModifier.ControlModifier or modifiers & Qt.KeyboardModifier.ShiftModifier):
+            self.signal_tree.clearSelection()
+
         match = self.signal_tree.findItems(
             name, Qt.MatchFlag.MatchExactly | Qt.MatchFlag.MatchRecursive
         )
         if match:
-            # Block signals to avoid recursion if we want, but here it's fine
-            self.signal_tree.setCurrentItem(match[0])
+            match[0].setSelected(True)
+            self.signal_tree.scrollToItem(match[0])
 
-        self._highlight_signal(name)
         event.accept()
 
     def _show_browser_menu(self, pos):
@@ -576,7 +663,7 @@ class WaveformViewer(QMainWindow):
             if action == del_plot_action:
                 self.remove_plot(plot_idx)
 
-    def remove_plot(self, idx):
+    def remove_plot(self, idx, update_tree=True):
         if 0 <= idx < len(self.plots):
             p = self.plots.pop(idx)
             # Remove all signals in this plot from self.signals
@@ -595,7 +682,8 @@ class WaveformViewer(QMainWindow):
                 if sig.axis_idx > idx:
                     sig.axis_idx -= 1
 
-            self._update_tree()
+            if update_tree:
+                self._update_tree()
 
     def _update_tree(self):
         self.signal_tree.clear()
@@ -644,13 +732,13 @@ class WaveformViewer(QMainWindow):
         msg = []
         if "A" in self.cursors:
             x_a = self.cursors["A"].value()
-            msg.append(f"A: {x_a:.4g}")
+            msg.append(f"A: {self._fmt_si(x_a)}")
         if "B" in self.cursors:
             x_b = self.cursors["B"].value()
-            msg.append(f"B: {x_b:.4g}")
+            msg.append(f"B: {self._fmt_si(x_b)}")
         if "A" in self.cursors and "B" in self.cursors:
             dx = abs(self.cursors["B"].value() - self.cursors["A"].value())
-            msg.append(f"dX: {dx:.4g}")
+            msg.append(f"dX: {self._fmt_si(dx)}")
 
         self.status.showMessage(" | ".join(msg) if msg else "Ready")
 

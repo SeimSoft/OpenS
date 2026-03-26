@@ -19,6 +19,7 @@ class Wire(QGraphicsLineItem):
         self.net_name = None
         self.voltage = None
         self.show_label = True
+        self.highlight_color = None  # QColor or None
 
     def _apply_pen(self):
         self.setPen(
@@ -53,6 +54,16 @@ class Wire(QGraphicsLineItem):
                     theme_manager.get_color("selection"),
                     2,
                     Qt.PenStyle.DashLine,
+                    Qt.PenCapStyle.RoundCap,
+                    Qt.PenJoinStyle.RoundJoin,
+                )
+            )
+        elif self.highlight_color is not None:
+            painter.setPen(
+                QPen(
+                    self.highlight_color,
+                    3,
+                    Qt.PenStyle.SolidLine,
                     Qt.PenCapStyle.RoundCap,
                     Qt.PenJoinStyle.RoundJoin,
                 )

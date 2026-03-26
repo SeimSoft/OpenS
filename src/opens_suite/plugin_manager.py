@@ -1,4 +1,5 @@
 import os
+from PyQt6.QtCore import QSettings
 from opens_suite.plugins.library_plugin import LibraryPlugin
 from opens_suite.plugins.properties_plugin import PropertiesPlugin
 from opens_suite.plugins.analysis_plugin import AnalysisPlugin
@@ -16,6 +17,14 @@ class PluginManager:
         self.plugins = []
 
     def load_plugins(self, force_load=None):
+        settings = QSettings("OpenS", "OpenS")
+        ai_enabled = str(settings.value("ai_features_enabled", "false")).lower() in (
+            "1",
+            "true",
+            "yes",
+            "on",
+        )
+
         # Instantiate plugins
         self.plugins = [
             LibraryPlugin(self.main_window),
@@ -27,10 +36,13 @@ class PluginManager:
             XycePlugin(self.main_window),
             VariablesPlugin(self.main_window),
             ResultsSelectionPlugin(self.main_window),
-            CopilotPlugin(self.main_window),
         ]
 
-        if "PYTEST_CURRENT_TEST" not in os.environ or (force_load and "McpPlugin" in force_load):
+        if ai_enabled:
+            self.plugins.append(CopilotPlugin(self.main_window))
+
+        should_load_mcp = ai_enabled or (force_load and "McpPlugin" in force_load)
+        if should_load_mcp:
             from opens_suite.plugins.mcp_plugin import McpPlugin
             self.plugins.append(McpPlugin(self.main_window))
 

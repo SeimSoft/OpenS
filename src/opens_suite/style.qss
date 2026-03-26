@@ -174,10 +174,13 @@ QTabBar::tab:selected {
   background: #ffffff;
   border-bottom: 2px solid #005A9C;
   color: #005A9C;
-  font-weight: bold;
 }
 QTabBar::tab:hover:!selected {
   background: #e2e6f0;
+}
+QTabBar::close-button:hover {
+  background: rgba(224, 96, 64, 180);
+  border-radius: 3px;
 }
 
 /* Status bar */

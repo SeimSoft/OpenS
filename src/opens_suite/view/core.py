@@ -74,12 +74,14 @@ class SchematicView(
     netSignalsPlotRequested = pyqtSignal(str)
     netProbed = pyqtSignal(str)
     simulationFinished = pyqtSignal()
-    openSubcircuitRequested = pyqtSignal(str)
+    openSubcircuitRequested = pyqtSignal(str, str)
+    returnToParentRequested = pyqtSignal()
     modificationChanged = pyqtSignal(bool)
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setScene(SchematicScene(self))
+        self.hierarchy_prefix = ""
 
         # Performance Optimizations
         self.setRenderHints(
